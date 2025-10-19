@@ -1,0 +1,9 @@
+{
+	"name": "@crawl-me-maybe/web",
+	"type": "module",
+	"main": "./index.ts",
+	"dependencies": {
+		"minify-xml": "^4.5.2",
+		"schema-dts": "^1.1.5"
+	}
+}
