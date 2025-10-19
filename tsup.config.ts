@@ -42,15 +42,12 @@ function readPkgDeps(pkg: string) {
 }
 
 export default [
-	// Core: shared types + utilities
-	pkgConfig("core"),
-
-	// Frontend helpers
-	pkgConfig("frontend", []),
+	// Sitemap plugin
+	pkgConfig("sitemap"),
 
 	// Sanity plugin (depends on react + sanity)
-	pkgConfig("sanity", ["react", "sanity"]),
+	pkgConfig("sanity-seo", ["react", "sanity"]),
 
-	// Vite plugin (depends on vite)
-	pkgConfig("vite", ["vite"]),
+	// Web utilities and schema markup
+	pkgConfig("web"),
 ];

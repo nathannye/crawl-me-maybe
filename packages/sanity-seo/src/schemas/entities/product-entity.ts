@@ -1,15 +1,15 @@
 import { defineType, defineField } from "sanity";
-import { createNote } from "../../../../../utils/create";
+// import { createNote } from "../../../../../utils/create";
 
 export const schemaMarkupProductFields = defineType({
 	name: "schemaMarkupProductFields",
 	title: "Product Fields",
 	type: "object",
 	fields: [
-		createNote({
-			description:
-				"Name, image, offers, aggregateRating, reviews, description, and SKU are automatically generated from the product data.",
-		}),
+		// createNote({
+		// 	description:
+		// 		"Name, image, offers, aggregateRating, reviews, description, and SKU are automatically generated from the product data.",
+		// }),
 		// defineField({
 		// 	name: "name",
 		// 	type: "string",

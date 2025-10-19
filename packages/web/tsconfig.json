@@ -1,0 +1,17 @@
+{
+	"compilerOptions": {
+		"target": "ES2020",
+		"module": "ESNext",
+		"moduleResolution": "Node",
+		"esModuleInterop": true,
+		"skipLibCheck": true,
+		"strict": true,
+		"baseUrl": ".",
+		"paths": {
+			"@crawl-me-maybe/sanity-plugin": ["packages/sanity-plugin/src"],
+			"@crawl-me-maybe/sitemap": ["packages/sitemap/src"],
+			"@crawl-me-maybe/schema": ["packages/schema/src"],
+			"~/*": ["./src/*"]
+		}
+	}
+}

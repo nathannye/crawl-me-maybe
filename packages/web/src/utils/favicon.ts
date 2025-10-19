@@ -1,6 +1,5 @@
 import type { SanityAssetDocument } from "@sanity/client";
-import sanityClient from "../../sanity-seo/client";
-import { urlFor } from "../../sanity-seo/utils/assets";
+import { urlFor } from "./sanity-image";
 
 export type Favicon = {
 	type: string;

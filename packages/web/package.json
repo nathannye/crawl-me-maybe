@@ -1,9 +1,28 @@
 {
 	"name": "@crawl-me-maybe/web",
+	"version": "0.0.1",
 	"type": "module",
-	"main": "./index.ts",
+	"main": "./dist/index.js",
+	"module": "./dist/index.mjs",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"files": [
+		"dist"
+	],
 	"dependencies": {
+		"@sanity-image/url-builder": "^1.0.0",
+		"@sanity/client": "^6.0.0",
+		"@sanity/image-url": "^1.2.0",
 		"minify-xml": "^4.5.2",
 		"schema-dts": "^1.1.5"
+	},
+	"peerDependencies": {
+		"@sanity/client": "^6.0.0"
 	}
 }

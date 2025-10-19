@@ -93,7 +93,7 @@ export function composeSchema({
 	extra,
 	isHomepage = false,
 }: ComposeSchemaProps): Thing[] {
-	const schemas: unknown[] = [];
+	const schemas: Thing[] = [];
 	const entities = new Set<string>(); // Track entities we've already added
 
 	// Extract base URL from seo data
@@ -105,7 +105,7 @@ export function composeSchema({
 		const schema = buildFn(entity) as Record<string, unknown>;
 		if (schema?.["@id"] && !entities.has(schema["@id"] as string)) {
 			entities.add(schema["@id"] as string);
-			schemas.push(schema);
+			schemas.push(schema as unknown as Thing);
 		}
 	};
 
@@ -234,7 +234,7 @@ export function composeSchema({
 					schemaDefaults?.publisher ||
 					schemaDefaults?.organization,
 				searchAction: schemaDefaults?.webSite?.searchAction,
-			}),
+			}) as unknown as Thing,
 		);
 	}
 
@@ -254,9 +254,9 @@ export function composeSchema({
 				seo,
 				schemaDefaults,
 				extra,
-			}),
+			}) as unknown as Thing,
 		);
 	}
 
-	return schemas.filter(Boolean);
+	return schemas.filter(Boolean) as Thing[];
 }

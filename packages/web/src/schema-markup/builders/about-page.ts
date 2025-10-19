@@ -33,7 +33,9 @@ export function buildAboutPage({
 		"@context": "https://schema.org",
 		"@type": "AboutPage",
 		name: name || (extra?.name as string | undefined),
-		description: coalesce(description, extra?.description) as string | undefined,
+		description: coalesce(description, extra?.description) as
+			| string
+			| undefined,
 		url: coalesce(seo.canonicalUrl, extra?.url) as string | undefined,
 		image,
 		inLanguage: coalesce(extra?.inLanguage, defaults.inLanguage) as

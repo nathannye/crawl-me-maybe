@@ -1,16 +1,23 @@
-// utils/image.ts
-import { urlFor } from "@local/sanity";
+import { urlFor } from "~/utils/sanity-image";
 import type { SanityImageAssetDocument } from "@sanity/client";
 import type { ImageObject } from "schema-dts";
 
-const formatImageUrl = (imageReference: string): ImageObject => {
-	if (!imageReference)
-		return { url: undefined, width: undefined, height: undefined };
+const formatImageUrl = (
+	imageReference: string,
+): {
+	url: string;
+	width: string;
+	height: string;
+} | null => {
+	if (!imageReference) return null;
 
 	const MAX_WIDTH = 2000;
 	const QUALITY = 85;
 
-	const [_, id, dimensions, _fileType] = imageReference.split("-");
+	const parts = imageReference.split("-");
+	if (parts.length < 3) return null;
+
+	const [_, id, dimensions, _fileType] = parts;
 	const [width, height] = dimensions.split("x").map(Number);
 	const aspectRatio = Number(width) / Number(height);
 
@@ -30,15 +37,15 @@ const formatImageUrl = (imageReference: string): ImageObject => {
 				.size(newWidth, newHeight)
 				.quality(QUALITY)
 				.url(),
-			width: newWidth,
-			height: newHeight,
+			width: String(newWidth),
+			height: String(newHeight),
 		};
 	}
 
 	return {
 		url: urlFor(imageReference).quality(QUALITY).url(),
-		width: w,
-		height: h,
+		width: String(w),
+		height: String(h),
 	};
 };
 
@@ -55,5 +62,13 @@ export function createSchemaImageObject(
 		? imageToUse.asset?._id
 		: imageToUse?.asset?._ref;
 
-	return { "@type": "ImageObject", ...formatImageUrl(reference || "") };
+	const imageData = formatImageUrl(reference || "");
+	if (!imageData) return undefined;
+
+	return {
+		"@type": "ImageObject",
+		url: imageData.url,
+		width: imageData.width,
+		height: imageData.height,
+	};
 }

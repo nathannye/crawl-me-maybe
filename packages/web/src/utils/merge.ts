@@ -1,6 +1,6 @@
 import type { SanityImageAssetDocument } from "@sanity/client";
 import { createMetaTitle } from "./meta-title";
-import { createFavicons, Favicon } from "./favicon";
+import { createFavicons, type Favicon } from "./favicon";
 
 /**
  * Type for SEO defaults from seoDefaults singleton

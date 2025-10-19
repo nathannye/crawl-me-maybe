@@ -1,9 +1,13 @@
-// schema/builders/event.ts
 import { createSchemaImageObject } from "../../utils";
 import type { MergedMetadata } from "../../utils/merge";
 import type { SchemaDefaults } from "../compose";
 import { coalesce } from "../schema-utils";
-import type { SchemaImage, SchemaPerson, SchemaOrganization } from "../types";
+import type {
+	SchemaImage,
+	SchemaPerson,
+	SchemaOrganization,
+	SchemaLocation,
+} from "../types";
 import { buildPersonOrOrg, formatSchemaDate } from "./utils";
 
 export function buildEvent({
@@ -31,17 +35,18 @@ export function buildEvent({
 	);
 
 	// Build location
-	const location = extra?.location
+	const locationData = extra?.location as SchemaLocation | undefined;
+	const location = locationData
 		? {
-				"@type": extra.location.url ? "VirtualLocation" : "Place",
-				name: extra.location.name,
-				url: extra.location.url,
-				address: extra.location.address,
-				geo: extra.location.geo
+				"@type": locationData.url ? "VirtualLocation" : "Place",
+				name: locationData.name,
+				url: locationData.url,
+				address: locationData.address,
+				geo: locationData.geo
 					? {
 							"@type": "GeoCoordinates",
-							latitude: extra.location.geo.latitude,
-							longitude: extra.location.geo.longitude,
+							latitude: locationData.geo.latitude,
+							longitude: locationData.geo.longitude,
 						}
 					: undefined,
 			}
@@ -77,8 +82,8 @@ export function buildEvent({
 		name: coalesce(name, extra?.name),
 		description: coalesce(description, extra?.description),
 		image,
-		startDate: formatSchemaDate(extra?.startDate),
-		endDate: formatSchemaDate(extra?.endDate),
+		startDate: formatSchemaDate(extra?.startDate as string | Date | undefined),
+		endDate: formatSchemaDate(extra?.endDate as string | Date | undefined),
 		eventStatus: extra?.eventStatus
 			? `https://schema.org/${extra.eventStatus}`
 			: undefined,
@@ -86,7 +91,7 @@ export function buildEvent({
 			extra?.eventAttendanceMode,
 			defaults.eventAttendanceMode,
 		)
-			? `https://schema.org/${extra.eventAttendanceMode || defaults.eventAttendanceMode}`
+			? `https://schema.org/${(extra?.eventAttendanceMode || defaults.eventAttendanceMode) as string}`
 			: undefined,
 		location,
 		organizer: organizerSchema,

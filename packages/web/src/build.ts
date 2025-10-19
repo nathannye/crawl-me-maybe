@@ -6,6 +6,7 @@ import {
 } from "./utils/merge";
 import { composeSchema, type SchemaDefaults } from "./schema-markup";
 import type { Thing } from "schema-dts";
+import { setConfig } from "./config";
 
 export type BuildSeoPayloadParams = {
 	globalDefaults?: SeoDefaults;
@@ -14,6 +15,8 @@ export type BuildSeoPayloadParams = {
 	pageSchemaType?: string;
 	extraSchemaData?: Record<string, unknown>;
 	isHomepage?: boolean;
+	projectId: string;
+	dataset: string;
 };
 
 export type BuildSeoPayloadResult = {
@@ -26,13 +29,21 @@ export type BuildSeoPayloadResult = {
  * Merges global defaults with page-specific metadata
  */
 export function buildSeoPayload({
+	pageSeo,
 	globalDefaults,
 	schemaDefaults,
-	pageSeo,
 	pageSchemaType = "WebPage",
-	extraSchemaData,
 	isHomepage = false,
+	extraSchemaData,
+	projectId,
+	dataset,
 }: BuildSeoPayloadParams): BuildSeoPayloadResult {
+	if (!projectId || !dataset) {
+		console.warn(
+			"No projectId or dataset provided to buildSeoPayload, favicons and image Objects will not be created",
+		);
+	}
+	setConfig({ projectId, dataset });
 	// Merge SEO data: page metadata overrides global defaults
 	const merged = mergeSeoData(pageSeo, globalDefaults);
 

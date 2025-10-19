@@ -5,6 +5,7 @@ import { DEFAULT_ROBOTS_TXT } from "./robots";
 import type { SitemapConfig, SitemapEntry } from "./types";
 
 const DEFAULT_CONFIG: SitemapConfig = {
+	domain: "https://yoursite.com",
 	outDir: "dist",
 	disableMinification: false,
 	sitemaps: { pages: async () => [] },
