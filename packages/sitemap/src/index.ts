@@ -6,20 +6,21 @@ import type { SitemapConfig, SitemapEntry } from "./types";
 
 const DEFAULT_CONFIG: SitemapConfig = {
 	outDir: "dist",
-	domain: "https://yourdomain.com",
 	disableMinification: false,
 	sitemaps: { pages: async () => [] },
 	robots: async () => DEFAULT_ROBOTS_TXT,
 };
 
-export default function sitemapPlugin(config: SitemapConfig = DEFAULT_CONFIG) {
+export default function crawlMeMaybeSitemap(
+	config: SitemapConfig = DEFAULT_CONFIG,
+) {
 	const domain = config?.domain;
 	if (!domain) {
-		throw new Error("Domain is required for sitemap generation");
+		console.log("⚠️ No domain provided, skipping sitemap generation");
+		return;
 	}
 
 	const outDir = config?.outDir || "dist";
-
 	const minify = !config?.disableMinification;
 
 	/**

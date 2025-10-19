@@ -1,34 +1,52 @@
 # SEO Sitemap Plugin Docs
 
 ## Overview
-A generic Node.js sitemap generation plugin for static sites and SSR apps. Outputs Google and SEO-friendly sitemap.xml and robots.txt files after build.
+A generic sitemap generation Vite plugin. Outputs sitemap.xml and robots.txt files after build.
+**This does not scan your directory for outputted routes, that approach only works for fully static sites. ISR and SSR are offlimits, hence I made this.**
 
-- **Framework-agnostic:** Works in any Node/Vite build script, not SolidJS-only.
-- **Customizable:** Single-callback or multi-sitemap object config.
-- **Fast:** Outputs static XML(s) to your `outDir`.
+- **Framework-agnostic:** Works in any Node/Vite build script. 
+- **Supports multiple sitemaps:** Single-callback or multi-sitemap object.
+
+---
+
+## Table of Contents
+
+- [Installation](#installation)
+- [Configuration](#configuration)
+  - [Vercel Output Directory](#vercel-output-directory)
+- [Usage: Single Sitemap (Callback)](#usage-single-sitemap-callback)
+- [Usage: Multi-Sitemap (Object)](#usage-multi-sitemap-object)
+  - [Why Not Arbitrary Splits?](#why-not-arbitrary-splits)
+- [API: SitemapEntry](#api-sitemapentry)
+- [Best Practices & Tips](#best-practices--tips)
+- [Example: Minimal Setup](#example-minimal-setup)
+- [License](#license)
 
 ---
 
 ## Installation
 
-Until this is published as a package, import locally:
+```
+pnpm i -D @crawl-me-maybe/sitemap
+```
 
 ```js
-import sitemapPlugin from "../../packages/seo/sitemap"; // Adjust path as needed
+import crawlMeMaybeSitemap from "@crawl-me-maybe/sitemap"; // Adjust path as needed
 ```
 
 ---
 
-## Config Options
+## Configuration
 
 | Name      | Type     | Required | Description                                                         |
 |-----------|----------|----------|---------------------------------------------------------------------|
-| domain    | string   | Yes      | The full site origin (e.g. `https://yoursite.com`); used in URLs    |
-| outDir    | string   | No       | Directory for output files. Recommend `.vercel/output/static` for Vercel; defaults to `dist` |
-| sitemaps  | Callback/Obj | Yes  | Your pages. See usage examples below                                |
+| `domain`    | string   | Yes      | The full site origin (e.g. `https://yoursite.com`); used in URLs    |
+| `outDir`   | string   | No       | Directory for output files. Recommend `.vercel/output/static` for Vercel; defaults to `dist` |
+| `sitemaps`  | Callback/Obj | Yes  | Your pages. See usage examples below                                |
+| `disableMinification` | Boolean | No | Minification is on by default, set this to true to stop XML from being minified. |
 
 
-### Recommended Vercel Output Directory
+### Vercel Output Directory
 For Vercel static deployments:
 ```js
 outDir: ".vercel/output/static"
@@ -58,7 +76,7 @@ This writes `sitemap.xml` and `robots.txt` in `outDir`.
 ---
 
 ## Usage: Multi-Sitemap (Object)
-If your site has *more than 50,000 URLs* (the maximum allowed per sitemap file by Google and other search engines), **do not split sitemaps arbitrarily by count**. Instead, split your sitemaps by logical content types—such as `pages`, `posts`, `products`, or other major sections of your site—using the object form:
+If your site has *more than 50K URLs* (the maximum allowed per sitemap file by Google and other search engines), **do not split sitemaps arbitrarily by count**. Instead, split your sitemaps by logical content types like `pages`, `posts`, `products`, etc.
 
 ```js
 sitemapPlugin({
@@ -71,22 +89,24 @@ sitemapPlugin({
   },
 });
 ```
-- Outputs one `sitemap-*.xml` per key, plus a `sitemap.xml` index.
-- This is best for very large or multi-sectioned sites, and makes it easier to debug SEO and manage crawl priorities.
-- Each child sitemap can hold up to 50,000 URLs. If one section exceeds that, segment further (e.g. `posts-1`, `posts-2`).
+The plugin outputs one `sitemap-[key].xml` per key, plus a `sitemap.xml` index.
+
 
 ### Why Not Arbitrary Splits?
-Splitting purely by number (`sitemap-001.xml`, `sitemap-002.xml`) is discouraged: search engines and SEOs prefer semantically meaningful sitemaps (content type, section, language, etc), which helps with crawl diagnostics and priority.
+Splitting purely by number (`sitemap-001.xml`, `sitemap-002.xml`) is discouraged: search engines prefer semantically meaningful sitemaps (content type, section, language, etc), which helps with crawl diagnostics and priority.
 
 ---
 
 ## API: SitemapEntry
-Each entry:
+Each entry only requires a url, other properties for bonus points:
 ```
 {
   url: string,       // e.g. "/blog/post-1"
   lastmod?: string,  // ISO or yyyy-mm-dd
-  changefreq?: "always" | "hourly" | "daily" | ...
+  changefreq?: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never"
+  imageUrls?: string[], 
+  videoUrls?: string[], 
+  priority?: number
 }
 ```
 
@@ -103,8 +123,10 @@ Each entry:
 ---
 
 ## Example: Minimal Setup
+
+### Basic (Any Node/Vite project)
 ```js
-import sitemapPlugin from "../../packages/seo/sitemap";
+import sitemapPlugin from "@crawl-me-maybe/sitemap";
 
 sitemapPlugin({
   domain: "https://mydomain.test",
@@ -116,6 +138,34 @@ sitemapPlugin({
   outDir: "dist", // or .vercel/output/static
 });
 ```
+
+---
+
+### With Sanity (Minimal)
+
+
+```js
+import sitemapPlugin from "@crawl-me-maybe/sitemap";
+import { createClient } from "path-to-sanity-client";
+
+const client = createClient({
+  projectId: "your_project_id",
+  dataset: "production",
+  apiVersion: "2025-10-15", // use today's date
+  useCdn: process.env.NODE_ENV === "production"
+});
+
+sitemapPlugin({
+  domain: "https://mydomain.test",
+  sitemaps: async () => {
+    // Fetch all published slugs for your content type(s)
+    const pages = await client.fetch(`*[_type == "page" && defined(slug.current)]{ "url": "/" + slug.current }`);
+    return pages;
+  },
+  outDir: "dist",
+});
+```
+
 
 ---
 

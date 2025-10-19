@@ -1,10 +1,15 @@
 {
   "name": "crawl-me-maybe",
   "version": "1.0.0",
-  "author": "Nathan Nye",
-  "main": "index.js",
+  "private": true,
+  "author": "Nathan Nye <you@email.com> (https://nathannye.com)",
   "license": "MIT",
-  "dependencies": {
-    
+  "main": "index.ts",
+  "workspaces": [
+    "packages/*"
+  ],
+  "devDependencies": {
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3"
   }
 }

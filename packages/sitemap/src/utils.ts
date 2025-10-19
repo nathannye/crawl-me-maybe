@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { SitemapEntry } from "../types";
+import type { SitemapEntry } from "./types";
 
 /**
  * Generates a sitemap.xml string from a list of SitemapEntry objects.
