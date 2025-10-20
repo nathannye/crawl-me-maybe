@@ -9,7 +9,7 @@ export type SanityImageConfig = {
 	dataset: string;
 };
 
-let imageConfig: SanityImageConfig | null = null;
+let imageConfig: SanityImageConfig
 
 /**
  * Initialize the Sanity image configuration

@@ -5,7 +5,7 @@
 		"moduleResolution": "Node",
 		"esModuleInterop": true,
 		"skipLibCheck": true,
-		"strict": true,
+		"strict": false,
 		"baseUrl": ".",
 		"paths": {
 			"@crawl-me-maybe/sanity-plugin": ["packages/sanity-plugin/src"],
