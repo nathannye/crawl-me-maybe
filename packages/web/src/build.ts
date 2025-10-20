@@ -9,9 +9,9 @@ import type { Thing } from "schema-dts";
 import { setConfig } from "./config";
 
 export type BuildSeoPayloadParams = {
-	globalDefaults?: SeoDefaults;
+	globalSeoDefaults?: SeoDefaults;
 	schemaDefaults?: SchemaDefaults;
-	pageSeo?: PageMetadata;
+	pageMetadata?: PageMetadata;
 	pageSchemaType?: string;
 	seoFieldName?: string;
 	extraSchemaData?: Record<string, unknown>;
@@ -30,8 +30,8 @@ export type BuildSeoPayloadResult = {
  * Merges global defaults with page-specific metadata
  */
 export function buildSeoPayload({
-	pageSeo,
-	globalDefaults,
+	pageMetadata,
+	globalSeoDefaults,
 	schemaDefaults,
 	pageSchemaType = "WebPage",
 	seoFieldName = "metadata",
@@ -48,7 +48,7 @@ export function buildSeoPayload({
 	
 	setConfig({ projectId, dataset });
 	// Merge SEO data: page metadata overrides global defaults
-	const merged = mergeSeoData(pageSeo, globalDefaults, seoFieldName);
+	const merged = mergeSeoData(pageMetadata, globalSeoDefaults, seoFieldName);
 
 	// Compose schema markup if defaults are provided
 	const schemas = schemaDefaults

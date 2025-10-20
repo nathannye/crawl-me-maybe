@@ -1,6 +1,8 @@
 # @crawl-me-maybe/web
 
-Web utilities and schema markup builders for SEO and structured data.
+>🚨 This library is under extremely active development, the structure of data is not set in stone, nor are exports in a final stage. I just needed this out of my turborepo folder 🙃.
+
+Web utilities and schema markup builders for Sanity driven data.
 
 ## Installation
 

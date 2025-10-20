@@ -1,4 +1,6 @@
-# SEO Sitemap Plugin Docs
+# SEO Sitemap Plugin
+
+
 
 ## Overview
 A generic sitemap generation Vite plugin. Outputs sitemap.xml and robots.txt files after build.

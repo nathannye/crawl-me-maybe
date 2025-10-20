@@ -25,7 +25,7 @@ export const seoDefaults = defineType({
 			title: "Site Title",
 			type: "string",
 			description:
-				"The title of the site. Used for the page title and the site title.",
+				"The title of the site. Used for each page and in schema markup.",
 			validation: (Rule) => Rule.required(),
 			group: "metadata",
 		}),
