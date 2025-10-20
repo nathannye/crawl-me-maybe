@@ -4,9 +4,16 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  '@crawl-me-maybe/web': link:packages/web
+
 importers:
 
   .:
+    dependencies:
+      '@crawl-me-maybe/web':
+        specifier: link:packages/web
+        version: link:packages/web
     devDependencies:
       tsup:
         specifier: ^8.5.0
@@ -15,7 +22,7 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  packages/sanity-seo:
+  packages/sanity:
     dependencies:
       '@sanity-image/url-builder':
         specifier: ^1.0.0
@@ -38,6 +45,9 @@ importers:
 
   packages/web:
     dependencies:
+      '@crawl-me-maybe/web':
+        specifier: 'link:'
+        version: 'link:'
       '@sanity-image/url-builder':
         specifier: ^1.0.0
         version: 1.0.0
