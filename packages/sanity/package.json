@@ -4,6 +4,19 @@
   "author": "Nathan Nye",
   "main": "./src/index.ts",
   "license": "MIT",
+  "publishConfig": {
+		"access": "public"
+	},
+  "exports": {
+		".": {
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"files": [
+		"dist"
+	],
   "dependencies": {
     "@sanity-image/url-builder": "^1.0.0",
     "@sanity/ui": "^3.1.10",

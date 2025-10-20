@@ -6,6 +6,19 @@
 	"author": "Nathan Nye <nathan@nye.design> (https://nye.design)",
   "license": "MIT",
 	"main": "./index.ts",
+	"exports": {
+		".": {
+			"import": "./dist/index.mjs",
+			"require": "./dist/index.js",
+			"types": "./dist/index.d.ts"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"publishConfig": {
+		"access": "public"
+	},
 	"dependencies": {
 		"minify-xml": "^4.5.2"
 	}
