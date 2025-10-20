@@ -4,9 +4,6 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
-overrides:
-  '@crawl-me-maybe/web': link:packages/web
-
 importers:
 
   .:
@@ -52,8 +49,8 @@ importers:
   packages/web:
     dependencies:
       '@crawl-me-maybe/web':
-        specifier: 'link:'
-        version: 'link:'
+        specifier: ^0.0.1
+        version: 0.0.1(@sanity/client@6.29.1)
       '@sanity-image/url-builder':
         specifier: ^1.0.0
         version: 1.0.0
@@ -701,6 +698,11 @@ packages:
   '@babel/types@7.28.4':
     resolution: {integrity: sha512-bkFqkLhh3pMBUQQkpVgWDWq/lqzc2678eUyDlTBhRqhCHFguYYGM0Efga7tYk4TogG/3x0EEl66/OQ+WGbWB/Q==}
     engines: {node: '>=6.9.0'}
+
+  '@crawl-me-maybe/web@0.0.1':
+    resolution: {integrity: sha512-NhDB3rJGGhd8PsvXAN9Yg0nreah7+qBeaMBM6DX7wcvCGUiUSwdyjYb0TGF770M+/c/oNkyzxupOL9R2+tZ9kQ==}
+    peerDependencies:
+      '@sanity/client': ^6.0.0
 
   '@csstools/color-helpers@5.1.0':
     resolution: {integrity: sha512-S11EXWJyy0Mz5SYvRmY8nJYTFFd1LCNV+7cXyAgQtOOuzb4EsgfqDufL+9esx72/eLhsRdGZwaldu/h+E4t4BA==}
@@ -5572,6 +5574,14 @@ snapshots:
     dependencies:
       '@babel/helper-string-parser': 7.27.1
       '@babel/helper-validator-identifier': 7.27.1
+
+  '@crawl-me-maybe/web@0.0.1(@sanity/client@6.29.1)':
+    dependencies:
+      '@sanity-image/url-builder': 1.0.0
+      '@sanity/client': 6.29.1
+      '@sanity/image-url': 1.2.0
+      minify-xml: 4.5.2
+      schema-dts: 1.1.5
 
   '@csstools/color-helpers@5.1.0': {}
 

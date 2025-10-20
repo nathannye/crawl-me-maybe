@@ -16,9 +16,7 @@
     "typescript": "^5.9.3"
   },
   "pnpm": {
-    "overrides": {
-      "@crawl-me-maybe/web": "link:packages/web"
-    }
+    "overrides": {}
   },
   "dependencies": {
     "@crawl-me-maybe/web": "link:packages/web"
