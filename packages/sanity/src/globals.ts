@@ -40,3 +40,4 @@ export const SCHEMA_MARKUP_TYPES = {
 	WebPage: { title: "WebPage", value: "WebPage", icon: MdPageview },
 	WebSite: { title: "WebSite", value: "WebSite", icon: MdWeb },
 };
+

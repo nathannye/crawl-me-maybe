@@ -1,6 +1,7 @@
 // schema/builders/webpage.ts
 import { createSchemaImageObject } from "../../utils";
 import type { MergedMetadata } from "../../utils/merge";
+import { automap } from "../automap";
 import type { SchemaDefaults } from "../compose";
 import { coalesce } from "../schema-utils";
 import type { SchemaImage } from "../types";
@@ -17,18 +18,20 @@ export function buildWebPage({
 	const defaults = schemaDefaults?.webPage || {};
 	const autoMap = schemaDefaults?.autoMap || {};
 
-	// Use auto-mapping if enabled
-	const name =
-		autoMap.title !== false ? seo.title : (extra?.name as string | undefined);
-	const description =
-		autoMap.description !== false
-			? seo.description
-			: (extra?.description as string | undefined);
+	const {title: name, description, image} = automap(autoMap, seo, extra);
 
-	const image = createSchemaImageObject(
-		autoMap.image !== false ? seo.metaImage : (extra?.image as SchemaImage),
-		schemaDefaults?.imageFallback,
-	);
+	// Use auto-mapping if enabled
+	// const name =
+	// 	autoMap.title !== false ? seo.title : (extra?.name as string | undefined);
+	// const description =
+	// 	autoMap.description !== false
+	// 		? seo.description
+	// 		: (extra?.description as string | undefined);
+
+	// const image = createSchemaImageObject(
+	// 	autoMap.image !== false ? seo.metaImage : (extra?.image as SchemaImage),
+	// 	schemaDefaults?.imageFallback,
+	// );
 
 	return {
 		"@context": "https://schema.org",

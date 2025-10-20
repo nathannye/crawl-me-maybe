@@ -1,4 +1,4 @@
-import InputWithGlobalDefault from "../../../components/core/InputWithGlobalDefault/InputWithGlobalDefault";
+import InputWithGlobalDefault from "../../../components/core/InputWithGlobalDefault";
 import PageSeoInput from "../../../components/core/PageSeoInput/PageSeoInput";
 
 export default {

@@ -1,11 +1,11 @@
 import { Box, Card, Flex, Text } from "@sanity/ui";
 import type { InputProps } from "sanity";
-import { useSeoDefaults } from "../../../context/SeoDefaultsContext";
+import { useSeoDefaults } from "../../context/SeoDefaultsContext";
 import { MdCheck, MdWarning } from "react-icons/md";
-import CardWithIcon from "../../partials/CardWithIcon";
+import CardWithIcon from "../partials/CardWithIcon";
 
-export default function InputWithGlobalDefault(props: InputProps) {
-	const defaults = useSeoDefaults();
+export default function SchemaFieldWithDefault(props: InputProps) {
+	const { schemaDefaults } = useSeoDefaults();
 
 	const defaultFieldName = props?.schemaType?.options?.matchingDefaultField;
 
@@ -17,7 +17,7 @@ export default function InputWithGlobalDefault(props: InputProps) {
 	}
 
 	const value = props?.value;
-	const hasDefault = defaultFieldName ? defaults?.[defaultFieldName] : false;
+	const hasDefault = defaultFieldName ? schemaDefaults?.[defaultFieldName] : false;
 
 	return (
 		<div>

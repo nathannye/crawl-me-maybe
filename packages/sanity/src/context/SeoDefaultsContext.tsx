@@ -11,28 +11,62 @@ const SeoDefaultsContext = createContext(null);
 
 export const SeoDefaultsProvider = ({ children }) => {
 	const client = useClient({ apiVersion: "2024-10-01" });
-	const [defaults, setDefaults] = useState(null);
+	const [defaults, setDefaults] = useState({
+		seoDefaults: null,
+		schemaDefaults: null,
+	});
 
 	const cleanup = useCallback(() => {
 		// return function for useEffect cleanup
-		if (cleanup.sub) {
-			cleanup.sub.unsubscribe();
+		if (cleanup.seoSub) {
+			cleanup.seoSub.unsubscribe();
+		}
+		if (cleanup.schemaSub) {
+			cleanup.schemaSub.unsubscribe();
 		}
 	}, []);
 
-	useEffect(() => {
-		const sub = client
-			.listen(`*[_type == "seoDefaults"][0]`)
+	const sub = (query: string, property: string) => {
+		return client
+			.listen(query)
 			.subscribe((update) => {
-				if (update.result) setDefaults(update.result);
+				if (update.result) {
+					setDefaults((prev) => ({
+						...prev,
+						[property]: update.result,
+					}));
+				}
 			});
-		cleanup.sub = sub;
+	};
 
-		client.fetch(`*[_type == "seoDefaults"][0]`).then(setDefaults);
+	useEffect(() => {
+		const seoSub = sub(`*[_type == "seoDefaults"][0]`, "seoDefaults");
+		const schemaSub = sub(`*[_type == "schemaMarkupDefaults"][0]`, "schemaDefaults");
+
+		cleanup.seoSub = seoSub;
+		cleanup.schemaSub = schemaSub;
+
+		client
+			.fetch(`*[_type == "seoDefaults"][0]`)
+			.then((seoDefaults) =>
+				setDefaults((prev) => ({
+					...prev,
+					seoDefaults,
+				})),
+			);
+
+		client
+			.fetch(`*[_type == "schemaMarkupDefaults"][0]`)
+			.then((schemaDefaults) =>
+				setDefaults((prev) => ({
+					...prev,
+					schemaDefaults,
+				})),
+			);
 
 		return cleanup;
 		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [client]); // cleaner will always be memoized since callback ref
+	}, [client]);
 
 	return (
 		<SeoDefaultsContext.Provider value={defaults}>

@@ -1,6 +1,7 @@
 // schema/builders/contact-page.ts
 import { createSchemaImageObject } from "../../utils";
 import type { MergedMetadata } from "../../utils/merge";
+import { automap } from "../automap";
 import type { SchemaDefaults } from "../compose";
 import { coalesce } from "../schema-utils";
 import type { SchemaImage } from "../types";
@@ -18,16 +19,18 @@ export function buildContactPage({
 	const autoMap = schemaDefaults?.autoMap || {};
 
 	// Use auto-mapping if enabled
-	const name =
-		autoMap.title !== false ? seo.title : (extra?.name as string | undefined);
-	const description =
-		autoMap.description !== false
-			? seo.description
-			: (extra?.description as string | undefined);
-	const image = createSchemaImageObject(
-		autoMap.image !== false ? seo.metaImage : (extra?.image as SchemaImage),
-		schemaDefaults?.imageFallback,
-	);
+	// const name =
+	// 	autoMap.title !== false ? seo.title : (extra?.name as string | undefined);
+	// const description =
+	// 	autoMap.description !== false
+	// 		? seo.description
+	// 		: (extra?.description as string | undefined);
+	// const image = createSchemaImageObject(
+	// 	autoMap.image !== false ? seo.metaImage : (extra?.image as SchemaImage),
+	// 	schemaDefaults?.imageFallback,
+	// );
+
+	const { title: name, description, image, dateModified, datePublished } = automap(autoMap, seo, extra);
 
 	return {
 		"@context": "https://schema.org",

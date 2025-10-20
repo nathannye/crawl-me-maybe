@@ -19,10 +19,14 @@ export type SeoDefaults = {
  * Type for page-level metadata
  * Based on apps/cms/plugins/schema-markup/src/schemas/fields/metadata/page-metadata.ts
  */
-export type PageMetadata = {
+
+type SanitySlug = { slug: { current?: string; fullUrl?: string } } | string;
+
+// This allows you to dynamically change the metadata field name on the page object
+export type PageMetadata<MetaKey extends string = "meta"> = {
+	schemaMarkup?: { type: string };
 	title: string;
-	schemaMarkup?: string;
-	metadata?: {
+	[metaKey in MetaKey]: {
 		description?: string;
 		canonicalUrl?: string;
 		metaImage?: SanityImageAssetDocument;
@@ -31,6 +35,7 @@ export type PageMetadata = {
 			noFollow?: boolean;
 		};
 	};
+	slug: SanitySlug;
 	_createdAt?: string;
 	_updatedAt?: string;
 };
@@ -43,7 +48,8 @@ export type MergedMetadata = {
 	favicons?: Favicon[] | null;
 	twitterHandle?: string;
 	robots?: string;
-	schemaMarkup?: string;
+	schemaMarkup?: string;	
+	siteTitle?: string;
 };
 
 const buildRobotsString = ({
@@ -63,10 +69,16 @@ const buildRobotsString = ({
 /**
  * Merges page-level metadata with SEO defaults,
  * Page metadata takes precedence over defaults
+ *
+ * The `seoObjectName` parameter tells us which key to look for on the page object.
+ * Typescript cannot statically verify the key, so types are a little looser at this access.
  */
-export const mergeSeoData = (
-	page?: PageMetadata,
+export const mergeSeoData = <
+	MetaKey extends string = "meta"
+>(
+	page?: PageMetadata<MetaKey>,
 	seoDefaults?: SeoDefaults,
+	seoObjectName: MetaKey = "meta" as MetaKey
 ): MergedMetadata => {
 	// If no data available, return minimal metadata
 	if (!page && !seoDefaults) {
@@ -76,6 +88,10 @@ export const mergeSeoData = (
 			description: undefined,
 		};
 	}
+
+	// -------- Dynamic meta key extraction --------
+	const pageMeta = page?.[seoObjectName as keyof PageMetadata<MetaKey>]
+	const schemaMarkupType = page?.schemaMarkup?.type;
 
 	// If only defaults available
 	if (!page) {
@@ -94,9 +110,9 @@ export const mergeSeoData = (
 		console.warn("mergeSeoData: No seoDefaults provided");
 		return {
 			title: page.title,
-			description: page.metadata?.description,
-			canonicalUrl: page.metadata?.canonicalUrl,
-			schemaMarkup: page.schemaMarkup,
+			description: pageMeta?.description,
+			canonicalUrl: pageMeta?.canonicalUrl,
+			schemaMarkup: schemaMarkupType,
 		};
 	}
 
@@ -106,17 +122,18 @@ export const mergeSeoData = (
 		title: createMetaTitle(
 			page.title,
 			seoDefaults.siteTitle,
-			seoDefaults.pageTitleTemplate,
+			seoDefaults.pageTitleTemplate
 		),
+		siteTitle: seoDefaults.siteTitle,
 		// Page metadata overrides defaults
-		description: page.metadata?.description || seoDefaults.metaDescription,
-		canonicalUrl: page.metadata?.canonicalUrl || seoDefaults.siteUrl,
-		metaImage: page.metadata?.metaImage,
+		description: pageMeta?.description || seoDefaults.metaDescription,
+		canonicalUrl: pageMeta?.canonicalUrl || seoDefaults.siteUrl,
+		metaImage: pageMeta?.metaImage,
 		favicons: createFavicons(seoDefaults.favicon),
 		twitterHandle: seoDefaults.twitterHandle,
 		robots: buildRobotsString(
-			page.metadata?.searchVisibility || { noIndex: false, noFollow: false },
+			pageMeta?.searchVisibility || { noIndex: false, noFollow: false }
 		),
-		schemaMarkup: page.schemaMarkup,
+		schemaMarkup: schemaMarkupType,
 	};
 };

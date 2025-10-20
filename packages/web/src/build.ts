@@ -13,6 +13,7 @@ export type BuildSeoPayloadParams = {
 	schemaDefaults?: SchemaDefaults;
 	pageSeo?: PageMetadata;
 	pageSchemaType?: string;
+	seoFieldName?: string;
 	extraSchemaData?: Record<string, unknown>;
 	isHomepage?: boolean;
 	projectId: string;
@@ -33,6 +34,7 @@ export function buildSeoPayload({
 	globalDefaults,
 	schemaDefaults,
 	pageSchemaType = "WebPage",
+	seoFieldName = "metadata",
 	isHomepage = false,
 	extraSchemaData,
 	projectId,
@@ -43,9 +45,10 @@ export function buildSeoPayload({
 			"No projectId or dataset provided to buildSeoPayload, favicons and image Objects will not be created",
 		);
 	}
+	
 	setConfig({ projectId, dataset });
 	// Merge SEO data: page metadata overrides global defaults
-	const merged = mergeSeoData(pageSeo, globalDefaults);
+	const merged = mergeSeoData(pageSeo, globalDefaults, seoFieldName);
 
 	// Compose schema markup if defaults are provided
 	const schemas = schemaDefaults

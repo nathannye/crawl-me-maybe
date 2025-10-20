@@ -157,7 +157,7 @@ export const schemaMarkupDefaults = defineType({
 			type: "object",
 			options: { collapsible: true, collapsed: true },
 			fields: [
-				{ name: "name", type: "string" },
+				// { name: "name", type: "string" },
 				// {
 				// 	name: "inLanguage",
 				// 	type: "string",

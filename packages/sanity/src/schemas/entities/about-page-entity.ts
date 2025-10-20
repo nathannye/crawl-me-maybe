@@ -1,4 +1,6 @@
 import { defineType, defineField } from "sanity";
+import { SchemaFieldWithDefault } from "~/components/core";
+
 
 export const schemaMarkupAboutPageFields = defineType({
 	name: "schemaMarkupAboutPageFields",
@@ -9,12 +11,26 @@ export const schemaMarkupAboutPageFields = defineType({
 			name: "name",
 			type: "string",
 			description: "Name of the about page (defaults to page title)",
+			// components: {
+			// 	input: SchemaFieldWithDefault
+			// }, 
+			// options: {
+			// 	automapName: 'description',
+			// 	matchingDefaultField: 'title'
+			// }
 		}),
 		defineField({
 			name: "description",
 			type: "text",
 			description:
 				"Description of the about page (defaults to meta description)",
+			// components: {
+			// 	input: SchemaFieldWithDefault
+			// }, 
+			// options: {
+			// 	matchingDefaultField: 'description',
+			// 	automapName: 'description'
+			// }
 		}),
 		defineField({
 			name: "inLanguage",
@@ -25,6 +41,7 @@ export const schemaMarkupAboutPageFields = defineType({
 			name: "datePublished",
 			type: "datetime",
 			description: "When the page was first published",
+
 		}),
 		defineField({
 			name: "dateModified",

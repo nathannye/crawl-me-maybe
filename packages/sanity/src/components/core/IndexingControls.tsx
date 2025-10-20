@@ -2,7 +2,7 @@ import type { ObjectInputProps } from "sanity";
 import { set } from "sanity";
 import { Button, Flex, Text, Card, Box, Stack } from "@sanity/ui";
 import { useCallback } from "react";
-import CardWithIcon from "../../partials/CardWithIcon";
+import { CardWithIcon } from "../partials";
 import { MdInfo, MdPlaylistRemove } from "react-icons/md";
 import { IoArrowRedo } from "react-icons/io5";
 
