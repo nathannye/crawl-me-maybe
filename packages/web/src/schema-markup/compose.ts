@@ -99,6 +99,8 @@ export function composeSchema({
 	// Extract base URL from seo data
 	const baseUrl = seo.canonicalUrl || "";
 
+	console.log('schema type::', seo)
+
 	// Helper to add entity schemas (Person, Organization) with @id
 	const addEntity = (entity: unknown, buildFn: (e: unknown) => unknown) => {
 		if (!entity) return;

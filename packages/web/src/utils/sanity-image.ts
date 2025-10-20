@@ -23,7 +23,7 @@ export function configureSanityImages(config: SanityImageConfig) {
  * Get the current Sanity image configuration
  */
 export function getImageConfig(): SanityImageConfig {
-	return imageConfig;
+	return imageConfig || { projectId: "", dataset: "" };
 }
 
 /**
