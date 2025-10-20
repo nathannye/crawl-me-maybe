@@ -9,10 +9,18 @@
     "packages/*"
   ],
   "scripts": {
-  "build": "tsup"
+    "build": "tsup"
   },
   "devDependencies": {
     "tsup": "^8.5.0",
     "typescript": "^5.9.3"
+  },
+  "pnpm": {
+    "overrides": {
+      "@crawl-me-maybe/web": "link:packages/web"
+    }
+  },
+  "dependencies": {
+    "@crawl-me-maybe/web": "link:packages/web"
   }
 }

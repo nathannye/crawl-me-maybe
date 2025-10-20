@@ -6,7 +6,7 @@ import fieldGroups from "./schemas/fields";
 import singleton from "./schemas/singleton";
 import SeoLayoutWrapper from "./components/core/SeoLayoutWrapper";
 
-export const crawlMeMaybe = definePlugin({
+export default definePlugin({
 	name: "crawl-me-maybe",
 
 	schema: {

@@ -70,8 +70,3 @@ export type {
 	SchemaLocation,
 	SchemaOffer,
 } from "~/schema-markup";
-
-// ----------------------------------------------------------------------------
-// Utilities
-// ----------------------------------------------------------------------------
-export { coalesce } from "./schema-markup/schema-utils";

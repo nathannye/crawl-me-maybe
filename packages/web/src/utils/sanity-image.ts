@@ -23,11 +23,6 @@ export function configureSanityImages(config: SanityImageConfig) {
  * Get the current Sanity image configuration
  */
 export function getImageConfig(): SanityImageConfig {
-	if (!imageConfig) {
-		throw new Error(
-			"Sanity image config not initialized. Call configureSanityImages() first.",
-		);
-	}
 	return imageConfig;
 }
 

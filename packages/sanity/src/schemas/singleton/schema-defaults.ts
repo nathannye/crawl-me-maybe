@@ -1,6 +1,7 @@
 import { AiOutlineGlobal } from "react-icons/ai";
 import { MdSettingsSuggest } from "react-icons/md";
 import { defineType, defineField } from "sanity";
+import { IoSparklesSharp } from "react-icons/io5";
 
 export const schemaMarkupDefaults = defineType({
 	name: "schemaMarkupDefaults",
@@ -12,6 +13,11 @@ export const schemaMarkupDefaults = defineType({
 			title: "Global Defaults",
 			default: true,
 			icon: AiOutlineGlobal,
+		},
+		{
+			name: "automapping",
+			title: "Automapping",
+			icon: IoSparklesSharp,
 		},
 		{
 			name: "type-specific",
@@ -106,9 +112,8 @@ export const schemaMarkupDefaults = defineType({
 		defineField({
 			name: "autoMap",
 			title: "Automatic Field Mapping",
-			group: "global",
+			group: "automapping",
 			type: "object",
-			options: { collapsible: true, collapsed: true },
 			fields: [
 				{
 					name: "title",
@@ -150,7 +155,7 @@ export const schemaMarkupDefaults = defineType({
 			title: "WebSite Defaults",
 			group: "type-specific",
 			type: "object",
-			options: { collapsible: true, collapsed: false },
+			options: { collapsible: true, collapsed: true },
 			fields: [
 				{ name: "name", type: "string" },
 				// {

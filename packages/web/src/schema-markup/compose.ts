@@ -253,7 +253,7 @@ export function composeSchema({
 			builders[type as keyof typeof builders]({
 				seo,
 				schemaDefaults,
-				extra,
+				extra, // this is fine, it just needs a good type to know what data you can roll down its pipeline and have it use
 			}) as unknown as Thing,
 		);
 	}

@@ -50,6 +50,7 @@ export function buildArticle({
 		schemaDefaults?.publisher,
 		schemaDefaults?.organization,
 	) as SchemaOrganization | undefined;
+
 	return {
 		"@context": "https://schema.org",
 		"@type": "Article",

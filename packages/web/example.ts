@@ -13,12 +13,6 @@ import {
 	type PageMetadata,
 } from "./src";
 
-// 1. Configure Sanity images (required if using Sanity assets)
-configureSanityImages({
-	projectId: "your-project-id",
-	dataset: "production",
-});
-
 // 2. Define your global SEO defaults
 const seoDefaults: SeoDefaults = {
 	siteTitle: "Awesome Company",
