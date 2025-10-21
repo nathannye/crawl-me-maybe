@@ -19,11 +19,9 @@
 		"dist"
 	],
 	"dependencies": {
-		"@crawl-me-maybe/web": "^0.0.1",
 		"@sanity-image/url-builder": "^1.0.0",
 		"@sanity/client": "^6.0.0",
 		"@sanity/image-url": "^1.2.0",
-		"minify-xml": "^4.5.2",
 		"schema-dts": "^1.1.5"
 	},
 	"peerDependencies": {

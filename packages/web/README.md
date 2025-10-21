@@ -111,7 +111,7 @@ const title = createMetaTitle(
 
 ### `createFavicons(favicon)`
 
-Creates multi-format favicons from a Sanity asset.
+Creates multi-format favicons from a Sanity asset. Feed SVG in, generate PNG + SVG.
 
 ### `createSchemaImageObject(image?, fallback?)`
 
