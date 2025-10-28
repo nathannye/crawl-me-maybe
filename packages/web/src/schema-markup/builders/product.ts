@@ -51,7 +51,9 @@ export function buildProduct({
 		name: name || (extra?.name as string | undefined),
 		description: description || (extra?.description as string | undefined),
 		image,
-		brand: buildOrgSchema(brand, true, seo.canonicalUrl), // Use reference
+		brand: brand
+			? buildOrgSchema(brand as any, true, seo.canonicalUrl)
+			: undefined, // Use reference
 		sku: extra?.sku as string | undefined,
 		mpn: extra?.mpn as string | undefined,
 		gtin: extra?.gtin as string | undefined,

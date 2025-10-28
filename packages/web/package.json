@@ -1,36 +1,36 @@
 {
-	"name": "@crawl-me-maybe/web",
-	"version": "0.0.6",
-	"type": "module",
-	"main": "./dist/index.js",
-	"module": "./dist/index.mjs",
-	"types": "./dist/index.d.ts",
-	"exports": {
-		".": {
-			"import": "./dist/index.mjs",
-			"require": "./dist/index.js",
-			"types": "./dist/index.d.ts"
-		}
-	},
-	"publishConfig": {
-		"access": "public"
-	},
-	"files": [
-		"dist"
-	],
-	"scripts": {
-		"build": "tsup"
-	},
-	"dependencies": {
-		"@sanity-image/url-builder": "^1.0.0",
-		"@sanity/client": "^6.0.0",
-		"@sanity/image-url": "^1.2.0",
-		"schema-dts": "^1.1.5"
-	},
-	"peerDependencies": {
-		"@sanity/client": "^6.0.0"
-	},
-	"devDependencies": {
-		"tsup": "^8.5.0"
-	}
+  "name": "@crawl-me-maybe/web",
+  "version": "0.0.6",
+  "type": "module",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup"
+  },
+  "dependencies": {
+    "@sanity-image/url-builder": "^1.0.0",
+    "@sanity/client": "^6.0.0",
+    "@sanity/image-url": "^1.2.0",
+    "schema-dts": "^1.1.5"
+  },
+  "peerDependencies": {
+    "@sanity/client": "^6.0.0"
+  },
+  "devDependencies": {
+    "tsup": "^8.5.0"
+  }
 }

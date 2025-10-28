@@ -49,7 +49,11 @@ export function buildSeoPayload({
 	setConfig({ projectId, dataset });
 
 	// Merge SEO data: page metadata overrides global defaults
-	const merged = mergeSeoData(pageMetadata, globalSeoDefaults, seoFieldName);
+	const merged = mergeSeoData(
+		pageMetadata,
+		globalSeoDefaults,
+		seoFieldName as any,
+	);
 
 	// Compose schema markup if defaults are provided
 	const schemas = schemaDefaults
