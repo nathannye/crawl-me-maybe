@@ -4,7 +4,7 @@
 	"version": "0.0.1",
 	"sideEffects": false,
 	"author": "Nathan Nye <nathan@nye.design> (https://nye.design)",
-  "license": "MIT",
+	"license": "MIT",
 	"main": "./index.ts",
 	"exports": {
 		".": {
@@ -16,10 +16,16 @@
 	"files": [
 		"dist"
 	],
+	"scripts": {
+		"build": "tsup"
+	},
 	"publishConfig": {
 		"access": "public"
 	},
 	"dependencies": {
 		"minify-xml": "^4.5.2"
+	},
+	"devDependencies": {
+		"tsup": "^8.5.0"
 	}
 }

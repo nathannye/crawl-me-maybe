@@ -1,13 +1,13 @@
 {
-  "name": "@crawl-me-maybe/sanity",
-  "version": "0.0.1",
-  "author": "Nathan Nye",
-  "main": "./src/index.ts",
-  "license": "MIT",
-  "publishConfig": {
+	"name": "@crawl-me-maybe/sanity",
+	"version": "0.0.1",
+	"author": "Nathan Nye",
+	"main": "./src/index.ts",
+	"license": "MIT",
+	"publishConfig": {
 		"access": "public"
 	},
-  "exports": {
+	"exports": {
 		".": {
 			"import": "./dist/index.mjs",
 			"require": "./dist/index.js",
@@ -17,11 +17,17 @@
 	"files": [
 		"dist"
 	],
-  "dependencies": {
-    "@sanity-image/url-builder": "^1.0.0",
-    "@sanity/ui": "^3.1.10",
-    "react": "18.3.1",
-    "react-icons": "^5.5.0",
-    "sanity": "^4.10.3"
-  }
+	"scripts": {
+		"build": "tsup"
+	},
+	"dependencies": {
+		"@sanity-image/url-builder": "^1.0.0",
+		"@sanity/ui": "^3.1.10",
+		"react": "18.3.1",
+		"react-icons": "^5.5.0",
+		"sanity": "^4.10.3"
+	},
+	"devDependencies": {
+		"tsup": "^8.5.0"
+	}
 }

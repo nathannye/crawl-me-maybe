@@ -26,7 +26,7 @@ coverage
 .next/
 out/
 build
-dist
+# Note: dist folders are committed for published packages
 
 
 # Debug
@@ -41,5 +41,5 @@ yarn-error.log*
 
 .npmrc
 
-#linters
-biome.json
+# linters
+# keep biome.json in repo

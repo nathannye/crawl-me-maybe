@@ -1,0 +1,11 @@
+#!/usr/bin/env sh
+. "$(dirname -- "$0")/_/husky.sh"
+
+# Run build for all packages after version bump
+pnpm build:packages
+
+# Add built files to git
+git add .
+
+# Amend the version commit to include built files
+git commit --amend --no-edit

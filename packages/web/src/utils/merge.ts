@@ -1,6 +1,6 @@
 import type { SanityImageAssetDocument } from "@sanity/client";
-import { createMetaTitle } from "./meta-title";
 import { createFavicons, type Favicon } from "./favicon";
+import { createMetaTitle } from "./meta-title";
 
 /**
  * Type for SEO defaults from seoDefaults singleton
@@ -26,6 +26,7 @@ type SanitySlug = { slug: { current?: string; fullUrl?: string } } | string;
 export type PageMetadata<MetaKey extends string = "meta"> = {
 	schemaMarkup?: { type: string };
 	title: string;
+} & {
 	[metaKey in MetaKey]: {
 		description?: string;
 		canonicalUrl?: string;
@@ -35,6 +36,7 @@ export type PageMetadata<MetaKey extends string = "meta"> = {
 			noFollow?: boolean;
 		};
 	};
+} & {
 	slug: SanitySlug;
 	_createdAt?: string;
 	_updatedAt?: string;
@@ -48,14 +50,17 @@ export type MergedMetadata = {
 	favicons?: Favicon[] | null;
 	twitterHandle?: string;
 	robots?: string;
-	schemaMarkup?: string;	
+	schemaMarkup?: string;
 	siteTitle?: string;
 };
 
 const buildRobotsString = ({
 	noIndex = false,
 	noFollow = false,
-}: { noIndex?: boolean; noFollow?: boolean }) => {
+}: {
+	noIndex?: boolean;
+	noFollow?: boolean;
+}) => {
 	const parts = [];
 
 	if (noIndex) parts.push("noindex");
@@ -73,12 +78,10 @@ const buildRobotsString = ({
  * The `seoObjectName` parameter tells us which key to look for on the page object.
  * Typescript cannot statically verify the key, so types are a little looser at this access.
  */
-export const mergeSeoData = <
-	MetaKey extends string = "meta"
->(
+export const mergeSeoData = <MetaKey extends string = "meta">(
 	page?: PageMetadata<MetaKey>,
 	seoDefaults?: SeoDefaults,
-	seoObjectName: MetaKey = "meta" as MetaKey
+	seoObjectName: MetaKey = "meta" as MetaKey,
 ): MergedMetadata => {
 	// If no data available, return minimal metadata
 	if (!page && !seoDefaults) {
@@ -90,7 +93,17 @@ export const mergeSeoData = <
 	}
 
 	// -------- Dynamic meta key extraction --------
-	const pageMeta = page?.[seoObjectName as keyof PageMetadata<MetaKey>]
+	const pageMeta = page?.[seoObjectName as keyof PageMetadata<MetaKey>] as
+		| {
+				description?: string;
+				canonicalUrl?: string;
+				metaImage?: SanityImageAssetDocument;
+				searchVisibility?: {
+					noIndex?: boolean;
+					noFollow?: boolean;
+				};
+		  }
+		| undefined;
 	const schemaMarkupType = page?.schemaMarkup?.type;
 
 	// If only defaults available
@@ -122,7 +135,7 @@ export const mergeSeoData = <
 		title: createMetaTitle(
 			page.title,
 			seoDefaults.siteTitle,
-			seoDefaults.pageTitleTemplate
+			seoDefaults.pageTitleTemplate,
 		),
 		siteTitle: seoDefaults.siteTitle,
 		// Page metadata overrides defaults
@@ -132,7 +145,7 @@ export const mergeSeoData = <
 		favicons: createFavicons(seoDefaults.favicon),
 		twitterHandle: seoDefaults.twitterHandle,
 		robots: buildRobotsString(
-			pageMeta?.searchVisibility || { noIndex: false, noFollow: false }
+			pageMeta?.searchVisibility || { noIndex: false, noFollow: false },
 		),
 		schemaMarkup: schemaMarkupType,
 	};

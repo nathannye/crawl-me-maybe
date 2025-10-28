@@ -18,6 +18,9 @@
 	"files": [
 		"dist"
 	],
+	"scripts": {
+		"build": "tsup"
+	},
 	"dependencies": {
 		"@sanity-image/url-builder": "^1.0.0",
 		"@sanity/client": "^6.0.0",
@@ -26,5 +29,8 @@
 	},
 	"peerDependencies": {
 		"@sanity/client": "^6.0.0"
+	},
+	"devDependencies": {
+		"tsup": "^8.5.0"
 	}
 }
