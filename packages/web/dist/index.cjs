@@ -776,7 +776,11 @@ function buildSeoPayload({
     );
   }
   setConfig({ projectId, dataset });
-  const merged = mergeSeoData(pageMetadata, globalSeoDefaults, seoFieldName);
+  const merged = mergeSeoData(
+    pageMetadata,
+    globalSeoDefaults,
+    seoFieldName
+  );
   const schemas = schemaDefaults ? composeSchema({
     seo: merged,
     schemaDefaults,
