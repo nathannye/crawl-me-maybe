@@ -31,6 +31,13 @@ export const createFavicons = (
 				href: pngFallback,
 			},
 		);
+	} else {
+		const png = urlFor(imageRef).size(32, 32).format("png").url();
+		favicons.push({
+			type: "image/png",
+			sizes: "32x32",
+			href: png,
+		});
 	}
 
 	return favicons;
