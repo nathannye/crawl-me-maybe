@@ -1,37 +1,47 @@
 {
-	"name": "crawl-me-maybe",
-	"version": "1.0.0",
-	"author": "Nathan Nye <nathan@nye.design> (https://nye.design)",
-	"license": "MIT",
-	"main": "index.ts",
-	"workspaces": [
-		"packages/*"
-	],
-	"scripts": {
-		"build": "tsup",
-		"build:packages": "pnpm -r build",
-		"prepare": "husky",
-		"precommit": "lint-staged",
-		"postversion": "pnpm build:packages && git add . && git commit --amend --no-edit",
-		"lint": "biome lint .",
-		"lint:fix": "biome lint . --write",
-		"format": "biome format . --write",
-		"format:check": "biome format . --check",
-		"version:patch": "pnpm version patch",
-		"version:minor": "pnpm version minor",
-		"version:major": "pnpm version major"
-	},
-	"devDependencies": {
-		"@types/node": "^24.8.1",
-		"@biomejs/biome": "^1.9.4",
-		"husky": "^9.1.7",
-		"lint-staged": "^16.2.6",
-		"tsup": "^8.5.0",
-		"typescript": "^5.9.3"
-	},
-	"lint-staged": {
-		"*.{ts,tsx,js,jsx,json,md,css}": [
-			"biome check --write"
-		]
-	}
+  "name": "crawl-me-maybe",
+  "version": "1.0.0",
+  "author": "Nathan Nye <nathan@nye.design> (https://nye.design)",
+  "license": "MIT",
+  "main": "index.ts",
+  "workspaces": [
+    "packages/*"
+  ],
+  "scripts": {
+    "build": "tsup",
+    "build:packages": "pnpm -r build",
+    "prepare": "husky",
+    "precommit": "lint-staged",
+    "postversion": "pnpm build:packages && git add . && git commit --amend --no-edit",
+    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "version:patch": "pnpm version patch",
+    "version:minor": "pnpm version minor",
+    "version:major": "pnpm version major"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.3.1",
+    "@types/node": "^24.8.1",
+    "@typescript-eslint/eslint-plugin": "^8.46.2",
+    "@typescript-eslint/parser": "^8.46.2",
+    "eslint": "^9.38.0",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.4",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.2.6",
+    "prettier": "^3.6.2",
+    "tsup": "^8.5.0",
+    "typescript": "^5.9.3"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,js,jsx}": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.{json,md,css}": [
+      "prettier --write"
+    ]
+  }
 }
