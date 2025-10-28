@@ -16,7 +16,6 @@ export default function ButtonSelector(props) {
 	const options = schemaType.options.list;
 
 	const handleChange = (option: string) => {
-		console.log(option);
 		onChange(set(option));
 	};
 

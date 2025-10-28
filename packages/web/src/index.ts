@@ -2,71 +2,63 @@
 // Main Entry Point: @crawl-me-maybe/web
 // ============================================================================
 
-// ----------------------------------------------------------------------------
-// Core Functions
-// ----------------------------------------------------------------------------
-export { buildSeoPayload } from "./build";
+// Schema Types
 export type {
-	BuildSeoPayloadParams,
-	BuildSeoPayloadResult,
-} from "./build";
-
+	SchemaAddress,
+	SchemaAggregateRating,
+	SchemaContactPoint,
+	SchemaDefaults,
+	SchemaFAQItem,
+	SchemaGeo,
+	SchemaImage,
+	SchemaLocation,
+	SchemaOffer,
+	SchemaOrganization,
+	SchemaPerson,
+	SchemaSearchAction,
+} from "~/schema-markup";
+// ----------------------------------------------------------------------------
+// Schema Markup
+// ----------------------------------------------------------------------------
+// Schema Builders
+export {
+	buildAboutPage,
+	buildArticle,
+	buildContactPage,
+	buildEvent,
+	buildFAQPage,
+	buildOrganization,
+	buildOrgSchema,
+	buildPersonOrOrg,
+	buildPersonSchema,
+	buildProduct,
+	buildWebPage,
+	buildWebSite,
+	composeSchema,
+	formatSchemaDate,
+	normalizeId,
+} from "~/schema-markup";
+export type {
+	Favicon,
+	MergedMetadata,
+	PageMetadata,
+	SeoDefaults,
+} from "~/utils";
 // ----------------------------------------------------------------------------
 // SEO Utilities
 // ----------------------------------------------------------------------------
 export {
-	mergeSeoData,
+	createFavicons,
 	createMetaTitle,
 	createSchemaImageObject,
-	createFavicons,
-	configureSanityImages,
-	getImageConfig,
+	mergeSeoData,
 	urlFor,
 } from "~/utils";
-
 export type {
-	SeoDefaults,
-	PageMetadata,
-	MergedMetadata,
-	Favicon,
-	SanityImageConfig,
-} from "~/utils";
-
+	BuildSeoPayloadParams,
+	BuildSeoPayloadResult,
+} from "./build";
 // ----------------------------------------------------------------------------
-// Schema Markup
+// Core Functions
 // ----------------------------------------------------------------------------
-export { composeSchema } from "~/schema-markup";
-export type { SchemaDefaults } from "~/schema-markup";
-
-// Schema Builders
-export {
-	buildWebPage,
-	buildWebSite,
-	buildArticle,
-	buildProduct,
-	buildEvent,
-	buildFAQPage,
-	buildOrganization,
-	buildPersonOrOrg,
-	buildAboutPage,
-	buildContactPage,
-	buildPersonSchema,
-	buildOrgSchema,
-	normalizeId,
-	formatSchemaDate,
-} from "~/schema-markup";
-
-// Schema Types
-export type {
-	SchemaImage,
-	SchemaAddress,
-	SchemaGeo,
-	SchemaAggregateRating,
-	SchemaPerson,
-	SchemaContactPoint,
-	SchemaOrganization,
-	SchemaFAQItem,
-	SchemaSearchAction,
-	SchemaLocation,
-	SchemaOffer,
-} from "~/schema-markup";
+export { buildSeoPayload } from "./build";

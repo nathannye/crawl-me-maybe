@@ -1,154 +1,5 @@
 import { buildSrc } from '@sanity-image/url-builder';
 
-// packages/web/src/utils/sanity-image.ts
-var imageConfig;
-function configureSanityImages(config2) {
-  imageConfig = config2;
-}
-function getImageConfig() {
-  return imageConfig || { projectId: "", dataset: "" };
-}
-function urlFor(imageRef) {
-  const config2 = getImageConfig();
-  const baseUrl = `https://cdn.sanity.io/images/${config2.projectId}/${config2.dataset}/`;
-  let width;
-  let height;
-  let format;
-  let quality;
-  const chain = {
-    size: (w, h) => {
-      width = w;
-      height = h;
-      return chain;
-    },
-    format: (fm) => {
-      format = fm;
-      return chain;
-    },
-    quality: (q) => {
-      quality = q;
-      return chain;
-    },
-    url: () => {
-      const result = buildSrc({
-        id: imageRef,
-        baseUrl,
-        width,
-        height,
-        queryParams: {
-          fm: format,
-          q: quality
-        }
-      });
-      return result?.src || "";
-    }
-  };
-  return chain;
-}
-
-// packages/web/src/utils/favicon.ts
-var createFavicons = (favicon) => {
-  if (!favicon?.asset) return null;
-  const favicons = [];
-  const imageRef = favicon.asset._ref || favicon.asset._id;
-  const [assetType, id, dimensions, fileType] = imageRef.split("-");
-  if (fileType === "svg") {
-    const svg = urlFor(imageRef).url();
-    const pngFallback = urlFor(imageRef).size(32, 32).format("png").url();
-    favicons.push(
-      {
-        type: "image/svg+xml",
-        href: svg
-      },
-      {
-        type: "image/png",
-        sizes: "32x32",
-        href: pngFallback
-      }
-    );
-  } else {
-    const png = urlFor(imageRef).size(32, 32).format("png").url();
-    console.log("png", png);
-    favicons.push({
-      type: "image/png",
-      sizes: "32x32",
-      href: png
-    });
-  }
-  return favicons;
-};
-
-// packages/web/src/utils/meta-title.ts
-var createMetaTitle = (pageTitle = "", siteTitle = "", template = "{pageTitle} | {siteTitle}") => {
-  let metaTitle = template.replace("{pageTitle}", pageTitle).replace("{siteTitle}", siteTitle);
-  metaTitle = metaTitle.replace(/\s*\|\s*$/, "").replace(/^\s*\|\s*/, "");
-  if (!metaTitle.trim()) {
-    metaTitle = siteTitle || pageTitle || "";
-  }
-  return metaTitle;
-};
-
-// packages/web/src/utils/merge.ts
-var buildRobotsString = ({
-  noIndex = false,
-  noFollow = false
-}) => {
-  const parts = [];
-  if (noIndex) parts.push("noindex");
-  if (noFollow) parts.push("nofollow");
-  if (parts.length === 0) return void 0;
-  return parts.join(",");
-};
-var mergeSeoData = (page, seoDefaults, seoObjectName = "meta") => {
-  if (!page && !seoDefaults) {
-    console.warn("mergeSeoData: No page or seoDefaults provided");
-    return {
-      title: void 0,
-      description: void 0
-    };
-  }
-  const pageMeta = page?.[seoObjectName];
-  const schemaMarkupType = page?.schemaMarkup?.type;
-  if (!page) {
-    console.warn("mergeSeoData: No page data provided");
-    return {
-      title: seoDefaults?.siteTitle,
-      description: seoDefaults?.metaDescription,
-      canonicalUrl: seoDefaults?.siteUrl,
-      favicons: createFavicons(seoDefaults?.favicon),
-      twitterHandle: seoDefaults?.twitterHandle
-    };
-  }
-  if (!seoDefaults) {
-    console.warn("mergeSeoData: No seoDefaults provided");
-    return {
-      title: page.title,
-      description: pageMeta?.description,
-      canonicalUrl: pageMeta?.canonicalUrl,
-      schemaMarkup: schemaMarkupType
-    };
-  }
-  return {
-    // Generate title using template
-    title: createMetaTitle(
-      page.title,
-      seoDefaults.siteTitle,
-      seoDefaults.pageTitleTemplate
-    ),
-    siteTitle: seoDefaults.siteTitle,
-    // Page metadata overrides defaults
-    description: pageMeta?.description || seoDefaults.metaDescription,
-    canonicalUrl: pageMeta?.canonicalUrl || seoDefaults.siteUrl,
-    metaImage: pageMeta?.metaImage,
-    favicons: createFavicons(seoDefaults.favicon),
-    twitterHandle: seoDefaults.twitterHandle,
-    robots: buildRobotsString(
-      pageMeta?.searchVisibility || { noIndex: false, noFollow: false }
-    ),
-    schemaMarkup: schemaMarkupType
-  };
-};
-
 // packages/web/src/schema-markup/automap.ts
 var fieldMappings = {
   title: "title",
@@ -213,6 +64,158 @@ function buildWebPage({
     } : void 0
   };
 }
+
+// packages/web/src/utils/meta-title.ts
+var createMetaTitle = (pageTitle = "", siteTitle = "", template = "{pageTitle} | {siteTitle}") => {
+  let metaTitle = template.replace("{pageTitle}", pageTitle).replace("{siteTitle}", siteTitle);
+  metaTitle = metaTitle.replace(/\s*\|\s*$/, "").replace(/^\s*\|\s*/, "");
+  if (!metaTitle.trim()) {
+    metaTitle = siteTitle || pageTitle || "";
+  }
+  return metaTitle;
+};
+
+// packages/web/src/config.ts
+var config = {};
+function setConfig(newConfig) {
+  config = { ...config, ...newConfig };
+}
+function getConfig() {
+  return config;
+}
+
+// packages/web/src/utils/sanity-image.ts
+function urlFor(imageRef) {
+  const config2 = getConfig();
+  const baseUrl = `https://cdn.sanity.io/images/${config2.projectId}/${config2.dataset}/`;
+  let width;
+  let height;
+  let format;
+  let quality = 100;
+  const chain = {
+    size: (w, h) => {
+      width = w;
+      height = h;
+      return chain;
+    },
+    format: (fm) => {
+      format = fm;
+      return chain;
+    },
+    quality: (q) => {
+      if (q) {
+        quality = q;
+      }
+      return chain;
+    },
+    url: () => {
+      const result = buildSrc({
+        id: imageRef,
+        baseUrl,
+        width,
+        height,
+        queryParams: {
+          fm: format,
+          q: quality
+        }
+      });
+      return result?.src || "";
+    }
+  };
+  return chain;
+}
+
+// packages/web/src/utils/favicon.ts
+var createFavicons = (favicon) => {
+  if (!favicon?.asset) return null;
+  const favicons = [];
+  const imageRef = favicon.asset._ref || favicon.asset._id;
+  const [assetType, id, dimensions, fileType] = imageRef.split("-");
+  if (fileType === "svg") {
+    const svg = urlFor(imageRef).url();
+    const pngFallback = urlFor(imageRef).size(32, 32).format("png").url();
+    favicons.push(
+      {
+        type: "image/svg+xml",
+        href: svg
+      },
+      {
+        type: "image/png",
+        sizes: "32x32",
+        href: pngFallback
+      }
+    );
+  } else {
+    const png = urlFor(imageRef).size(32, 32).format("png").url();
+    favicons.push({
+      type: "image/png",
+      sizes: "32x32",
+      href: png
+    });
+  }
+  return favicons;
+};
+
+// packages/web/src/utils/merge.ts
+var buildRobotsString = ({
+  noIndex = false,
+  noFollow = false
+}) => {
+  const parts = [];
+  if (noIndex) parts.push("noindex");
+  if (noFollow) parts.push("nofollow");
+  if (parts.length === 0) return void 0;
+  return parts.join(",");
+};
+var mergeSeoData = (page, seoDefaults, seoObjectName = "meta") => {
+  if (!page && !seoDefaults) {
+    console.warn("mergeSeoData: No page or seoDefaults provided");
+    return {
+      title: void 0,
+      description: void 0
+    };
+  }
+  const pageMeta = page?.[seoObjectName];
+  const schemaMarkupType = page?.schemaMarkup?.type;
+  if (!page) {
+    console.warn("mergeSeoData: No page data provided");
+    return {
+      title: seoDefaults?.siteTitle,
+      description: seoDefaults?.metaDescription,
+      canonicalUrl: seoDefaults?.siteUrl,
+      favicons: createFavicons(seoDefaults?.favicon),
+      twitterHandle: seoDefaults?.twitterHandle
+    };
+  }
+  if (!seoDefaults) {
+    console.warn("mergeSeoData: No seoDefaults provided");
+    return {
+      title: page.title,
+      description: pageMeta?.description,
+      canonicalUrl: pageMeta?.canonicalUrl,
+      schemaMarkup: schemaMarkupType
+    };
+  }
+  return {
+    // Generate title using template
+    title: createMetaTitle(
+      page.title,
+      seoDefaults.siteTitle,
+      seoDefaults.pageTitleTemplate
+    ),
+    siteTitle: seoDefaults.siteTitle,
+    // Page metadata overrides defaults
+    description: pageMeta?.description || seoDefaults.metaDescription,
+    canonicalUrl: pageMeta?.canonicalUrl || seoDefaults.siteUrl,
+    metaImage: pageMeta?.metaImage,
+    favicons: createFavicons(seoDefaults.favicon),
+    twitterHandle: seoDefaults.twitterHandle,
+    robots: buildRobotsString(
+      pageMeta?.searchVisibility || { noIndex: false, noFollow: false }
+    ),
+    schemaMarkup: schemaMarkupType
+  };
+};
 
 // packages/web/src/utils/image.ts
 var formatImageUrl = (imageReference) => {
@@ -753,12 +756,6 @@ function composeSchema({
   return schemas.filter(Boolean);
 }
 
-// packages/web/src/config.ts
-var config = {};
-function setConfig(newConfig) {
-  config = { ...config, ...newConfig };
-}
-
 // packages/web/src/build.ts
 function buildSeoPayload({
   pageMetadata,
@@ -791,6 +788,6 @@ function buildSeoPayload({
   };
 }
 
-export { buildAboutPage, buildArticle, buildContactPage, buildEvent, buildFAQPage, buildOrgSchema, buildOrganization, buildPersonOrOrg, buildPersonSchema, buildProduct, buildSeoPayload, buildWebPage, buildWebSite, composeSchema, configureSanityImages, createFavicons, createMetaTitle, createSchemaImageObject, formatSchemaDate, getImageConfig, mergeSeoData, normalizeId, urlFor };
+export { buildAboutPage, buildArticle, buildContactPage, buildEvent, buildFAQPage, buildOrgSchema, buildOrganization, buildPersonOrOrg, buildPersonSchema, buildProduct, buildSeoPayload, buildWebPage, buildWebSite, composeSchema, createFavicons, createMetaTitle, createSchemaImageObject, formatSchemaDate, mergeSeoData, normalizeId, urlFor };
 //# sourceMappingURL=index.mjs.map
 //# sourceMappingURL=index.mjs.map

@@ -24,18 +24,6 @@ yarn add @crawl-me-maybe/web
 
 ## Quick Start
 
-### 1. Configure Sanity Images (Optional)
-
-If you're using Sanity CMS images, configure the image builder first:
-
-```typescript
-import { configureSanityImages } from '@crawl-me-maybe/web';
-
-configureSanityImages({
-  projectId: 'your-project-id',
-  dataset: 'production'
-});
-```
 
 ### 2. Build SEO Payload
 
@@ -212,16 +200,11 @@ const value = coalesce(undefined, null, 'default', 'fallback');
 ```typescript
 import { 
   buildSeoPayload, 
-  configureSanityImages,
   type SeoDefaults,
   type SchemaDefaults
 } from '@crawl-me-maybe/web';
 
-// Configure (once at app startup)
-configureSanityImages({
-  projectId: process.env.SANITY_PROJECT_ID!,
-  dataset: process.env.SANITY_DATASET!
-});
+
 
 // Define your defaults
 const seoDefaults: SeoDefaults = {

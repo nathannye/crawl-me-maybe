@@ -1,12 +1,12 @@
+import type { Thing } from "schema-dts";
+import { getConfig, setConfig } from "./config";
+import { composeSchema, type SchemaDefaults } from "./schema-markup";
 import {
+	type MergedMetadata,
 	mergeSeoData,
 	type PageMetadata,
 	type SeoDefaults,
-	type MergedMetadata,
 } from "./utils/merge";
-import { composeSchema, type SchemaDefaults } from "./schema-markup";
-import type { Thing } from "schema-dts";
-import { setConfig } from "./config";
 
 export type BuildSeoPayloadParams = {
 	globalSeoDefaults?: SeoDefaults;
@@ -45,8 +45,9 @@ export function buildSeoPayload({
 			"No projectId or dataset provided to buildSeoPayload, favicons and image Objects will not be created",
 		);
 	}
-	
+
 	setConfig({ projectId, dataset });
+
 	// Merge SEO data: page metadata overrides global defaults
 	const merged = mergeSeoData(pageMetadata, globalSeoDefaults, seoFieldName);
 

@@ -93,17 +93,7 @@ export const mergeSeoData = <MetaKey extends string = "meta">(
 	}
 
 	// -------- Dynamic meta key extraction --------
-	const pageMeta = page?.[seoObjectName as keyof PageMetadata<MetaKey>] as
-		| {
-				description?: string;
-				canonicalUrl?: string;
-				metaImage?: SanityImageAssetDocument;
-				searchVisibility?: {
-					noIndex?: boolean;
-					noFollow?: boolean;
-				};
-		  }
-		| undefined;
+	const pageMeta = page?.[seoObjectName as keyof PageMetadata<MetaKey>];
 	const schemaMarkupType = page?.schemaMarkup?.type;
 
 	// If only defaults available

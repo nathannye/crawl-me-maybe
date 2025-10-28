@@ -33,7 +33,6 @@ export const createFavicons = (
 		);
 	} else {
 		const png = urlFor(imageRef).size(32, 32).format("png").url();
-		console.log("png", png);
 		favicons.push({
 			type: "image/png",
 			sizes: "32x32",
