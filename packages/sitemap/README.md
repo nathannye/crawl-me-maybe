@@ -1,6 +1,6 @@
 # SEO Sitemap Plugin
 
-
+> 🈳 Lang alternates are not _yet_ supported, but are in the works, stay tuned!
 
 ## Overview
 A generic sitemap generation Vite plugin. Outputs sitemap.xml and robots.txt files after build.
@@ -95,7 +95,7 @@ The plugin outputs one `sitemap-[key].xml` per key, plus a `sitemap.xml` index.
 
 
 ### Why Not Arbitrary Splits?
-Splitting purely by number (`sitemap-001.xml`, `sitemap-002.xml`) is discouraged: search engines prefer semantically meaningful sitemaps (content type, section, language, etc), which helps with crawl diagnostics and priority.
+Splitting purely by number (`sitemap-001.xml`, `sitemap-002.xml`) is discouraged: search engines prefer semantically meaningful sitemaps (content type, section, language, etc), which helps with crawl diagnostics and priority. Plus, if you're sorry ass has to look thru an xml sitemap, going through numeric ones to find what you need is a dreadful experience.
 
 ---
 
@@ -167,8 +167,6 @@ sitemapPlugin({
   outDir: "dist",
 });
 ```
-
-
 ---
 
 ## License

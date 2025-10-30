@@ -1,5 +1,3 @@
-
-
 var fs = require("fs");
 var path = require("path");
 
@@ -11,6 +9,13 @@ var fs__default = /*#__PURE__*/ _interopDefault(fs);
 var path__default = /*#__PURE__*/ _interopDefault(path);
 
 // packages/sitemap/src/index.ts
+
+// packages/sitemap/src/robots.ts
+var DEFAULT_ROBOTS_TXT = `User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+`;
 async function createSitemapXml(urls, opts) {
 	try {
 		const now = /* @__PURE__ */ new Date().toISOString();
@@ -107,13 +112,6 @@ var createFile = (outputPath, filename, content) => {
 		);
 	}
 };
-
-// packages/sitemap/src/robots.ts
-var DEFAULT_ROBOTS_TXT = `User-agent: *
-Allow: /
-Disallow: /admin
-Disallow: /api/
-`;
 
 // packages/sitemap/src/index.ts
 var DEFAULT_CONFIG = {

@@ -1,6 +1,6 @@
-import { buildSrc } from "@sanity-image/url-builder";
+var urlBuilder = require("@sanity-image/url-builder");
 
-// src/schema-markup/automap.ts
+// packages/web/src/schema-markup/automap.ts
 var fieldMappings = {
 	title: "title",
 	description: "description",
@@ -31,7 +31,7 @@ var automap = (automapSettings, baseSeoObject, extra) => {
 	return automappedValues;
 };
 
-// src/schema-markup/schema-utils.ts
+// packages/web/src/schema-markup/schema-utils.ts
 function coalesce(...values) {
 	for (const value of values) {
 		if (value !== void 0 && value !== null) return value;
@@ -39,7 +39,7 @@ function coalesce(...values) {
 	return void 0;
 }
 
-// src/schema-markup/builders/webpage.ts
+// packages/web/src/schema-markup/builders/webpage.ts
 function buildWebPage({ seo, schemaDefaults, extra }) {
 	const defaults = schemaDefaults?.webPage || {};
 	const autoMap = schemaDefaults?.autoMap || {};
@@ -64,7 +64,7 @@ function buildWebPage({ seo, schemaDefaults, extra }) {
 	};
 }
 
-// src/utils/meta-title.ts
+// packages/web/src/utils/meta-title.ts
 var createMetaTitle = (
 	pageTitle = "",
 	siteTitle = "",
@@ -80,7 +80,7 @@ var createMetaTitle = (
 	return metaTitle;
 };
 
-// src/config.ts
+// packages/web/src/config.ts
 var config = {};
 function setConfig(newConfig) {
 	config = { ...config, ...newConfig };
@@ -89,7 +89,7 @@ function getConfig() {
 	return config;
 }
 
-// src/utils/sanity-image.ts
+// packages/web/src/utils/sanity-image.ts
 function urlFor(imageRef) {
 	const config2 = getConfig();
 	const baseUrl = `https://cdn.sanity.io/images/${config2.projectId}/${config2.dataset}/`;
@@ -114,7 +114,7 @@ function urlFor(imageRef) {
 			return chain;
 		},
 		url: () => {
-			const result = buildSrc({
+			const result = urlBuilder.buildSrc({
 				id: imageRef,
 				baseUrl,
 				width,
@@ -130,7 +130,7 @@ function urlFor(imageRef) {
 	return chain;
 }
 
-// src/utils/favicon.ts
+// packages/web/src/utils/favicon.ts
 var createFavicons = (favicon) => {
 	if (!favicon?.asset) return null;
 	const favicons = [];
@@ -161,7 +161,7 @@ var createFavicons = (favicon) => {
 	return favicons;
 };
 
-// src/utils/merge.ts
+// packages/web/src/utils/merge.ts
 var buildRobotsString = ({ noIndex = false, noFollow = false }) => {
 	const parts = [];
 	if (noIndex) parts.push("noindex");
@@ -219,7 +219,7 @@ var mergeSeoData = (page, seoDefaults, seoObjectName = "meta") => {
 	};
 };
 
-// src/utils/image.ts
+// packages/web/src/utils/image.ts
 var formatImageUrl = (imageReference) => {
 	if (!imageReference) return null;
 	const MAX_WIDTH = 2e3;
@@ -270,7 +270,7 @@ function createSchemaImageObject(image, fallback) {
 	};
 }
 
-// src/schema-markup/builders/utils.ts
+// packages/web/src/schema-markup/builders/utils.ts
 function normalizeId(name) {
 	return name
 		.toLowerCase()
@@ -352,7 +352,7 @@ function formatSchemaDate(date) {
 	return date.toISOString();
 }
 
-// src/schema-markup/builders/article.ts
+// packages/web/src/schema-markup/builders/article.ts
 function buildArticle({ seo, schemaDefaults, extra }) {
 	const defaults = schemaDefaults?.article || {};
 	const autoMap = schemaDefaults?.autoMap || {};
@@ -407,7 +407,7 @@ function buildArticle({ seo, schemaDefaults, extra }) {
 	};
 }
 
-// src/schema-markup/builders/product.ts
+// packages/web/src/schema-markup/builders/product.ts
 function buildProduct({ seo, schemaDefaults, extra }) {
 	const defaults = schemaDefaults?.product || {};
 	const autoMap = schemaDefaults?.autoMap || {};
@@ -448,7 +448,7 @@ function buildProduct({ seo, schemaDefaults, extra }) {
 	};
 }
 
-// src/schema-markup/builders/event.ts
+// packages/web/src/schema-markup/builders/event.ts
 function buildEvent({ seo, schemaDefaults, extra }) {
 	const defaults = schemaDefaults?.event || {};
 	const autoMap = schemaDefaults?.autoMap || {};
@@ -515,7 +515,7 @@ function buildEvent({ seo, schemaDefaults, extra }) {
 	};
 }
 
-// src/schema-markup/builders/faq.ts
+// packages/web/src/schema-markup/builders/faq.ts
 function buildFAQPage({ seo, schemaDefaults, extra }) {
 	const autoMap = schemaDefaults?.autoMap || {};
 	const name = autoMap.title !== false ? seo.title : extra?.name;
@@ -547,7 +547,7 @@ function buildFAQPage({ seo, schemaDefaults, extra }) {
 	};
 }
 
-// src/schema-markup/builders/website.ts
+// packages/web/src/schema-markup/builders/website.ts
 function buildWebSite({ name, url, publisher, searchAction, inLanguage }) {
 	return {
 		"@context": "https://schema.org",
@@ -572,7 +572,7 @@ function buildWebSite({ name, url, publisher, searchAction, inLanguage }) {
 	};
 }
 
-// src/schema-markup/builders/organization.ts
+// packages/web/src/schema-markup/builders/organization.ts
 function buildOrganization(
 	organization,
 	schemaDefaults,
@@ -620,7 +620,7 @@ function buildOrganization(
 	};
 }
 
-// src/schema-markup/builders/about-page.ts
+// packages/web/src/schema-markup/builders/about-page.ts
 function buildAboutPage({ seo, schemaDefaults, extra }) {
 	const defaults = schemaDefaults?.webPage || {};
 	const autoMap = schemaDefaults?.autoMap || {};
@@ -650,7 +650,7 @@ function buildAboutPage({ seo, schemaDefaults, extra }) {
 	};
 }
 
-// src/schema-markup/builders/contact-page.ts
+// packages/web/src/schema-markup/builders/contact-page.ts
 function buildContactPage({ seo, schemaDefaults, extra }) {
 	const defaults = schemaDefaults?.webPage || {};
 	const autoMap = schemaDefaults?.autoMap || {};
@@ -680,7 +680,7 @@ function buildContactPage({ seo, schemaDefaults, extra }) {
 	};
 }
 
-// src/schema-markup/compose.ts
+// packages/web/src/schema-markup/compose.ts
 function composeSchema({
 	seo,
 	schemaDefaults,
@@ -811,7 +811,7 @@ function composeSchema({
 	return schemas.filter(Boolean);
 }
 
-// src/build.ts
+// packages/web/src/build.ts
 function buildSeoPayload({
 	pageMetadata,
 	globalSeoDefaults,
@@ -845,28 +845,26 @@ function buildSeoPayload({
 	};
 }
 
-export {
-	buildAboutPage,
-	buildArticle,
-	buildContactPage,
-	buildEvent,
-	buildFAQPage,
-	buildOrgSchema,
-	buildOrganization,
-	buildPersonOrOrg,
-	buildPersonSchema,
-	buildProduct,
-	buildSeoPayload,
-	buildWebPage,
-	buildWebSite,
-	composeSchema,
-	createFavicons,
-	createMetaTitle,
-	createSchemaImageObject,
-	formatSchemaDate,
-	mergeSeoData,
-	normalizeId,
-	urlFor,
-};
+exports.buildAboutPage = buildAboutPage;
+exports.buildArticle = buildArticle;
+exports.buildContactPage = buildContactPage;
+exports.buildEvent = buildEvent;
+exports.buildFAQPage = buildFAQPage;
+exports.buildOrgSchema = buildOrgSchema;
+exports.buildOrganization = buildOrganization;
+exports.buildPersonOrOrg = buildPersonOrOrg;
+exports.buildPersonSchema = buildPersonSchema;
+exports.buildProduct = buildProduct;
+exports.buildSeoPayload = buildSeoPayload;
+exports.buildWebPage = buildWebPage;
+exports.buildWebSite = buildWebSite;
+exports.composeSchema = composeSchema;
+exports.createFavicons = createFavicons;
+exports.createMetaTitle = createMetaTitle;
+exports.createSchemaImageObject = createSchemaImageObject;
+exports.formatSchemaDate = formatSchemaDate;
+exports.mergeSeoData = mergeSeoData;
+exports.normalizeId = normalizeId;
+exports.urlFor = urlFor;
 //# sourceMappingURL=index.js.map
 //# sourceMappingURL=index.js.map

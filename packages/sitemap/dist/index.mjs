@@ -2,6 +2,13 @@ import fs from 'fs';
 import path from 'path';
 
 // packages/sitemap/src/index.ts
+
+// packages/sitemap/src/robots.ts
+var DEFAULT_ROBOTS_TXT = `User-agent: *
+Allow: /
+Disallow: /admin
+Disallow: /api/
+`;
 async function createSitemapXml(urls, opts) {
   try {
     const now = (/* @__PURE__ */ new Date()).toISOString();
@@ -85,13 +92,6 @@ var createFile = (outputPath, filename, content) => {
     );
   }
 };
-
-// packages/sitemap/src/robots.ts
-var DEFAULT_ROBOTS_TXT = `User-agent: *
-Allow: /
-Disallow: /admin
-Disallow: /api/
-`;
 
 // packages/sitemap/src/index.ts
 var DEFAULT_CONFIG = {
