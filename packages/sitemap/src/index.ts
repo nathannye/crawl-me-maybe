@@ -66,7 +66,13 @@ export default function crawlMeMaybeSitemap(
 		const processedUrls =
 			locales && locales.length > 0
 				? generateLocalizedEntries(urls, locales, domain, localeMode)
-				: urls.map((u) => ({ ...u, url: domain + u.url }));
+				: urls.map((u) => {
+						// Normalize URL: ensure it starts with /
+						const normalizedUrl = u.url?.startsWith("/")
+							? u.url
+							: `/${u.url || ""}`;
+						return { ...u, url: domain + normalizedUrl };
+					});
 
 		const xml = await createSitemapXml(processedUrls, { minify });
 		createFile(outDir, filename, xml);

@@ -26,9 +26,14 @@ export function localizeUrl(
 	domain: string,
 	localeMode: "prefix" | "subdomain" = "prefix",
 ): string {
+	// Normalize baseUrl: ensure it starts with /
+	const normalizedUrl = baseUrl?.startsWith("/")
+		? baseUrl
+		: `/${baseUrl || ""}`;
+
 	// Default locale doesn't get modified
 	if (locale.default) {
-		return domain + baseUrl;
+		return domain + normalizedUrl;
 	}
 
 	if (localeMode === "subdomain") {
@@ -36,12 +41,12 @@ export function localizeUrl(
 		const urlObj = new URL(domain);
 		const hostname = urlObj.hostname.replace(/^www\./, "");
 		const subdomain = `${locale.code}.${hostname}`;
-		return `${urlObj.protocol}//${subdomain}${urlObj.port ? `:${urlObj.port}` : ""}${baseUrl}`;
+		return `${urlObj.protocol}//${subdomain}${urlObj.port ? `:${urlObj.port}` : ""}${normalizedUrl}`;
 	}
 
 	// Prefix mode: add locale to path
 	const prefix = `/${locale.code}`;
-	return domain + prefix + baseUrl;
+	return domain + prefix + normalizedUrl;
 }
 
 /**
