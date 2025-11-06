@@ -1,5 +1,3 @@
-import { Plugin } from 'vite';
-
 /**
  * Configuration for a locale/language.
  */
@@ -88,6 +86,10 @@ type SitemapConfig = {
 	localeMode?: "prefix" | "subdomain";
 };
 
-declare function crawlMeMaybeSitemap(config?: SitemapConfig): Plugin;
+declare function crawlMeMaybeSitemap(config?: SitemapConfig): {
+    name: string;
+    apply: "build";
+    closeBundle(): Promise<void>;
+};
 
 export { type LocaleConfig, type SitemapConfig, type SitemapEntry, crawlMeMaybeSitemap as default };

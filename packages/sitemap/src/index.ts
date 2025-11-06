@@ -1,6 +1,5 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { Plugin } from "vite";
 import { DEFAULT_ROBOTS_TXT } from "./robots";
 import type { LocaleConfig, SitemapConfig, SitemapEntry } from "./types";
 import {
@@ -23,7 +22,7 @@ const DEFAULT_CONFIG: SitemapConfig = {
 
 export default function crawlMeMaybeSitemap(
 	config: SitemapConfig = DEFAULT_CONFIG,
-): Plugin {
+) {
 	const domain = config?.domain;
 	if (!domain) {
 		throw new Error(
