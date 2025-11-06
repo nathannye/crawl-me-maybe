@@ -1,7 +1,6 @@
 {
   "name": "@crawl-me-maybe/sitemap",
-  "type": "module",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "sideEffects": false,
   "author": "Nathan Nye <nathan@nye.design> (https://nye.design)",
   "license": "MIT",

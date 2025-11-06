@@ -13,8 +13,6 @@
     "prepare": "husky",
     "precommit": "lint-staged",
     "postversion": "pnpm build:packages && git add . && git commit --amend --no-edit",
-    "lint": "eslint . --ext .ts,.tsx,.js,.jsx",
-    "lint:fix": "eslint . --ext .ts,.tsx,.js,.jsx --fix",
     "version:patch": "pnpm version patch",
     "version:minor": "pnpm version minor",
     "version:major": "pnpm version major"
