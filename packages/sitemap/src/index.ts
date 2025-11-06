@@ -69,7 +69,7 @@ export default function crawlMeMaybeSitemap(
 				: urls.map((u) => ({ ...u, url: domain + u.url }));
 
 		const xml = await createSitemapXml(processedUrls, { minify });
-		createFile(outDir, `${filename}.xml`, xml);
+		createFile(outDir, filename, xml);
 	};
 
 	return {
@@ -104,7 +104,7 @@ export default function crawlMeMaybeSitemap(
 				{ minify },
 			);
 			createFile(outDir, "sitemap.xml", indexXml);
-			await createRobots(["/sitemap.xml", ...allSitemaps]);
+			await createRobots(["/sitemap.xml"]);
 			console.log(
 				`✅ Generated ${allSitemaps.length} sitemaps + index + robots.txt`,
 			);
