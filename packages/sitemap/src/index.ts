@@ -1,8 +1,17 @@
 import fs from "node:fs";
 import path from "node:path";
+import type { Plugin } from "vite";
 import { DEFAULT_ROBOTS_TXT } from "./robots";
-import type { SitemapConfig, SitemapEntry } from "./types";
-import { createFile, createIndexSitemap, createSitemapXml } from "./utils";
+import type { LocaleConfig, SitemapConfig, SitemapEntry } from "./types";
+import {
+	createFile,
+	createIndexSitemap,
+	createSitemapXml,
+	generateLocalizedEntries,
+} from "./utils";
+
+// Export types for consumers
+export type { LocaleConfig, SitemapConfig, SitemapEntry };
 
 const DEFAULT_CONFIG: SitemapConfig = {
 	domain: "https://yoursite.com",
@@ -14,15 +23,18 @@ const DEFAULT_CONFIG: SitemapConfig = {
 
 export default function crawlMeMaybeSitemap(
 	config: SitemapConfig = DEFAULT_CONFIG,
-) {
+): Plugin {
 	const domain = config?.domain;
 	if (!domain) {
-		console.log("⚠️ No domain provided, skipping sitemap generation");
-		return;
+		throw new Error(
+			"⚠️ No domain provided. Sitemap generation requires a domain.",
+		);
 	}
 
 	const outDir = config?.outDir || "dist";
 	const minify = !config?.disableMinification;
+	const locales = config?.locales;
+	const localeMode = config?.localeMode || "prefix";
 
 	/**
 	 * Creates robots.txt handling custom async/user rules and always adds sitemaps at the end.
@@ -51,13 +63,19 @@ export default function crawlMeMaybeSitemap(
 	};
 
 	const createSitemap = async (filename: string, urls: SitemapEntry[]) => {
-		const xml = await createSitemapXml(urls, { minify });
+		// Apply localization if configured
+		const processedUrls =
+			locales && locales.length > 0
+				? generateLocalizedEntries(urls, locales, domain, localeMode)
+				: urls.map((u) => ({ ...u, url: domain + u.url }));
+
+		const xml = await createSitemapXml(processedUrls, { minify });
 		createFile(outDir, `${filename}.xml`, xml);
 	};
 
 	return {
 		name: "vite-plugin-sitemap",
-		apply: "build",
+		apply: "build" as const,
 		async closeBundle() {
 			const outDir = path.resolve(process.cwd(), config?.outDir || "dist");
 			fs.mkdirSync(outDir, { recursive: true });

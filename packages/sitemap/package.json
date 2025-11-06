@@ -1,31 +1,34 @@
 {
-	"name": "@crawl-me-maybe/sitemap",
-	"type": "module",
-	"version": "0.0.2",
-	"sideEffects": false,
-	"author": "Nathan Nye <nathan@nye.design> (https://nye.design)",
-	"license": "MIT",
-	"main": "./index.ts",
-	"exports": {
-		".": {
-			"import": "./dist/index.mjs",
-			"require": "./dist/index.js",
-			"types": "./dist/index.d.ts"
-		}
-	},
-	"files": [
-		"dist"
-	],
-	"scripts": {
-		"build": "tsup"
-	},
-	"publishConfig": {
-		"access": "public"
-	},
-	"dependencies": {
-		"minify-xml": "^4.5.2"
-	},
-	"devDependencies": {
-		"tsup": "^8.5.0"
-	}
+  "name": "@crawl-me-maybe/sitemap",
+  "type": "module",
+  "version": "0.0.3",
+  "sideEffects": false,
+  "author": "Nathan Nye <nathan@nye.design> (https://nye.design)",
+  "license": "MIT",
+  "main": "./index.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsup"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.1",
+    "terser": "^5.37.0",
+    "tsup": "^8.5.0",
+    "vite": "^6.0.1"
+  },
+  "peerDependencies": {
+    "vite": "^5.0.0 || ^6.0.0"
+  }
 }

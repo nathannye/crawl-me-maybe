@@ -1,3 +1,15 @@
+import { Plugin } from 'vite';
+
+/**
+ * Configuration for a locale/language.
+ */
+type LocaleConfig = {
+	/** Language/locale code (e.g., 'en', 'fr', 'es') */
+	code: string;
+	/** Whether this is the default locale (doesn't get prefix/subdomain) */
+	default?: boolean;
+};
+
 /**
  * An entry describing a page for the sitemap.
  * See: https://www.sitemaps.org/protocol.html
@@ -31,6 +43,11 @@ type SitemapEntry = {
 	 * See: https://www.sitemaps.org/protocol.html#prioritydef
 	 */
 	priority?: number;
+	/**
+	 * Optional: If true, this entry will not be localized even if locales are configured.
+	 * Useful for pages that shouldn't have language variants (e.g., /sitemap.xml)
+	 */
+	skipLocalization?: boolean;
 };
 
 /**
@@ -58,12 +75,19 @@ type SitemapConfig = {
 	 * (Optional) If true, disables minification for all output XML. Defaults to false (so XML is minified by default for SEO best practices).
 	 */
 	disableMinification?: boolean;
+	/**
+	 * (Optional) Array of locale configurations for multi-language support.
+	 * If provided, the plugin will generate locale variants for each URL.
+	 */
+	locales?: LocaleConfig[];
+	/**
+	 * (Optional) How to format localized URLs. Defaults to 'prefix'.
+	 * - 'prefix': Adds locale code as path prefix (e.g., /fr/about)
+	 * - 'subdomain': Adds locale code as subdomain (e.g., fr.example.com/about)
+	 */
+	localeMode?: "prefix" | "subdomain";
 };
 
-declare function crawlMeMaybeSitemap(config?: SitemapConfig): {
-    name: string;
-    apply: string;
-    closeBundle(): Promise<void>;
-} | undefined;
+declare function crawlMeMaybeSitemap(config?: SitemapConfig): Plugin;
 
-export { crawlMeMaybeSitemap as default };
+export { type LocaleConfig, type SitemapConfig, type SitemapEntry, crawlMeMaybeSitemap as default };

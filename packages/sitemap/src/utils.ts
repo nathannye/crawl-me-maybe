@@ -1,6 +1,55 @@
 import fs from "node:fs";
 import path from "node:path";
-import type { SitemapEntry } from "./types";
+import type { LocaleConfig, SitemapEntry } from "./types";
+
+/**
+ * Minifies XML by removing unnecessary whitespace.
+ * Lightweight alternative to heavy minification libraries.
+ */
+function minifyXml(xml: string): string {
+	return xml
+		.replace(/>\s+</g, "><") // Remove whitespace between tags
+		.replace(/\s{2,}/g, " ") // Collapse multiple spaces
+		.trim();
+}
+
+/**
+ * Generates a localized URL based on the locale mode.
+ * @param baseUrl - The base URL (e.g., '/about')
+ * @param locale - The locale configuration
+ * @param domain - The domain (e.g., 'https://example.com')
+ * @param localeMode - How to format the URL ('prefix' or 'subdomain')
+ */
+export function localizeUrl(
+	baseUrl: string,
+	locale: LocaleConfig,
+	domain: string,
+	localeMode: "prefix" | "subdomain" = "prefix",
+): string {
+	// Default locale doesn't get modified
+	if (locale.default) {
+		return domain + baseUrl;
+	}
+
+	if (localeMode === "subdomain") {
+		// Remove protocol and www for subdomain handling
+		const urlObj = new URL(domain);
+		const hostname = urlObj.hostname.replace(/^www\./, "");
+		const subdomain = `${locale.code}.${hostname}`;
+		return `${urlObj.protocol}//${subdomain}${urlObj.port ? `:${urlObj.port}` : ""}${baseUrl}`;
+	}
+
+	// Prefix mode: add locale to path
+	const prefix = `/${locale.code}`;
+	return domain + prefix + baseUrl;
+}
+
+/**
+ * Internal type for sitemap entry with locale alternates
+ */
+type SitemapEntryWithAlternates = SitemapEntry & {
+	alternates?: { hreflang: string; href: string }[];
+};
 
 /**
  * Generates a sitemap.xml string from a list of SitemapEntry objects.
@@ -8,13 +57,14 @@ import type { SitemapEntry } from "./types";
  * Throws an Error if minify or generation fails.
  */
 export async function createSitemapXml(
-	urls: SitemapEntry[],
+	urls: SitemapEntryWithAlternates[],
 	opts?: { minify?: boolean },
 ): Promise<string> {
 	try {
 		const now = new Date().toISOString();
 		let imageNS = false;
 		let videoNS = false;
+		let xhtmlNS = false;
 
 		const items: string = urls
 			.map((u) => {
@@ -24,6 +74,12 @@ export async function createSitemapXml(
 				}
 				if (typeof u.priority === "number") {
 					xml += `<priority>${u.priority.toFixed(1)}</priority>`;
+				}
+				if (u.alternates?.length) {
+					xhtmlNS = true;
+					for (const alt of u.alternates) {
+						xml += `<xhtml:link rel="alternate" hreflang="${alt.hreflang}" href="${alt.href}" />`;
+					}
 				}
 				if (u.imageUrls?.length) {
 					imageNS = true;
@@ -43,6 +99,7 @@ export async function createSitemapXml(
 			.join("");
 		const ns: string = [
 			'xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"',
+			xhtmlNS ? 'xmlns:xhtml="http://www.w3.org/1999/xhtml"' : null,
 			imageNS
 				? 'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"'
 				: null,
@@ -54,14 +111,7 @@ export async function createSitemapXml(
 			.join(" ");
 		let xmlString = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset ${ns}>${items}</urlset>`;
 		if (opts?.minify) {
-			try {
-				const { minify } = await import("minify-xml");
-				xmlString = minify(xmlString);
-			} catch (e) {
-				throw new Error(
-					`Sitemap XML minification failed: ${e instanceof Error ? e.message : String(e)}`,
-				);
-			}
+			xmlString = minifyXml(xmlString);
 		}
 		return xmlString;
 	} catch (err) {
@@ -86,14 +136,7 @@ export async function createIndexSitemap(
 			.join("");
 		let xmlString = `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${items}</sitemapindex>`;
 		if (opts?.minify) {
-			try {
-				const { minify } = await import("minify-xml");
-				xmlString = minify(xmlString);
-			} catch (e) {
-				throw new Error(
-					`Sitemap index minification failed: ${e instanceof Error ? e.message : String(e)}`,
-				);
-			}
+			xmlString = minifyXml(xmlString);
 		}
 		return xmlString;
 	} catch (err) {
@@ -119,3 +162,54 @@ export const createFile = (
 		);
 	}
 };
+
+/**
+ * Generates localized versions of sitemap entries.
+ * Creates one entry per locale with hreflang alternates.
+ */
+export function generateLocalizedEntries(
+	baseEntries: SitemapEntry[],
+	locales: LocaleConfig[],
+	domain: string,
+	localeMode: "prefix" | "subdomain" = "prefix",
+): SitemapEntryWithAlternates[] {
+	const localizedEntries: SitemapEntryWithAlternates[] = [];
+	const defaultLocale = locales.find((l) => l.default);
+
+	for (const entry of baseEntries) {
+		// Skip localization if requested
+		if (entry.skipLocalization) {
+			localizedEntries.push({
+				...entry,
+				url: domain + entry.url,
+			});
+			continue;
+		}
+
+		// Generate alternates for this entry
+		const alternates = locales.map((locale) => ({
+			hreflang: locale.code,
+			href: localizeUrl(entry.url, locale, domain, localeMode),
+		}));
+
+		// Add x-default pointing to the default locale (or first if no default set)
+		const xDefaultLocale = defaultLocale || locales[0];
+		if (xDefaultLocale) {
+			alternates.push({
+				hreflang: "x-default",
+				href: localizeUrl(entry.url, xDefaultLocale, domain, localeMode),
+			});
+		}
+
+		// Create an entry for each locale
+		for (const locale of locales) {
+			localizedEntries.push({
+				...entry,
+				url: localizeUrl(entry.url, locale, domain, localeMode),
+				alternates,
+			});
+		}
+	}
+
+	return localizedEntries;
+}
