@@ -23,17 +23,20 @@ const DEFAULT_CONFIG: SitemapConfig = {
 export default function crawlMeMaybeSitemap(
 	config: SitemapConfig = DEFAULT_CONFIG,
 ) {
-	const domain = config?.domain;
+	// Explicitly capture config to ensure it's always available in closures
+	const pluginConfig: SitemapConfig = config || DEFAULT_CONFIG;
+	
+	const domain = pluginConfig?.domain;
 	if (!domain) {
 		throw new Error(
 			"⚠️ No domain provided. Sitemap generation requires a domain.",
 		);
 	}
 
-	const outDir = config?.outDir || "dist";
-	const minify = !config?.disableMinification;
-	const locales = config?.locales;
-	const localeMode = config?.localeMode || "prefix";
+	const outDir = pluginConfig?.outDir || "dist";
+	const minify = !pluginConfig?.disableMinification;
+	const locales = pluginConfig?.locales;
+	const localeMode = pluginConfig?.localeMode || "prefix";
 
 	/**
 	 * Creates robots.txt handling custom async/user rules and always adds sitemaps at the end.
@@ -41,9 +44,9 @@ export default function crawlMeMaybeSitemap(
 	 */
 	const createRobots = async (sitemapsUrls: string[] = ["/sitemap.xml"]) => {
 		let userRobots = DEFAULT_ROBOTS_TXT;
-		if (config.robots && typeof config.robots === "function") {
+		if (pluginConfig.robots && typeof pluginConfig.robots === "function") {
 			try {
-				const result = await config.robots();
+				const result = await pluginConfig.robots();
 				if (typeof result === "string") {
 					userRobots = result;
 				}
@@ -82,9 +85,11 @@ export default function crawlMeMaybeSitemap(
 		name: "vite-plugin-sitemap",
 		apply: "build" as const,
 		async closeBundle() {
-			const outDir = path.resolve(process.cwd(), config?.outDir || "dist");
+			// Ensure config is available (capture it explicitly)
+			const pluginConfig = config || DEFAULT_CONFIG;
+			const outDir = path.resolve(process.cwd(), pluginConfig?.outDir || "dist");
 			fs.mkdirSync(outDir, { recursive: true });
-			const { sitemaps } = config;
+			const { sitemaps } = pluginConfig;
 
 			if (typeof sitemaps === "function") {
 				// Single sitemap mode
