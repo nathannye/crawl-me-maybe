@@ -1,12 +1,5 @@
-'use strict';
-
-var fs = require('fs');
-var path = require('path');
-
-function _interopDefault (e) { return e && e.__esModule ? e : { default: e }; }
-
-var fs__default = /*#__PURE__*/_interopDefault(fs);
-var path__default = /*#__PURE__*/_interopDefault(path);
+import fs from 'fs';
+import path from 'path';
 
 // packages/sitemap/src/index.ts
 
@@ -103,7 +96,7 @@ async function createIndexSitemap(files, baseUrl, opts) {
 }
 var createFile = (outputPath, filename, content) => {
   try {
-    fs__default.default.writeFileSync(path__default.default.join(outputPath, filename), content);
+    fs.writeFileSync(path.join(outputPath, filename), content);
   } catch (err) {
     throw new Error(
       `Failed to write file ${filename} to ${outputPath}: ${err instanceof Error ? err.message : String(err)}`
@@ -197,8 +190,8 @@ function crawlMeMaybeSitemap(config = DEFAULT_CONFIG) {
     apply: "build",
     async closeBundle() {
       const pluginConfig2 = config || DEFAULT_CONFIG;
-      const outDir2 = path__default.default.resolve(process.cwd(), pluginConfig2?.outDir || "dist");
-      fs__default.default.mkdirSync(outDir2, { recursive: true });
+      const outDir2 = path.resolve(process.cwd(), pluginConfig2?.outDir || "dist");
+      fs.mkdirSync(outDir2, { recursive: true });
       const { sitemaps } = pluginConfig2;
       if (typeof sitemaps === "function") {
         const urls = await sitemaps();
@@ -228,6 +221,6 @@ function crawlMeMaybeSitemap(config = DEFAULT_CONFIG) {
   };
 }
 
-module.exports = crawlMeMaybeSitemap;
-//# sourceMappingURL=index.js.map
-//# sourceMappingURL=index.js.map
+export { crawlMeMaybeSitemap as default };
+//# sourceMappingURL=index.mjs.map
+//# sourceMappingURL=index.mjs.map

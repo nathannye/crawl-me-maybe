@@ -1101,7 +1101,7 @@ var page_metadata_default = {
       },
       title: "Meta Image",
       description: "Displayed when the site link is posted on social media, defaults to a screenshot of the homepage.",
-      type: "imageAlt"
+      type: "image"
     }
   ]
 };
@@ -1142,7 +1142,6 @@ function ButtonSelector(props) {
   } = props;
   const options = schemaType.options.list;
   const handleChange = (option) => {
-    console.log(option);
     onChange(set(option));
   };
   const c = (c2) => {

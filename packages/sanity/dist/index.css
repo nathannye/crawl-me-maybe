@@ -1,148 +1,157 @@
 /* src/components/socials/facebook/FacebookCard.module.css */
 .facebookCard {
-	border: 1px solid #1877f2;
-	background: #fff;
-	max-width: 500px;
-	margin: 0 auto;
-	box-sizing: border-box;
-	font-family: Arial, sans-serif;
-	padding: 0;
-	gap: 0;
+  border: 1px solid #1877f2;
+  background: #fff;
+  max-width: 500px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  padding: 0;
+  gap: 0;
 }
 .header {
-	display: flex;
-	gap: 1.2rem;
-	align-items: center;
-	border-bottom: 1px solid #f0f2f5;
-	padding-bottom: 8px;
-	margin-bottom: 8px;
+  display: flex;
+  gap: 1.2rem;
+  align-items: center;
+  border-bottom: 1px solid #f0f2f5;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
 }
 .image {
-	width: 100%;
-	height: 220px;
-	object-fit: cover;
-	display: block;
-	border-bottom: 1px solid #f0f2f5;
-	margin: 8px 0 12px 0;
+  width: 100%;
+  height: 220px;
+  object-fit: cover;
+  display: block;
+  border-bottom: 1px solid #f0f2f5;
+  margin: 8px 0 12px 0;
 }
 .cardSection {
-	margin: 16px 0;
+  margin: 16px 0;
 }
 @media (max-width: 600px) {
-	.facebookCard {
-		max-width: 99vw;
-	}
-	.image {
-		height: 160px;
-	}
-	.header {
-		gap: 0.6rem;
-	}
+  .facebookCard {
+    max-width: 99vw;
+  }
+  .image {
+    height: 160px;
+  }
+  .header {
+    gap: 0.6rem;
+  }
 }
 
 /* src/components/socials/twitter/TwitterCard.module.css */
 .twitterCard {
-	border: 1px solid #1da1f2;
-	background: #fff;
-	max-width: 500px;
-	margin: 0 auto;
-	box-sizing: border-box;
-	font-family: Arial, sans-serif;
-	padding: 0;
+  border: 1px solid #1da1f2;
+  background: #fff;
+  max-width: 500px;
+  margin: 0 auto;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  padding: 0;
 }
 .userRow {
-	display: flex;
-	gap: 1.2rem;
-	align-items: center;
-	padding-bottom: 8px;
-	margin-bottom: 8px;
-	border-bottom: 1px solid #eaf5fe;
+  display: flex;
+  gap: 1.2rem;
+  align-items: center;
+  padding-bottom: 8px;
+  margin-bottom: 8px;
+  border-bottom: 1px solid #eaf5fe;
 }
 .imageLarge {
-	width: 100%;
-	height: 260px;
-	object-fit: cover;
-	border-radius: 12px;
-	margin: 12px 0 18px 0;
-	display: block;
+  width: 100%;
+  height: 260px;
+  object-fit: cover;
+  border-radius: 12px;
+  margin: 12px 0 18px 0;
+  display: block;
 }
 .cardSection {
-	margin: 16px 0;
+  margin: 16px 0;
 }
 @media (max-width: 600px) {
-	.twitterCard {
-		max-width: 99vw;
-	}
-	.imageLarge {
-		height: 160px;
-	}
-	.userRow {
-		gap: 0.6rem;
-	}
+  .twitterCard {
+    max-width: 99vw;
+  }
+  .imageLarge {
+    height: 160px;
+  }
+  .userRow {
+    gap: 0.6rem;
+  }
 }
 
 /* src/components/socials/google/GoogleEntry.module.css */
 .googleCard {
-	border: 1px solid #e1e4e8;
-	background: #fff;
-	max-width: 550px;
-	margin: 0 auto 24px auto;
-	box-sizing: border-box;
-	font-family: Arial, sans-serif;
-	padding: 0;
+  border: 1px solid #e1e4e8;
+  background: #fff;
+  max-width: 550px;
+  margin: 0 auto 24px auto;
+  box-sizing: border-box;
+  font-family: Arial, sans-serif;
+  padding: 0;
 }
 .title {
-	color: #1a0dab;
-	margin-bottom: 0.25em;
+  color: #1a0dab;
+  margin-bottom: 0.25em;
 }
 .site {
-	color: #202124;
-	font-size: 0.97em;
-	margin-bottom: 0.2em;
+  color: #202124;
+  font-size: 0.97em;
+  margin-bottom: 0.2em;
 }
 .desc {
-	color: #4d5156;
+  color: #4d5156;
 }
 .cardSection {
-	margin: 16px 0;
+  margin: 16px 0;
 }
 @media (max-width: 600px) {
-	.googleCard {
-		max-width: 99vw;
-	}
+  .googleCard {
+    max-width: 99vw;
+  }
 }
 
 /* src/components/core/Favicon/favicon-preview.module.css */
 .card {
-	&[data-theme="dark"] {
-		--card-bg: #22242a;
-		--tab-bg: #22242a;
-		--tab-shadow: 0px 1.5px 3px 0px #181a1f, 0px 0.5px 0.5px 0.2px #23272b;
-		--tab-border: 1.5px solid #32353b;
-		--tab-favicon-bg: #22242a;
-		--tab-favicon-border: 1px solid #44464a;
-		--tab-url-text-color: #e1e6f0;
-	}
-	&[data-theme="light"] {
-		--card-bg: #fff;
-		--tab-bg: #fff;
-		--tab-shadow: 0px 1.5px 3px 0px #ececec, 0px 0.5px 0.5px 0.2px #d4d9db;
-		--tab-border: 1.5px solid #e7ebed;
-		--tab-favicon-bg: #fff;
-		--tab-favicon-border: 1px solid #e5e5e5;
-		--tab-url-text-color: #242629;
-	}
-	& [data-tab-display] {
-		background: var(--tab-bg);
-		font-family:
-			"system-ui", "-apple-system", "BlinkMacSystemFont", "Segoe UI", "Roboto",
-			"Oxygen", "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans",
-			"Helvetica Neue", sans-serif;
-	}
+  &[data-theme=dark] {
+    --card-bg: #22242a;
+    --tab-bg: #22242a;
+    --tab-shadow: 0px 1.5px 3px 0px #181a1f, 0px 0.5px 0.5px 0.2px #23272b;
+    --tab-border: 1.5px solid #32353b;
+    --tab-favicon-bg: #22242a;
+    --tab-favicon-border: 1px solid #44464a;
+    --tab-url-text-color: #e1e6f0;
+  }
+  &[data-theme=light] {
+    --card-bg: #fff;
+    --tab-bg: #fff;
+    --tab-shadow: 0px 1.5px 3px 0px #ececec, 0px 0.5px 0.5px 0.2px #d4d9db;
+    --tab-border: 1.5px solid #e7ebed;
+    --tab-favicon-bg: #fff;
+    --tab-favicon-border: 1px solid #e5e5e5;
+    --tab-url-text-color: #242629;
+  }
+  & [data-tab-display] {
+    background: var(--tab-bg);
+    font-family:
+      "system-ui",
+      "-apple-system",
+      "BlinkMacSystemFont",
+      "Segoe UI",
+      "Roboto",
+      "Oxygen",
+      "Ubuntu",
+      "Cantarell",
+      "Fira Sans",
+      "Droid Sans",
+      "Helvetica Neue",
+      sans-serif;
+  }
 }
 .image-preview {
-	img {
-		background: #ececec !important;
-	}
+  img {
+    background: #ececec !important;
+  }
 }
 /*# sourceMappingURL=index.css.map */

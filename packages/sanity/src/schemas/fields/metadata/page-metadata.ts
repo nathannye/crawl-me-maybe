@@ -50,7 +50,7 @@ export default {
 			title: "Meta Image",
 			description:
 				"Displayed when the site link is posted on social media, defaults to a screenshot of the homepage.",
-			type: "imageAlt",
+			type: "image",
 		},
 	],
 };
