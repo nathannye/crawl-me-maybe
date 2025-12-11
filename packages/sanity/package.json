@@ -1,6 +1,6 @@
 {
   "name": "@crawl-me-maybe/sanity",
-  "version": "0.0.4",
+  "version": "0.0.5",
   "author": "Nathan Nye",
   "main": "./src/index.ts",
   "license": "MIT",
