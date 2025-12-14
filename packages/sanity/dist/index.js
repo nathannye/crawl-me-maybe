@@ -788,7 +788,10 @@ var SeoDefaultsProvider = ({ children }) => {
   };
   react.useEffect(() => {
     const seoSub = sub(`*[_type == "seoDefaults"][0]`, "seoDefaults");
-    const schemaSub = sub(`*[_type == "schemaMarkupDefaults"][0]`, "schemaDefaults");
+    const schemaSub = sub(
+      `*[_type == "schemaMarkupDefaults"][0]`,
+      "schemaDefaults"
+    );
     cleanup.seoSub = seoSub;
     cleanup.schemaSub = schemaSub;
     client.fetch(`*[_type == "seoDefaults"][0]`).then(
