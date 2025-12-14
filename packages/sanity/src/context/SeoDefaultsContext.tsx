@@ -1,9 +1,9 @@
 import {
 	createContext,
+	useCallback,
 	useContext,
 	useEffect,
 	useState,
-	useCallback,
 } from "react";
 import { useClient } from "sanity";
 
@@ -27,33 +27,32 @@ export const SeoDefaultsProvider = ({ children }) => {
 	}, []);
 
 	const sub = (query: string, property: string) => {
-		return client
-			.listen(query)
-			.subscribe((update) => {
-				if (update.result) {
-					setDefaults((prev) => ({
-						...prev,
-						[property]: update.result,
-					}));
-				}
-			});
+		return client.listen(query).subscribe((update) => {
+			if (update.result) {
+				setDefaults((prev) => ({
+					...prev,
+					[property]: update.result,
+				}));
+			}
+		});
 	};
 
 	useEffect(() => {
 		const seoSub = sub(`*[_type == "seoDefaults"][0]`, "seoDefaults");
-		const schemaSub = sub(`*[_type == "schemaMarkupDefaults"][0]`, "schemaDefaults");
+		const schemaSub = sub(
+			`*[_type == "schemaMarkupDefaults"][0]`,
+			"schemaDefaults",
+		);
 
 		cleanup.seoSub = seoSub;
 		cleanup.schemaSub = schemaSub;
 
-		client
-			.fetch(`*[_type == "seoDefaults"][0]`)
-			.then((seoDefaults) =>
-				setDefaults((prev) => ({
-					...prev,
-					seoDefaults,
-				})),
-			);
+		client.fetch(`*[_type == "seoDefaults"][0]`).then((seoDefaults) =>
+			setDefaults((prev) => ({
+				...prev,
+				seoDefaults,
+			})),
+		);
 
 		client
 			.fetch(`*[_type == "schemaMarkupDefaults"][0]`)
