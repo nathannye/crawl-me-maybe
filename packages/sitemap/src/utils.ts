@@ -19,21 +19,26 @@ function minifyXml(xml: string): string {
  * @param locale - The locale configuration
  * @param domain - The domain (e.g., 'https://example.com')
  * @param localeMode - How to format the URL ('prefix' or 'subdomain')
+ * @param prefixDefault - Whether to add prefix to default locale
  */
 export function localizeUrl(
 	baseUrl: string,
 	locale: LocaleConfig,
 	domain: string,
 	localeMode: "prefix" | "subdomain" = "prefix",
+	prefixDefault: boolean = false,
 ): string {
 	// Normalize baseUrl: ensure it starts with /
 	const normalizedUrl = baseUrl?.startsWith("/")
 		? baseUrl
 		: `/${baseUrl || ""}`;
 
-	// Default locale doesn't get modified
+	// Default locale: only add prefix if prefixDefault is true
 	if (locale.default) {
-		return domain + normalizedUrl;
+		if (!prefixDefault) {
+			return domain + normalizedUrl;
+		}
+		// Continue to add prefix like other locales when prefixDefault is true
 	}
 
 	if (localeMode === "subdomain") {
@@ -177,6 +182,7 @@ export function generateLocalizedEntries(
 	locales: LocaleConfig[],
 	domain: string,
 	localeMode: "prefix" | "subdomain" = "prefix",
+	prefixDefault: boolean = false,
 ): SitemapEntryWithAlternates[] {
 	const localizedEntries: SitemapEntryWithAlternates[] = [];
 	const defaultLocale = locales.find((l) => l.default);
@@ -194,7 +200,7 @@ export function generateLocalizedEntries(
 		// Generate alternates for this entry
 		const alternates = locales.map((locale) => ({
 			hreflang: locale.code,
-			href: localizeUrl(entry.url, locale, domain, localeMode),
+			href: localizeUrl(entry.url, locale, domain, localeMode, prefixDefault),
 		}));
 
 		// Add x-default pointing to the default locale (or first if no default set)
@@ -202,7 +208,13 @@ export function generateLocalizedEntries(
 		if (xDefaultLocale) {
 			alternates.push({
 				hreflang: "x-default",
-				href: localizeUrl(entry.url, xDefaultLocale, domain, localeMode),
+				href: localizeUrl(
+					entry.url,
+					xDefaultLocale,
+					domain,
+					localeMode,
+					prefixDefault,
+				),
 			});
 		}
 
@@ -210,7 +222,7 @@ export function generateLocalizedEntries(
 		for (const locale of locales) {
 			localizedEntries.push({
 				...entry,
-				url: localizeUrl(entry.url, locale, domain, localeMode),
+				url: localizeUrl(entry.url, locale, domain, localeMode, prefixDefault),
 				alternates,
 			});
 		}

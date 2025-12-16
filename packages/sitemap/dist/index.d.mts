@@ -84,6 +84,12 @@ type SitemapConfig = {
 	 * - 'subdomain': Adds locale code as subdomain (e.g., fr.example.com/about)
 	 */
 	localeMode?: "prefix" | "subdomain";
+	/**
+	 * (Optional) Whether to add a locale prefix to the default locale URL.
+	 * - true: Adds locale prefix to default locale (e.g., /en/about)
+	 * - false: No prefix for default locale (e.g., /about) - default behavior
+	 */
+	prefixDefault?: boolean;
 };
 
 declare function crawlMeMaybeSitemap(config?: SitemapConfig): {

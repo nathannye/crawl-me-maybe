@@ -25,7 +25,7 @@ export default function crawlMeMaybeSitemap(
 ) {
 	// Explicitly capture config to ensure it's always available in closures
 	const pluginConfig: SitemapConfig = config || DEFAULT_CONFIG;
-	
+
 	const domain = pluginConfig?.domain;
 	if (!domain) {
 		throw new Error(
@@ -34,9 +34,11 @@ export default function crawlMeMaybeSitemap(
 	}
 
 	const outDir = pluginConfig?.outDir || "dist";
+	const resolvedOutDir = path.resolve(process.cwd(), outDir);
 	const minify = !pluginConfig?.disableMinification;
 	const locales = pluginConfig?.locales;
 	const localeMode = pluginConfig?.localeMode || "prefix";
+	const prefixDefault = pluginConfig?.prefixDefault ?? false;
 
 	/**
 	 * Creates robots.txt handling custom async/user rules and always adds sitemaps at the end.
@@ -61,14 +63,20 @@ export default function crawlMeMaybeSitemap(
 		for (const rel of sitemapsUrls) {
 			content += `Sitemap: ${domainUrl}${rel.startsWith("/") ? rel : `${"/"}${rel}`}\n`;
 		}
-		createFile(outDir, "robots.txt", content);
+		createFile(resolvedOutDir, "robots.txt", content);
 	};
 
 	const createSitemap = async (filename: string, urls: SitemapEntry[]) => {
 		// Apply localization if configured
 		const processedUrls =
 			locales && locales.length > 0
-				? generateLocalizedEntries(urls, locales, domain, localeMode)
+				? generateLocalizedEntries(
+						urls,
+						locales,
+						domain,
+						localeMode,
+						prefixDefault,
+					)
 				: urls.map((u) => {
 						// Normalize URL: ensure it starts with /
 						const normalizedUrl = u.url?.startsWith("/")
@@ -78,18 +86,21 @@ export default function crawlMeMaybeSitemap(
 					});
 
 		const xml = await createSitemapXml(processedUrls, { minify });
-		createFile(outDir, filename, xml);
+		createFile(resolvedOutDir, filename, xml);
 	};
 
 	return {
 		name: "vite-plugin-sitemap",
 		apply: "build" as const,
 		async closeBundle() {
-			// Ensure config is available (capture it explicitly)
-			const pluginConfig = config || DEFAULT_CONFIG;
-			const outDir = path.resolve(process.cwd(), pluginConfig?.outDir || "dist");
-			fs.mkdirSync(outDir, { recursive: true });
+			// Use the captured pluginConfig from outer scope for consistency
+			fs.mkdirSync(resolvedOutDir, { recursive: true });
 			const { sitemaps } = pluginConfig;
+
+			if (!sitemaps) {
+				console.warn("⚠️ No sitemaps configuration found");
+				return;
+			}
 
 			if (typeof sitemaps === "function") {
 				// Single sitemap mode
@@ -114,7 +125,7 @@ export default function crawlMeMaybeSitemap(
 				domain,
 				{ minify },
 			);
-			createFile(outDir, "sitemap.xml", indexXml);
+			createFile(resolvedOutDir, "sitemap.xml", indexXml);
 			await createRobots(["/sitemap.xml"]);
 			console.log(
 				`✅ Generated ${allSitemaps.length} sitemaps + index + robots.txt`,
