@@ -2,7 +2,9 @@
   "name": "@crawl-me-maybe/sanity",
   "version": "0.0.6",
   "author": "Nathan Nye",
-  "main": "./src/index.ts",
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "license": "MIT",
   "publishConfig": {
     "access": "public"
@@ -10,26 +12,24 @@
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.mjs",
-      "require": "./dist/index.js"
+      "import": "./dist/index.js",
+      "require": "./dist/index.cjs"
     }
   },
   "files": [
     "dist"
   ],
   "scripts": {
-    "build": "tsup"
+    "build": "bun run build.ts && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src --noCheck"
   },
   "dependencies": {
     "@sanity-image/url-builder": "^1.0.0",
     "@sanity/ui": "^3.1.11",
     "@types/react": "^19.2.7",
-    "react": "19.2.3",
-    "react-dom": "^19.2.3",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
     "react-icons": "^5.5.0",
     "sanity": "^4.21.1"
   },
-  "devDependencies": {
-    "tsup": "^8.5.0"
-  }
+  "devDependencies": {}
 }

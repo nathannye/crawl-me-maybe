@@ -25,14 +25,12 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup"
+    "build": "rm -rf dist && bun build src/index.ts --outfile dist/index.js --format esm --target node && bun build src/index.ts --outfile dist/index.cjs --format cjs --target node --minify && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src && cp dist/index.d.ts dist/index.d.cts"
   },
   "publishConfig": {
     "access": "public"
   },
   "devDependencies": {
-    "@types/node": "^22.10.1",
-    "terser": "^5.37.0",
-    "tsup": "^8.5.0"
+    "@types/node": "^22.10.1"
   }
 }

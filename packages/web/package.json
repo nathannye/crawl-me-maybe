@@ -19,7 +19,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "tsup"
+    "build": "rm -rf dist && bun build src/index.ts --outfile dist/index.js --format esm --sourcemap --external @sanity/client --external @sanity-image/url-builder --external @sanity/image-url --external schema-dts && bun build src/index.ts --outfile dist/index.cjs --format cjs --external @sanity/client --external @sanity-image/url-builder --external @sanity/image-url --external schema-dts && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src"
   },
   "dependencies": {
     "@sanity-image/url-builder": "^1.0.0",
@@ -30,7 +30,5 @@
   "peerDependencies": {
     "@sanity/client": "^6.0.0"
   },
-  "devDependencies": {
-    "tsup": "^8.5.0"
-  }
+  "devDependencies": {}
 }

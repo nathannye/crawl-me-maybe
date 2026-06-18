@@ -8,10 +8,8 @@
 		"strict": true,
 		"baseUrl": ".",
 		"paths": {
-			"@crawl-me-maybe/sanity-plugin": ["packages/sanity-plugin/src"],
-			"@crawl-me-maybe/sitemap": ["packages/sitemap/src"],
-			"@crawl-me-maybe/schema": ["packages/schema/src"],
 			"~/*": ["./src/*"]
 		}
-	}
+	},
+	"exclude": ["node_modules", "dist", "src/schema-markup/SchemaMarkup.tsx"]
 }

@@ -38,9 +38,10 @@ export const automap = (
 	const automappedValues = Object.keys(fieldMappings).reduce(
 		(acc, key) => {
 			if (shouldAutomap(automapSettings, key as AutoMapProperty)) {
-				acc[key] =
-					baseSeoObject[fieldMappings[key]] ||
-					extra[fieldMappings[key] as keyof typeof extra];
+				const field = fieldMappings[key as AutoMapProperty];
+				(acc as Record<string, unknown>)[key] =
+					(baseSeoObject as Record<string, unknown>)[field] ||
+					extra?.[field];
 			}
 			return acc;
 		},

@@ -10,7 +10,7 @@ import { useClient } from "sanity";
 const SeoDefaultsContext = createContext(null);
 
 export const SeoDefaultsProvider = ({ children }) => {
-	const client = useClient({ apiVersion: "2024-10-01" });
+	const client = useClient({ apiVersion: "2025-01-11" });
 	const [defaults, setDefaults] = useState({
 		seoDefaults: null,
 		schemaDefaults: null,

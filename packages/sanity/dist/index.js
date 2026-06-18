@@ -1,32 +1,19 @@
-'use strict';
-
-var sanity = require('sanity');
-var md = require('react-icons/md');
-var ui = require('@sanity/ui');
-var react = require('react');
-var jsxRuntime = require('react/jsx-runtime');
-var io5 = require('react-icons/io5');
-var urlBuilder = require('@sanity-image/url-builder');
-var ai = require('react-icons/ai');
-
 // src/index.ts
-var schemaMarkupWebPageFields = sanity.defineType({
+import { definePlugin } from "sanity";
+
+// src/schemas/entities/webpage-entity.ts
+import { defineType, defineField } from "sanity";
+var schemaMarkupWebPageFields = defineType({
   name: "schemaMarkupWebPageFields",
   title: "WebPage Fields",
   type: "object",
   fields: [
-    sanity.defineField({ name: "name", type: "string" }),
-    sanity.defineField({ name: "description", type: "text" }),
-    sanity.defineField({ name: "inLanguage", type: "string" }),
-    // defineField({ name: "primaryImageOfPage", type: "jsonldImageObject" }),
-    sanity.defineField({ name: "datePublished", type: "datetime" }),
-    sanity.defineField({ name: "dateModified", type: "datetime" }),
-    // defineField({
-    // 	name: "breadcrumb",
-    // 	title: "Breadcrumb (optional)",
-    // 	type: "jsonldBreadcrumbListFields",
-    // }),
-    sanity.defineField({
+    defineField({ name: "name", type: "string" }),
+    defineField({ name: "description", type: "text" }),
+    defineField({ name: "inLanguage", type: "string" }),
+    defineField({ name: "datePublished", type: "datetime" }),
+    defineField({ name: "dateModified", type: "datetime" }),
+    defineField({
       name: "about",
       title: "About (Entities)",
       type: "array",
@@ -41,20 +28,20 @@ var schemaMarkupWebPageFields = sanity.defineType({
     prepare: ({ title, subtitle }) => ({ title: title || "WebPage", subtitle })
   }
 });
-var schemaMarkupArticleFields = sanity.defineType({
+
+// src/schemas/entities/article-entity.ts
+import { defineType as defineType2, defineField as defineField2 } from "sanity";
+var schemaMarkupArticleFields = defineType2({
   name: "schemaMarkupArticleFields",
   title: "Article Fields",
   type: "object",
   fields: [
-    sanity.defineField({
+    defineField2({
       name: "headline",
       type: "string",
       validation: (r) => r.required()
     }),
-    // defineField({ name: "articleSection", type: "string" }),
-    // defineField({ name: "datePublished", type: "datetime" }),
-    // defineField({ name: "dateModified", type: "datetime" }),
-    sanity.defineField({
+    defineField2({
       name: "author",
       title: "Author(s)",
       type: "array",
@@ -63,122 +50,67 @@ var schemaMarkupArticleFields = sanity.defineType({
         { type: "schemaMarkupOrganization" }
       ]
     }),
-    sanity.defineField({
+    defineField2({
       name: "publisher",
       title: "Publisher",
       type: "schemaMarkupOrganization"
     })
-    // defineField({
-    // 	name: "image",
-    // 	title: "Article Image",
-    // 	type: "jsonldImageObject",
-    // }),
-    // defineField({
-    // 	name: "mainEntityOfPage",
-    // 	type: "url",
-    // 	description: "Canonical URL of the page hosting this article.",
-    // }),
   ],
   preview: {
     select: { title: "headline", subtitle: "articleSection" },
     prepare: ({ title, subtitle }) => ({ title: title || "Article", subtitle })
   }
 });
-var schemaMarkupProductFields = sanity.defineType({
+
+// src/schemas/entities/product-entity.ts
+import { defineType as defineType3, defineField as defineField3 } from "sanity";
+var schemaMarkupProductFields = defineType3({
   name: "schemaMarkupProductFields",
   title: "Product Fields",
   type: "object",
   fields: [
-    // createNote({
-    // 	description:
-    // 		"Name, image, offers, aggregateRating, reviews, description, and SKU are automatically generated from the product data.",
-    // }),
-    // defineField({
-    // 	name: "name",
-    // 	type: "string",
-    // 	validation: (r) => r.required(),
-    // }),
-    // defineField({ name: "description", type: "text" }),
-    sanity.defineField({
+    defineField3({
       name: "brand",
       title: "Brand",
       type: "schemaMarkupOrganization"
     }),
-    // defineField({
-    // 	name: "sku",
-    // 	type: "string",
-    // 	description: "Stock keeping unit.",
-    // }),
-    sanity.defineField({
+    defineField3({
       name: "mpn",
       type: "string",
       description: "Manufacturer part number."
     }),
-    sanity.defineField({
+    defineField3({
       name: "gtin",
       type: "string",
       description: "GTIN (8/12/13/14)."
     })
-    // defineField({
-    // 	name: "image",
-    // 	title: "Primary Image",
-    // 	type: "jsonldImageObject",
-    // }),
-    // defineField({
-    // 	name: "offers",
-    // 	title: "Offers",
-    // 	type: "array",
-    // 	of: [{ type: "jsonldOffer" }],
-    // 	description: "Price, currency, availability, URL, itemCondition, etc.",
-    // }),
-    // defineField({
-    // 	name: "aggregateRating",
-    // 	title: "Aggregate Rating",
-    // 	type: "jsonldAggregateRating",
-    // }),
-    // defineField({
-    // 	name: "review",
-    // 	title: "Reviews",
-    // 	type: "array",
-    // 	of: [{ type: "jsonldReview" }],
-    // }),
   ],
   preview: {
     select: { title: "name" },
     prepare: ({ title }) => ({ title: title || "Product" })
   }
 });
-var schemaMarkupEventFields = sanity.defineType({
+
+// src/schemas/entities/event-entity.ts
+import { defineType as defineType4, defineField as defineField4 } from "sanity";
+var schemaMarkupEventFields = defineType4({
   name: "schemaMarkupEventFields",
   title: "Event Fields",
   type: "object",
   fields: [
-    sanity.defineField({
+    defineField4({
       name: "name",
       type: "string",
       validation: (r) => r.required()
     }),
-    sanity.defineField({ name: "description", type: "text" }),
-    sanity.defineField({
+    defineField4({ name: "description", type: "text" }),
+    defineField4({
       name: "startDate",
       type: "datetime",
       validation: (r) => r.required()
     }),
-    sanity.defineField({ name: "endDate", type: "datetime" }),
-    // defineField({
-    // 	name: "eventStatus",
-    // 	type: "string",
-    // 	options: {
-    // 		list: [
-    // 			{ title: "Scheduled", value: "EventScheduled" },
-    // 			{ title: "Cancelled", value: "EventCancelled" },
-    // 			{ title: "Postponed", value: "EventPostponed" },
-    // 			{ title: "Rescheduled", value: "EventRescheduled" },
-    // 			{ title: "Moved Online", value: "EventMovedOnline" },
-    // 		],
-    // 	},
-    // }),
-    sanity.defineField({
+    defineField4({ name: "endDate", type: "datetime" }),
+    defineField4({
       name: "eventAttendanceMode",
       type: "string",
       options: {
@@ -189,28 +121,18 @@ var schemaMarkupEventFields = sanity.defineType({
         ]
       }
     }),
-    sanity.defineField({
+    defineField4({
       name: "location",
       title: "Location",
       type: "object",
       fields: [
-        sanity.defineField({ name: "name", type: "string" }),
-        sanity.defineField({ name: "url", type: "url" }),
-        sanity.defineField({ name: "address", type: "schemaMarkupAddress" }),
-        sanity.defineField({ name: "geo", type: "schemaMarkupGeo" })
+        defineField4({ name: "name", type: "string" }),
+        defineField4({ name: "url", type: "url" }),
+        defineField4({ name: "address", type: "schemaMarkupAddress" }),
+        defineField4({ name: "geo", type: "schemaMarkupGeo" })
       ]
     }),
-    // defineField({
-    // 	name: "image",
-    // 	type: "jsonldImageObject",
-    // }),
-    // defineField({
-    // 	name: "offers",
-    // 	title: "Offers / Tickets",
-    // 	type: "array",
-    // 	of: [{ type: "jsonldOffer" }],
-    // }),
-    sanity.defineField({
+    defineField4({
       name: "organizer",
       title: "Organizer",
       type: "array",
@@ -219,7 +141,7 @@ var schemaMarkupEventFields = sanity.defineType({
         { type: "schemaMarkupPerson" }
       ]
     }),
-    sanity.defineField({
+    defineField4({
       name: "performer",
       title: "Performer(s)",
       type: "array",
@@ -234,17 +156,19 @@ var schemaMarkupEventFields = sanity.defineType({
     prepare: ({ title, subtitle }) => ({ title: title || "Event", subtitle })
   }
 });
-var schemaMarkupFAQPageFields = sanity.defineType({
+
+// src/schemas/entities/faq-entity.ts
+import { defineType as defineType5, defineField as defineField5 } from "sanity";
+var schemaMarkupFAQPageFields = defineType5({
   name: "schemaMarkupFAQPageFields",
   title: "FAQ Page Fields",
   type: "object",
   fields: [
-    sanity.defineField({
+    defineField5({
       name: "mainEntity",
       title: "FAQ Items",
       type: "array",
       of: [{ type: "schemaMarkupFAQItem" }],
-      // {question:string, answer:PortableText}
       validation: (r) => r.min(1)
     })
   ],
@@ -256,29 +180,26 @@ var schemaMarkupFAQPageFields = sanity.defineType({
     })
   }
 });
-var schemaMarkupPersonFields = sanity.defineType({
+
+// src/schemas/entities/person-entity.ts
+import { defineType as defineType6, defineField as defineField6 } from "sanity";
+var schemaMarkupPersonFields = defineType6({
   name: "schemaMarkupPersonFields",
   title: "Person Fields",
   type: "object",
   fields: [
-    sanity.defineField({
+    defineField6({
       name: "name",
       type: "string",
       validation: (r) => r.required()
     }),
-    // defineField({ name: "jobTitle", type: "string" }),
-    // defineField({ name: "url", type: "url" }),
-    // defineField({
-    // 	name: "image",
-    // 	type: "jsonldImageObject",
-    // }),
-    sanity.defineField({
+    defineField6({
       name: "sameAs",
       title: "Profiles (sameAs)",
       type: "array",
       of: [{ type: "url" }]
     }),
-    sanity.defineField({
+    defineField6({
       name: "affiliation",
       title: "Affiliation (Organizations)",
       type: "array",
@@ -290,51 +211,40 @@ var schemaMarkupPersonFields = sanity.defineType({
     prepare: ({ title, subtitle }) => ({ title: title || "Person", subtitle })
   }
 });
-var schemaMarkupAboutPageFields = sanity.defineType({
+
+// src/schemas/entities/about-page-entity.ts
+import { defineType as defineType7, defineField as defineField7 } from "sanity";
+var schemaMarkupAboutPageFields = defineType7({
   name: "schemaMarkupAboutPageFields",
   title: "About Page Fields",
   type: "object",
   fields: [
-    sanity.defineField({
+    defineField7({
       name: "name",
       type: "string",
       description: "Name of the about page (defaults to page title)"
-      // components: {
-      // 	input: SchemaFieldWithDefault
-      // }, 
-      // options: {
-      // 	automapName: 'description',
-      // 	matchingDefaultField: 'title'
-      // }
     }),
-    sanity.defineField({
+    defineField7({
       name: "description",
       type: "text",
       description: "Description of the about page (defaults to meta description)"
-      // components: {
-      // 	input: SchemaFieldWithDefault
-      // }, 
-      // options: {
-      // 	matchingDefaultField: 'description',
-      // 	automapName: 'description'
-      // }
     }),
-    sanity.defineField({
+    defineField7({
       name: "inLanguage",
       type: "string",
       description: "Language code (e.g., 'en-US')"
     }),
-    sanity.defineField({
+    defineField7({
       name: "datePublished",
       type: "datetime",
       description: "When the page was first published"
     }),
-    sanity.defineField({
+    defineField7({
       name: "dateModified",
       type: "datetime",
       description: "When the page was last modified"
     }),
-    sanity.defineField({
+    defineField7({
       name: "about",
       title: "About (Entities)",
       type: "array",
@@ -350,32 +260,35 @@ var schemaMarkupAboutPageFields = sanity.defineType({
     prepare: ({ title }) => ({ title: title || "About Page" })
   }
 });
-var schemaMarkupContactPageFields = sanity.defineType({
+
+// src/schemas/entities/contact-page-entity.ts
+import { defineType as defineType8, defineField as defineField8 } from "sanity";
+var schemaMarkupContactPageFields = defineType8({
   name: "schemaMarkupContactPageFields",
   title: "Contact Page Fields",
   type: "object",
   fields: [
-    sanity.defineField({
+    defineField8({
       name: "name",
       type: "string",
       description: "Name of the contact page (defaults to page title)"
     }),
-    sanity.defineField({
+    defineField8({
       name: "description",
       type: "text",
       description: "Description of the contact page (defaults to meta description)"
     }),
-    sanity.defineField({
+    defineField8({
       name: "inLanguage",
       type: "string",
       description: "Language code (e.g., 'en-US')"
     }),
-    sanity.defineField({
+    defineField8({
       name: "datePublished",
       type: "datetime",
       description: "When the page was first published"
     }),
-    sanity.defineField({
+    defineField8({
       name: "dateModified",
       type: "datetime",
       description: "When the page was last modified"
@@ -398,42 +311,46 @@ var entities_default = [
   schemaMarkupAboutPageFields,
   schemaMarkupContactPageFields
 ];
-var schemaMarkupOrganization = sanity.defineType({
+
+// src/schemas/global/organization.ts
+import { MdBusiness } from "react-icons/md";
+import { defineType as defineType9, defineField as defineField9 } from "sanity";
+var schemaMarkupOrganization = defineType9({
   name: "schemaMarkupOrganization",
-  icon: md.MdBusiness,
+  icon: MdBusiness,
   title: "Organization",
   type: "document",
   validation: (Rule) => Rule.custom((val) => {
-    if (!val) return true;
+    if (!val)
+      return true;
     const hasRef = !!val.organization?._ref;
     const hasInline = !!val.name;
     return hasRef || hasInline || "Provide an organization reference or set a Name.";
   }),
   fields: [
-    sanity.defineField({
+    defineField9({
       name: "name",
       title: "Name (Inline)",
       type: "string",
       description: "Inline fallback/override if no reference is set."
     }),
-    sanity.defineField({
+    defineField9({
       name: "url",
       title: "URL (Inline)",
       type: "url"
     }),
-    sanity.defineField({
+    defineField9({
       name: "logo",
       title: "Logo (Inline)",
       type: "image"
-      // shared image object type
     }),
-    sanity.defineField({
+    defineField9({
       name: "department",
       title: "Department (Inline)",
       type: "array",
       of: [{ type: "reference", to: [{ type: "schemaMarkupOrganization" }] }]
     }),
-    sanity.defineField({
+    defineField9({
       name: "contactPoint",
       title: "Contact Points",
       type: "array",
@@ -442,32 +359,32 @@ var schemaMarkupOrganization = sanity.defineType({
         {
           type: "object",
           fields: [
-            sanity.defineField({
+            defineField9({
               name: "contactType",
               title: "Contact Type",
               type: "string",
               description: "e.g., customer service, sales, support",
               validation: (Rule) => Rule.required()
             }),
-            sanity.defineField({
+            defineField9({
               name: "telephone",
               title: "Telephone",
               type: "string",
               description: "Phone number including country code"
             }),
-            sanity.defineField({
+            defineField9({
               name: "email",
               title: "Email",
               type: "string",
               validation: (Rule) => Rule.email()
             }),
-            sanity.defineField({
+            defineField9({
               name: "url",
               title: "Contact URL",
               type: "url",
               description: "URL to contact form or page"
             }),
-            sanity.defineField({
+            defineField9({
               name: "areaServed",
               title: "Area Served",
               type: "array",
@@ -475,7 +392,7 @@ var schemaMarkupOrganization = sanity.defineType({
               description: "Geographic areas served (e.g., US, GB, Worldwide)",
               options: { layout: "tags" }
             }),
-            sanity.defineField({
+            defineField9({
               name: "availableLanguage",
               title: "Available Languages",
               type: "array",
@@ -498,7 +415,7 @@ var schemaMarkupOrganization = sanity.defineType({
         }
       ]
     }),
-    sanity.defineField({
+    defineField9({
       name: "sameAs",
       title: "Profiles (sameAs)",
       type: "array",
@@ -522,44 +439,36 @@ var schemaMarkupOrganization = sanity.defineType({
     }
   }
 });
-var schemaMarkupPerson = sanity.defineType({
+
+// src/schemas/global/person.ts
+import { MdPerson } from "react-icons/md";
+import { defineType as defineType10, defineField as defineField10 } from "sanity";
+var schemaMarkupPerson = defineType10({
   name: "schemaMarkupPerson",
   title: "Person",
   type: "document",
-  icon: md.MdPerson,
+  icon: MdPerson,
   validation: (Rule) => Rule.custom((val) => {
-    if (!val) return true;
+    if (!val)
+      return true;
     const hasRef = !!val.person?._ref;
     const hasInline = !!val.name;
     return hasRef || hasInline || "Provide a person reference or set a Name.";
   }),
   fields: [
-    // defineField({
-    // 	name: "person",
-    // 	title: "Reference",
-    // 	type: "reference",
-    // 	to: [{ type: "person" }], // change if your base person doc uses a different type name
-    // 	weak: true,
-    // 	description: "Preferred: reference a Person document.",
-    // }),
-    sanity.defineField({
+    defineField10({
       name: "name",
       title: "Name (Inline)",
       type: "string",
       description: "Inline fallback or override if no reference is set."
     }),
-    sanity.defineField({
+    defineField10({
       name: "url",
       title: "URL (Inline)",
       type: "url",
       description: "Personal website or profile URL."
     }),
-    // defineField({
-    // 	name: "image",
-    // 	title: "Image (Inline)",
-    // 	type: "jsonldImageObject", // reuse shared type
-    // }),
-    sanity.defineField({
+    defineField10({
       name: "sameAs",
       title: "Profiles (sameAs)",
       type: "array",
@@ -567,13 +476,13 @@ var schemaMarkupPerson = sanity.defineType({
       options: { layout: "tags" },
       description: "Social or professional profiles associated with this person."
     }),
-    sanity.defineField({
+    defineField10({
       name: "jobTitle",
       title: "Job Title (Optional)",
       type: "string",
       description: "Role or title, if relevant (optional, ignored by Google)."
     }),
-    sanity.defineField({
+    defineField10({
       name: "affiliation",
       title: "Affiliation (Optional)",
       type: "array",
@@ -594,20 +503,23 @@ var schemaMarkupPerson = sanity.defineType({
     })
   }
 });
-var schemaMarkupFAQItem = sanity.defineType({
+
+// src/schemas/global/faq-item.ts
+import { defineType as defineType11, defineField as defineField11 } from "sanity";
+var schemaMarkupFAQItem = defineType11({
   name: "schemaMarkupFAQItem",
   title: "FAQ Item",
   type: "object",
   options: { collapsible: true, collapsed: true },
   fields: [
-    sanity.defineField({
+    defineField11({
       name: "question",
       title: "Question",
       type: "string",
       validation: (Rule) => Rule.required(),
       description: "The question being answered. (Used as the Question name in JSON-LD)"
     }),
-    sanity.defineField({
+    defineField11({
       name: "answer",
       title: "Answer",
       type: "text",
@@ -619,7 +531,7 @@ var schemaMarkupFAQItem = sanity.defineType({
   preview: {
     select: { title: "question", subtitle: "answer" },
     prepare({ title, subtitle }) {
-      const shortAnswer = subtitle && subtitle.length > 60 ? subtitle.slice(0, 57).trim() + "\u2026" : subtitle;
+      const shortAnswer = subtitle && subtitle.length > 60 ? subtitle.slice(0, 57).trim() + "…" : subtitle;
       return {
         title: title || "Untitled FAQ",
         subtitle: shortAnswer || ""
@@ -634,34 +546,37 @@ var global_default = [
   schemaMarkupOrganization,
   schemaMarkupFAQItem
 ];
-var schemaMarkupAddress = sanity.defineType({
+
+// src/schemas/fields/schema-markup/address.ts
+import { defineType as defineType12, defineField as defineField12 } from "sanity";
+var schemaMarkupAddress = defineType12({
   name: "schemaMarkupAddress",
   title: "Postal Address",
   type: "object",
   options: { collapsible: true, collapsed: true },
   fields: [
-    sanity.defineField({
+    defineField12({
       name: "streetAddress",
       title: "Street Address",
       type: "string",
       description: 'Street and number, e.g. "123 Main St".'
     }),
-    sanity.defineField({
+    defineField12({
       name: "addressLocality",
       title: "City / Locality",
       type: "string"
     }),
-    sanity.defineField({
+    defineField12({
       name: "addressRegion",
       title: "State / Region",
       type: "string"
     }),
-    sanity.defineField({
+    defineField12({
       name: "postalCode",
       title: "Postal Code",
       type: "string"
     }),
-    sanity.defineField({
+    defineField12({
       name: "addressCountry",
       title: "Country",
       type: "string",
@@ -685,33 +600,36 @@ var schemaMarkupAddress = sanity.defineType({
     }
   }
 });
-var schemaMarkupAggregateRating = sanity.defineType({
+
+// src/schemas/fields/schema-markup/aggregate-rating.ts
+import { defineType as defineType13, defineField as defineField13 } from "sanity";
+var schemaMarkupAggregateRating = defineType13({
   name: "schemaMarkupAggregateRating",
   title: "Aggregate Rating",
   type: "object",
   options: { collapsible: true, collapsed: true },
   fields: [
-    sanity.defineField({
+    defineField13({
       name: "ratingValue",
       title: "Rating Value",
       type: "number",
       validation: (Rule) => Rule.min(1).max(5).precision(1),
       description: "Average rating value (usually between 1.0 and 5.0)."
     }),
-    sanity.defineField({
+    defineField13({
       name: "reviewCount",
       title: "Review Count",
       type: "number",
       validation: (Rule) => Rule.min(0),
       description: "Total number of reviews included in this aggregate."
     }),
-    sanity.defineField({
+    defineField13({
       name: "bestRating",
       title: "Best Rating (Optional)",
       type: "number",
       description: "Optional maximum rating value (defaults to 5 if omitted)."
     }),
-    sanity.defineField({
+    defineField13({
       name: "worstRating",
       title: "Worst Rating (Optional)",
       type: "number",
@@ -725,13 +643,16 @@ var schemaMarkupAggregateRating = sanity.defineType({
     },
     prepare({ value, count }) {
       return {
-        title: value ? `\u2B50\uFE0F ${value.toFixed(1)} / 5` : "Aggregate Rating",
+        title: value ? `⭐️ ${value.toFixed(1)} / 5` : "Aggregate Rating",
         subtitle: count ? `${count} reviews` : ""
       };
     }
   }
 });
-var schemaMarkupGeo = sanity.defineType({
+
+// src/schemas/fields/schema-markup/geo.ts
+import { defineType as defineType14 } from "sanity";
+var schemaMarkupGeo = defineType14({
   name: "schemaMarkupGeo",
   title: "Geo Coordinates",
   type: "object",
@@ -751,24 +672,39 @@ var schemaMarkupGeo = sanity.defineType({
     })
   }
 });
-var meta_description_default = sanity.defineField({
+
+// src/schemas/fields/metadata/meta-description.ts
+import { defineField as defineField14 } from "sanity";
+var meta_description_default = defineField14({
   name: "metaDescription",
   title: "Meta Description",
   type: "text",
   rows: 3,
   description: "The description of the page. Used for the meta description.",
-  validation: (Rule) => Rule.max(160).warning(
-    "Long descriptions (over 160 characters) will be truncated by Google."
-  )
+  validation: (Rule) => Rule.max(160).warning("Long descriptions (over 160 characters) will be truncated by Google.")
 });
-var SeoDefaultsContext = react.createContext(null);
+
+// src/components/core/InputWithGlobalDefault.tsx
+import { Box } from "@sanity/ui";
+
+// src/context/SeoDefaultsContext.tsx
+import {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useState
+} from "react";
+import { useClient } from "sanity";
+import { jsxDEV } from "react/jsx-dev-runtime";
+var SeoDefaultsContext = createContext(null);
 var SeoDefaultsProvider = ({ children }) => {
-  const client = sanity.useClient({ apiVersion: "2024-10-01" });
-  const [defaults, setDefaults] = react.useState({
+  const client = useClient({ apiVersion: "2025-01-11" });
+  const [defaults, setDefaults] = useState({
     seoDefaults: null,
     schemaDefaults: null
   });
-  const cleanup = react.useCallback(() => {
+  const cleanup = useCallback(() => {
     if (cleanup.seoSub) {
       cleanup.seoSub.unsubscribe();
     }
@@ -786,95 +722,171 @@ var SeoDefaultsProvider = ({ children }) => {
       }
     });
   };
-  react.useEffect(() => {
+  useEffect(() => {
     const seoSub = sub(`*[_type == "seoDefaults"][0]`, "seoDefaults");
-    const schemaSub = sub(
-      `*[_type == "schemaMarkupDefaults"][0]`,
-      "schemaDefaults"
-    );
+    const schemaSub = sub(`*[_type == "schemaMarkupDefaults"][0]`, "schemaDefaults");
     cleanup.seoSub = seoSub;
     cleanup.schemaSub = schemaSub;
-    client.fetch(`*[_type == "seoDefaults"][0]`).then(
-      (seoDefaults2) => setDefaults((prev) => ({
-        ...prev,
-        seoDefaults: seoDefaults2
-      }))
-    );
-    client.fetch(`*[_type == "schemaMarkupDefaults"][0]`).then(
-      (schemaDefaults) => setDefaults((prev) => ({
-        ...prev,
-        schemaDefaults
-      }))
-    );
+    client.fetch(`*[_type == "seoDefaults"][0]`).then((seoDefaults) => setDefaults((prev) => ({
+      ...prev,
+      seoDefaults
+    })));
+    client.fetch(`*[_type == "schemaMarkupDefaults"][0]`).then((schemaDefaults) => setDefaults((prev) => ({
+      ...prev,
+      schemaDefaults
+    })));
     return cleanup;
   }, [client]);
-  return /* @__PURE__ */ jsxRuntime.jsx(SeoDefaultsContext.Provider, { value: defaults, children });
+  return /* @__PURE__ */ jsxDEV(SeoDefaultsContext.Provider, {
+    value: defaults,
+    children
+  }, undefined, false, undefined, this);
 };
-var useSeoDefaults = () => react.useContext(SeoDefaultsContext);
+var useSeoDefaults = () => useContext(SeoDefaultsContext);
+
+// src/components/core/InputWithGlobalDefault.tsx
+import { MdCheck, MdWarning } from "react-icons/md";
+
+// src/components/partials/CardWithIcon.tsx
+import { Card, Flex, Text } from "@sanity/ui";
+import { jsxDEV as jsxDEV2 } from "react/jsx-dev-runtime";
 function CardWithIcon({
   icon,
   text,
   tone = "nuetral"
 }) {
   const Icon = icon;
-  return /* @__PURE__ */ jsxRuntime.jsx(ui.Card, { marginBottom: 3, tone, padding: 3, children: /* @__PURE__ */ jsxRuntime.jsxs(ui.Flex, { gap: 2, align: "center", children: [
-    Icon && /* @__PURE__ */ jsxRuntime.jsx(Icon, { size: 18 }),
-    /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: 1, children: text })
-  ] }) });
-}
-function InputWithGlobalDefault(props) {
-  const { seoDefaults: seoDefaults2 } = useSeoDefaults();
-  const defaultFieldName = props?.schemaType?.options?.matchingDefaultField;
-  if (!defaultFieldName) {
-    console.warn(
-      "No default field name found for input: ",
-      props?.schemaType?.name
-    );
-  }
-  const value = props?.value;
-  const hasDefault = defaultFieldName ? seoDefaults2?.[defaultFieldName] : false;
-  return /* @__PURE__ */ jsxRuntime.jsxs("div", { children: [
-    !value && !hasDefault && /* @__PURE__ */ jsxRuntime.jsx(
-      CardWithIcon,
-      {
-        icon: md.MdWarning,
-        tone: "critical",
-        text: "This field does not have a global default set. Make sure to fill it in here."
-      }
-    ),
-    !value && hasDefault && /* @__PURE__ */ jsxRuntime.jsx(
-      CardWithIcon,
-      {
-        icon: md.MdCheck,
-        tone: "suggest",
-        text: "This field is using the global default."
-      }
-    ),
-    /* @__PURE__ */ jsxRuntime.jsx(ui.Box, { children: props.renderDefault(props) })
-  ] });
+  return /* @__PURE__ */ jsxDEV2(Card, {
+    marginBottom: 3,
+    tone,
+    padding: 3,
+    children: /* @__PURE__ */ jsxDEV2(Flex, {
+      gap: 2,
+      align: "center",
+      children: [
+        Icon && /* @__PURE__ */ jsxDEV2(Icon, {
+          size: 18
+        }, undefined, false, undefined, this),
+        /* @__PURE__ */ jsxDEV2(Text, {
+          size: 1,
+          children: text
+        }, undefined, false, undefined, this)
+      ]
+    }, undefined, true, undefined, this)
+  }, undefined, false, undefined, this);
 }
 
-// src/components/socials/facebook/FacebookCard.module.css
-var FacebookCard_default = {};
+// src/components/core/InputWithGlobalDefault.tsx
+import { jsxDEV as jsxDEV3 } from "react/jsx-dev-runtime";
+function InputWithGlobalDefault(props) {
+  const { seoDefaults } = useSeoDefaults();
+  const defaultFieldName = props?.schemaType?.options?.matchingDefaultField;
+  if (!defaultFieldName) {
+    console.warn("No default field name found for input: ", props?.schemaType?.name);
+  }
+  const value = props?.value;
+  const hasDefault = defaultFieldName ? seoDefaults?.[defaultFieldName] : false;
+  return /* @__PURE__ */ jsxDEV3("div", {
+    children: [
+      !value && !hasDefault && /* @__PURE__ */ jsxDEV3(CardWithIcon, {
+        icon: MdWarning,
+        tone: "critical",
+        text: "This field does not have a global default set. Make sure to fill it in here."
+      }, undefined, false, undefined, this),
+      !value && hasDefault && /* @__PURE__ */ jsxDEV3(CardWithIcon, {
+        icon: MdCheck,
+        tone: "suggest",
+        text: "This field is using the global default."
+      }, undefined, false, undefined, this),
+      /* @__PURE__ */ jsxDEV3(Box, {
+        children: props.renderDefault(props)
+      }, undefined, false, undefined, this)
+    ]
+  }, undefined, true, undefined, this);
+}
+
+// src/components/core/PageSeoInput/PageSeoInput.tsx
+import { Box as Box6, Flex as Flex7 } from "@sanity/ui";
+import { useEffect as useEffect2, useState as useState2 } from "react";
+import { MdEdit, MdPreview } from "react-icons/md";
+import { useClient as useClient2, useFormValue } from "sanity";
 
 // src/utils/string.ts
 function truncate(text, len) {
-  if (!text) return "";
-  if (text.length <= len) return text;
+  if (!text)
+    return "";
+  if (text.length <= len)
+    return text;
   let out = text.slice(0, len);
   const lastSpace = out.lastIndexOf(" ");
-  if (lastSpace > 40) out = out.slice(0, lastSpace);
-  return `${out}\u2026`;
+  if (lastSpace > 40)
+    out = out.slice(0, lastSpace);
+  return `${out}…`;
 }
 var concatenatePageTitle = (pageTitle, siteTitle, template) => {
-  if (!pageTitle) return siteTitle;
-  if (!siteTitle) return pageTitle;
-  if (!template) return `${pageTitle} | ${siteTitle}`;
+  if (!pageTitle)
+    return siteTitle;
+  if (!siteTitle)
+    return pageTitle;
+  if (!template)
+    return `${pageTitle} | ${siteTitle}`;
   return template.replace("{pageTitle}", pageTitle || "").replace("{siteTitle}", siteTitle || "");
 };
-function SocialCardWrapper(props) {
-  return /* @__PURE__ */ jsxRuntime.jsx(ui.Card, { border: false, radius: 2, tone: "neutral", children: props.children });
+
+// src/components/partials/ButtonWithIcon.tsx
+import { Button, Flex as Flex3, Text as Text3 } from "@sanity/ui";
+import { jsxDEV as jsxDEV4 } from "react/jsx-dev-runtime";
+function ButtonWithIcon({
+  icon,
+  buttonProps = {},
+  label
+}) {
+  const Icon = icon;
+  return /* @__PURE__ */ jsxDEV4(Button, {
+    ...buttonProps,
+    children: /* @__PURE__ */ jsxDEV4(Flex3, {
+      gap: 2,
+      align: "center",
+      justify: "center",
+      children: [
+        Icon && /* @__PURE__ */ jsxDEV4(Icon, {
+          size: 17
+        }, undefined, false, undefined, this),
+        /* @__PURE__ */ jsxDEV4(Text3, {
+          size: 1,
+          weight: "semibold",
+          children: label
+        }, undefined, false, undefined, this)
+      ]
+    }, undefined, true, undefined, this)
+  }, undefined, false, undefined, this);
 }
+
+// src/components/socials/facebook/FacebookCard.tsx
+import { Stack, Text as Text4, Box as Box2, Avatar, Flex as Flex4 } from "@sanity/ui";
+
+// src/components/socials/facebook/FacebookCard.module.css
+var FacebookCard_module_default = {
+  facebookCard: "facebookCard_iq-4hA",
+  header: "header_iq-4hA",
+  image: "image_iq-4hA",
+  cardSection: "cardSection_iq-4hA"
+};
+
+// src/components/partials/SocialCardWrapper.tsx
+import { Card as Card3 } from "@sanity/ui";
+import { jsxDEV as jsxDEV5 } from "react/jsx-dev-runtime";
+function SocialCardWrapper(props) {
+  return /* @__PURE__ */ jsxDEV5(Card3, {
+    border: false,
+    radius: 2,
+    tone: "neutral",
+    children: props.children
+  }, undefined, false, undefined, this);
+}
+
+// src/components/socials/facebook/FacebookCard.tsx
+import { jsxDEV as jsxDEV6 } from "react/jsx-dev-runtime";
 function FacebookCard(props) {
   const fallback = {
     title: "My Awesome Page",
@@ -885,26 +897,165 @@ function FacebookCard(props) {
     avatar: "https://placehold.co/40x40"
   };
   const data = { ...fallback, ...props };
-  return /* @__PURE__ */ jsxRuntime.jsxs(SocialCardWrapper, { children: [
-    /* @__PURE__ */ jsxRuntime.jsxs(ui.Flex, { gap: 2, padding: 3, className: FacebookCard_default.header, children: [
-      /* @__PURE__ */ jsxRuntime.jsx(ui.Avatar, { src: data.avatar, size: 3 }),
-      /* @__PURE__ */ jsxRuntime.jsxs(ui.Stack, { space: 2, children: [
-        /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { weight: "semibold", size: 2, children: data.siteTitle }),
-        /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: 1, muted: true, children: data.siteUrl })
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxRuntime.jsx(ui.Box, { children: /* @__PURE__ */ jsxRuntime.jsx("img", { className: FacebookCard_default.image, src: data.image, alt: "Facebook preview" }) }),
-    /* @__PURE__ */ jsxRuntime.jsx(ui.Box, { padding: 3, children: /* @__PURE__ */ jsxRuntime.jsxs(ui.Stack, { space: 3, children: [
-      /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: 1, muted: true, children: data.siteUrl }),
-      /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { weight: "semibold", size: 3, children: truncate(data.title, 60) }),
-      /* @__PURE__ */ jsxRuntime.jsx(ui.Box, { marginTop: 1, children: /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: 2, children: truncate(data.description, 110) }) })
-    ] }) })
-  ] });
+  return /* @__PURE__ */ jsxDEV6(SocialCardWrapper, {
+    children: [
+      /* @__PURE__ */ jsxDEV6(Flex4, {
+        gap: 2,
+        padding: 3,
+        className: FacebookCard_module_default.header,
+        children: [
+          /* @__PURE__ */ jsxDEV6(Avatar, {
+            src: data.avatar,
+            size: 3
+          }, undefined, false, undefined, this),
+          /* @__PURE__ */ jsxDEV6(Stack, {
+            space: 2,
+            children: [
+              /* @__PURE__ */ jsxDEV6(Text4, {
+                weight: "semibold",
+                size: 2,
+                children: data.siteTitle
+              }, undefined, false, undefined, this),
+              /* @__PURE__ */ jsxDEV6(Text4, {
+                size: 1,
+                muted: true,
+                children: data.siteUrl
+              }, undefined, false, undefined, this)
+            ]
+          }, undefined, true, undefined, this)
+        ]
+      }, undefined, true, undefined, this),
+      /* @__PURE__ */ jsxDEV6(Box2, {
+        children: /* @__PURE__ */ jsxDEV6("img", {
+          className: FacebookCard_module_default.image,
+          src: data.image,
+          alt: "Facebook preview"
+        }, undefined, false, undefined, this)
+      }, undefined, false, undefined, this),
+      /* @__PURE__ */ jsxDEV6(Box2, {
+        padding: 3,
+        children: /* @__PURE__ */ jsxDEV6(Stack, {
+          space: 3,
+          children: [
+            /* @__PURE__ */ jsxDEV6(Text4, {
+              size: 1,
+              muted: true,
+              children: data.siteUrl
+            }, undefined, false, undefined, this),
+            /* @__PURE__ */ jsxDEV6(Text4, {
+              weight: "semibold",
+              size: 3,
+              children: truncate(data.title, 60)
+            }, undefined, false, undefined, this),
+            /* @__PURE__ */ jsxDEV6(Box2, {
+              marginTop: 1,
+              children: /* @__PURE__ */ jsxDEV6(Text4, {
+                size: 2,
+                children: truncate(data.description, 110)
+              }, undefined, false, undefined, this)
+            }, undefined, false, undefined, this)
+          ]
+        }, undefined, true, undefined, this)
+      }, undefined, false, undefined, this)
+    ]
+  }, undefined, true, undefined, this);
 }
-var FacebookCard_default2 = FacebookCard;
+var FacebookCard_default = FacebookCard;
+
+// src/components/socials/google/GoogleEntry.tsx
+import { Stack as Stack2, Text as Text5, Box as Box3, Flex as Flex5, Avatar as Avatar2 } from "@sanity/ui";
+
+// src/components/socials/google/GoogleEntry.module.css
+var GoogleEntry_module_default = {
+  googleCard: "googleCard_yJDEgw",
+  title: "title_yJDEgw",
+  site: "site_yJDEgw",
+  desc: "desc_yJDEgw",
+  cardSection: "cardSection_yJDEgw"
+};
+
+// src/components/socials/google/GoogleEntry.tsx
+import { useRootTheme } from "@sanity/ui";
+import { jsxDEV as jsxDEV7 } from "react/jsx-dev-runtime";
+function GoogleEntry(props) {
+  const fallback = {
+    title: "My Awesome Page - MyWebsite",
+    description: "A compelling meta description for Google search snippet. Explain what users can find inside!",
+    siteUrl: "https://mywebsite.com/page",
+    favicon: "https://placehold.co/32x32"
+  };
+  const data = { ...fallback, ...props };
+  const theme = useRootTheme();
+  return /* @__PURE__ */ jsxDEV7(SocialCardWrapper, {
+    children: /* @__PURE__ */ jsxDEV7(Box3, {
+      padding: 3,
+      children: /* @__PURE__ */ jsxDEV7(Stack2, {
+        space: 3,
+        children: [
+          /* @__PURE__ */ jsxDEV7(Flex5, {
+            align: "center",
+            marginBottom: 2,
+            gap: 2,
+            children: [
+              /* @__PURE__ */ jsxDEV7(Avatar2, {
+                size: 2,
+                src: data.favicon,
+                alt: "Favicon"
+              }, undefined, false, undefined, this),
+              /* @__PURE__ */ jsxDEV7(Stack2, {
+                space: 2,
+                children: [
+                  /* @__PURE__ */ jsxDEV7(Text5, {
+                    size: 1,
+                    weight: "semibold",
+                    className: GoogleEntry_module_default.site,
+                    children: data.siteTitle
+                  }, undefined, false, undefined, this),
+                  /* @__PURE__ */ jsxDEV7(Text5, {
+                    size: 1,
+                    muted: true,
+                    className: GoogleEntry_module_default.site,
+                    children: data.siteUrl
+                  }, undefined, false, undefined, this)
+                ]
+              }, undefined, true, undefined, this)
+            ]
+          }, undefined, true, undefined, this),
+          /* @__PURE__ */ jsxDEV7(Text5, {
+            style: {
+              color: theme.scheme === "light" ? "#1D11AC" : "#99C2FF"
+            },
+            weight: "medium",
+            size: 3,
+            className: GoogleEntry_module_default.title,
+            children: truncate(data.title, 60)
+          }, undefined, false, undefined, this),
+          /* @__PURE__ */ jsxDEV7(Text5, {
+            size: 2,
+            muted: true,
+            className: GoogleEntry_module_default.desc,
+            children: truncate(data.description, 155)
+          }, undefined, false, undefined, this)
+        ]
+      }, undefined, true, undefined, this)
+    }, undefined, false, undefined, this)
+  }, undefined, false, undefined, this);
+}
+var GoogleEntry_default = GoogleEntry;
+
+// src/components/socials/twitter/TwitterCard.tsx
+import { Stack as Stack3, Text as Text6, Box as Box4, Avatar as Avatar3, Flex as Flex6 } from "@sanity/ui";
 
 // src/components/socials/twitter/TwitterCard.module.css
-var TwitterCard_default = {};
+var TwitterCard_module_default = {
+  twitterCard: "twitterCard_1NtJNQ",
+  userRow: "userRow_1NtJNQ",
+  imageLarge: "imageLarge_1NtJNQ",
+  cardSection: "cardSection_1NtJNQ"
+};
+
+// src/components/socials/twitter/TwitterCard.tsx
+import { jsxDEV as jsxDEV8 } from "react/jsx-dev-runtime";
 function TwitterCard(props) {
   const fallback = {
     siteTitle: "Why Static Site Generators Rock",
@@ -918,146 +1069,161 @@ function TwitterCard(props) {
     ...fallback,
     ...props
   };
-  return /* @__PURE__ */ jsxRuntime.jsxs(SocialCardWrapper, { children: [
-    /* @__PURE__ */ jsxRuntime.jsxs(ui.Flex, { gap: 2, padding: 3, className: TwitterCard_default.userRow, children: [
-      /* @__PURE__ */ jsxRuntime.jsx(ui.Avatar, { src: data.avatar, size: 3 }),
-      /* @__PURE__ */ jsxRuntime.jsxs(ui.Stack, { space: 2, children: [
-        /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { weight: "semibold", size: 2, children: data.siteTitle }),
-        /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: 1, muted: true, children: data.twitterHandle })
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxRuntime.jsx(ui.Box, { children: /* @__PURE__ */ jsxRuntime.jsx(
-      "img",
-      {
-        className: TwitterCard_default.imageLarge,
-        src: data.image,
-        alt: "Twitter preview"
-      }
-    ) }),
-    /* @__PURE__ */ jsxRuntime.jsx(ui.Box, { padding: 3, children: /* @__PURE__ */ jsxRuntime.jsxs(ui.Flex, { direction: "column", gap: 4, children: [
-      /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: 1, muted: true, children: data.siteUrl }),
-      /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { weight: "semibold", size: 3, children: truncate(data.title, 70) }),
-      /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: 2, children: truncate(data.description, 120) })
-    ] }) })
-  ] });
+  return /* @__PURE__ */ jsxDEV8(SocialCardWrapper, {
+    children: [
+      /* @__PURE__ */ jsxDEV8(Flex6, {
+        gap: 2,
+        padding: 3,
+        className: TwitterCard_module_default.userRow,
+        children: [
+          /* @__PURE__ */ jsxDEV8(Avatar3, {
+            src: data.avatar,
+            size: 3
+          }, undefined, false, undefined, this),
+          /* @__PURE__ */ jsxDEV8(Stack3, {
+            space: 2,
+            children: [
+              /* @__PURE__ */ jsxDEV8(Text6, {
+                weight: "semibold",
+                size: 2,
+                children: data.siteTitle
+              }, undefined, false, undefined, this),
+              /* @__PURE__ */ jsxDEV8(Text6, {
+                size: 1,
+                muted: true,
+                children: data.twitterHandle
+              }, undefined, false, undefined, this)
+            ]
+          }, undefined, true, undefined, this)
+        ]
+      }, undefined, true, undefined, this),
+      /* @__PURE__ */ jsxDEV8(Box4, {
+        children: /* @__PURE__ */ jsxDEV8("img", {
+          className: TwitterCard_module_default.imageLarge,
+          src: data.image,
+          alt: "Twitter preview"
+        }, undefined, false, undefined, this)
+      }, undefined, false, undefined, this),
+      /* @__PURE__ */ jsxDEV8(Box4, {
+        padding: 3,
+        children: /* @__PURE__ */ jsxDEV8(Flex6, {
+          direction: "column",
+          gap: 4,
+          children: [
+            /* @__PURE__ */ jsxDEV8(Text6, {
+              size: 1,
+              muted: true,
+              children: data.siteUrl
+            }, undefined, false, undefined, this),
+            /* @__PURE__ */ jsxDEV8(Text6, {
+              weight: "semibold",
+              size: 3,
+              children: truncate(data.title, 70)
+            }, undefined, false, undefined, this),
+            /* @__PURE__ */ jsxDEV8(Text6, {
+              size: 2,
+              children: truncate(data.description, 120)
+            }, undefined, false, undefined, this)
+          ]
+        }, undefined, true, undefined, this)
+      }, undefined, false, undefined, this)
+    ]
+  }, undefined, true, undefined, this);
 }
-var TwitterCard_default2 = TwitterCard;
+var TwitterCard_default = TwitterCard;
 
-// src/components/socials/google/GoogleEntry.module.css
-var GoogleEntry_default = {};
-function GoogleEntry(props) {
-  const fallback = {
-    title: "My Awesome Page - MyWebsite",
-    description: "A compelling meta description for Google search snippet. Explain what users can find inside!",
-    siteUrl: "https://mywebsite.com/page",
-    favicon: "https://placehold.co/32x32"
-    // fallback favicon
-  };
-  const data = { ...fallback, ...props };
-  const theme = ui.useRootTheme();
-  return /* @__PURE__ */ jsxRuntime.jsx(SocialCardWrapper, { children: /* @__PURE__ */ jsxRuntime.jsx(ui.Box, { padding: 3, children: /* @__PURE__ */ jsxRuntime.jsxs(ui.Stack, { space: 3, children: [
-    /* @__PURE__ */ jsxRuntime.jsxs(ui.Flex, { align: "center", marginBottom: 2, gap: 2, children: [
-      /* @__PURE__ */ jsxRuntime.jsx(ui.Avatar, { size: 2, src: data.favicon, alt: "Favicon" }),
-      /* @__PURE__ */ jsxRuntime.jsxs(ui.Stack, { space: 2, children: [
-        /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: 1, weight: "semibold", className: GoogleEntry_default.site, children: data.siteTitle }),
-        /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: 1, muted: true, className: GoogleEntry_default.site, children: data.siteUrl })
-      ] })
-    ] }),
-    /* @__PURE__ */ jsxRuntime.jsx(
-      ui.Text,
-      {
-        style: {
-          color: theme.scheme === "light" ? "#1D11AC" : "#99C2FF"
-        },
-        weight: "medium",
-        size: 3,
-        className: GoogleEntry_default.title,
-        children: truncate(data.title, 60)
-      }
-    ),
-    /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: 2, muted: true, className: GoogleEntry_default.desc, children: truncate(data.description, 155) })
-  ] }) }) });
-}
-var GoogleEntry_default2 = GoogleEntry;
+// src/components/core/PageSeoInput/PreviewGroup.tsx
+import { Box as Box5, Text as Text7 } from "@sanity/ui";
+import { jsxDEV as jsxDEV9 } from "react/jsx-dev-runtime";
 function PreviewGroup({
   title,
   children
 }) {
-  return /* @__PURE__ */ jsxRuntime.jsxs("div", { children: [
-    /* @__PURE__ */ jsxRuntime.jsx(ui.Box, { marginBottom: 4, children: /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { weight: "semibold", size: 2, children: title }) }),
-    children
-  ] });
+  return /* @__PURE__ */ jsxDEV9("div", {
+    children: [
+      /* @__PURE__ */ jsxDEV9(Box5, {
+        marginBottom: 4,
+        children: /* @__PURE__ */ jsxDEV9(Text7, {
+          weight: "semibold",
+          size: 2,
+          children: title
+        }, undefined, false, undefined, this)
+      }, undefined, false, undefined, this),
+      children
+    ]
+  }, undefined, true, undefined, this);
 }
-function ButtonWithIcon({
-  icon,
-  buttonProps = {},
-  label
-}) {
-  const Icon = icon;
-  return /* @__PURE__ */ jsxRuntime.jsx(ui.Button, { ...buttonProps, children: /* @__PURE__ */ jsxRuntime.jsxs(ui.Flex, { gap: 2, align: "center", justify: "center", children: [
-    Icon && /* @__PURE__ */ jsxRuntime.jsx(Icon, { size: 17 }),
-    /* @__PURE__ */ jsxRuntime.jsx(ui.Text, { size: 1, weight: "semibold", children: label })
-  ] }) });
-}
+
+// src/components/core/PageSeoInput/PageSeoInput.tsx
+import { jsxDEV as jsxDEV10 } from "react/jsx-dev-runtime";
 var PREVIEW_GROUPS = [
   {
     name: "Facebook",
-    component: FacebookCard_default2,
+    component: FacebookCard_default,
     title: "Facebook"
   },
   {
     name: "Twitter / X",
-    component: TwitterCard_default2,
+    component: TwitterCard_default,
     title: "Twitter"
   },
   {
     name: "Google",
-    component: GoogleEntry_default2,
+    component: GoogleEntry_default,
     title: "Google"
   }
 ];
 function PageSeoInput(props) {
-  const client = sanity.useClient({ apiVersion: "2025-01-11" });
+  const client = useClient2({ apiVersion: "2025-01-11" });
   const MODES = [
-    { name: "fields", title: "Fields", icon: md.MdEdit },
-    { name: "preview", title: "Preview", icon: md.MdPreview }
+    { name: "fields", title: "Fields", icon: MdEdit },
+    { name: "preview", title: "Preview", icon: MdPreview }
   ];
-  const [currentMode, setCurrentMode] = react.useState(
-    MODES[0]?.name
-  );
-  const [seoDefaults2, setSeoDefaults] = react.useState(null);
-  react.useEffect(() => {
+  const [currentMode, setCurrentMode] = useState2(MODES[0]?.name);
+  const [seoDefaults, setSeoDefaults] = useState2(null);
+  useEffect2(() => {
     client.fetch(`*[_type == "seoDefaults"][0]`).then(setSeoDefaults);
   }, [client]);
-  const document = sanity.useFormValue([]) || {};
+  const document = useFormValue([]) || {};
   const seoData = {
-    ...seoDefaults2 || {},
+    ...seoDefaults || {},
     ...props.value || {},
-    title: concatenatePageTitle(
-      document?.title,
-      seoDefaults2?.siteTitle,
-      seoDefaults2?.pageTitleTemplate
-    )
-    // merge description or other fields as needed
+    title: concatenatePageTitle(document?.title, seoDefaults?.siteTitle, seoDefaults?.pageTitleTemplate)
   };
-  return /* @__PURE__ */ jsxRuntime.jsxs("div", { children: [
-    /* @__PURE__ */ jsxRuntime.jsx(ui.Box, { marginBottom: 4, width: "fill", children: /* @__PURE__ */ jsxRuntime.jsx(ui.Flex, { gap: 2, width: "fill", children: MODES.map((m) => /* @__PURE__ */ jsxRuntime.jsx(
-      ButtonWithIcon,
-      {
-        buttonProps: {
-          padding: 2,
+  return /* @__PURE__ */ jsxDEV10("div", {
+    children: [
+      /* @__PURE__ */ jsxDEV10(Box6, {
+        marginBottom: 4,
+        width: "fill",
+        children: /* @__PURE__ */ jsxDEV10(Flex7, {
+          gap: 2,
           width: "fill",
-          mode: m.name === currentMode ? "default" : "ghost",
-          onClick: () => setCurrentMode(m.name)
-        },
-        label: m.title,
-        icon: m.icon
-      },
-      m.name
-    )) }) }),
-    currentMode === "fields" && props.renderDefault(props),
-    currentMode === "preview" && /* @__PURE__ */ jsxRuntime.jsx(ui.Flex, { gap: 6, marginTop: 6, direction: "column", children: PREVIEW_GROUPS.map((group) => /* @__PURE__ */ jsxRuntime.jsx(PreviewGroup, { title: group.title, children: /* @__PURE__ */ jsxRuntime.jsx(group.component, { ...seoData }) }, group.name)) })
-  ] });
+          children: MODES.map((m) => /* @__PURE__ */ jsxDEV10(ButtonWithIcon, {
+            buttonProps: {
+              padding: 2,
+              width: "fill",
+              mode: m.name === currentMode ? "default" : "ghost",
+              onClick: () => setCurrentMode(m.name)
+            },
+            label: m.title,
+            icon: m.icon
+          }, m.name, false, undefined, this))
+        }, undefined, false, undefined, this)
+      }, undefined, false, undefined, this),
+      currentMode === "fields" && props.renderDefault(props),
+      currentMode === "preview" && /* @__PURE__ */ jsxDEV10(Flex7, {
+        gap: 6,
+        marginTop: 6,
+        direction: "column",
+        children: PREVIEW_GROUPS.map((group) => /* @__PURE__ */ jsxDEV10(PreviewGroup, {
+          title: group.title,
+          children: /* @__PURE__ */ jsxDEV10(group.component, {
+            ...seoData
+          }, undefined, false, undefined, this)
+        }, group.name, false, undefined, this))
+      }, undefined, false, undefined, this)
+    ]
+  }, undefined, true, undefined, this);
 }
 
 // src/schemas/fields/metadata/page-metadata.ts
@@ -1082,9 +1248,7 @@ var page_metadata_default = {
       type: "text",
       rows: 3,
       description: "The description displayed when a user finds the site in search results. Defaults to the description provided in Settings > SEO.",
-      validation: (Rule) => Rule.max(160).warning(
-        "Long titles (over 160 characters) will be truncated by Google."
-      )
+      validation: (Rule) => Rule.max(160).warning("Long titles (over 160 characters) will be truncated by Google.")
     },
     {
       name: "searchVisibility",
@@ -1111,95 +1275,130 @@ var page_metadata_default = {
   ]
 };
 
+// src/schemas/fields/schema-markup/schemaMarkup.ts
+import { defineType as defineType15, defineField as defineField15 } from "sanity";
+
 // src/utils/needs.ts
 var COMMON_BY_TYPE = {
-  WebSite: /* @__PURE__ */ new Set(["name", "inLanguage", "image"]),
-  WebPage: /* @__PURE__ */ new Set(["name", "description", "inLanguage", "image"]),
-  Article: /* @__PURE__ */ new Set(["name", "description", "inLanguage", "image"]),
-  Product: /* @__PURE__ */ new Set(["name", "description", "image"]),
-  Event: /* @__PURE__ */ new Set(["name", "description", "image"]),
-  FAQPage: /* @__PURE__ */ new Set(["name", "description"]),
-  // often driven by mainEntity; keep minimal here
-  BreadcrumbList: /* @__PURE__ */ new Set([]),
-  // all data lives in itemListElement
-  Organization: /* @__PURE__ */ new Set(["name", "image"]),
-  // url lives in the entity group
-  Person: /* @__PURE__ */ new Set(["name", "image"]),
-  LocalBusiness: /* @__PURE__ */ new Set(["name", "description", "image"])
+  WebSite: new Set(["name", "inLanguage", "image"]),
+  WebPage: new Set(["name", "description", "inLanguage", "image"]),
+  Article: new Set(["name", "description", "inLanguage", "image"]),
+  Product: new Set(["name", "description", "image"]),
+  Event: new Set(["name", "description", "image"]),
+  FAQPage: new Set(["name", "description"]),
+  BreadcrumbList: new Set([]),
+  Organization: new Set(["name", "image"]),
+  Person: new Set(["name", "image"]),
+  LocalBusiness: new Set(["name", "description", "image"])
 };
 function needs(parent, key) {
   const t = parent?.type;
-  if (!t) return false;
-  const set3 = COMMON_BY_TYPE[t];
-  return set3 ? set3.has(key) : false;
+  if (!t)
+    return false;
+  const set = COMMON_BY_TYPE[t];
+  return set ? set.has(key) : false;
 }
+var REQUIRED_BY_TYPE = {
+  WebSite: new Set(["name"]),
+  WebPage: new Set(["name"]),
+  Article: new Set(["name"]),
+  Product: new Set(["name"]),
+  Event: new Set(["name"])
+};
+
+// src/components/core/PageSchemaMarkupInput/PageSchemaMarkupInput.tsx
+import { jsxDEV as jsxDEV11 } from "react/jsx-dev-runtime";
 function PageSchemaMarkupInput(props) {
-  return /* @__PURE__ */ jsxRuntime.jsx("div", { children: props.renderDefault(props) });
+  return /* @__PURE__ */ jsxDEV11("div", {
+    children: props.renderDefault(props)
+  }, undefined, false, undefined, this);
 }
+
+// src/components/core/PageSchemaMarkupInput/SchemaMarkupTypeSelector.tsx
+import { Box as Box7, Grid, useToast } from "@sanity/ui";
+import { set } from "sanity";
+import { jsxDEV as jsxDEV12 } from "react/jsx-dev-runtime";
 function ButtonSelector(props) {
-  ui.useToast();
+  const toast = useToast();
   const {
     elementProps: { id, onBlur, onFocus, placeholder, readOnly, ref, value },
     onChange,
     schemaType,
     validation
-    // value = '',
   } = props;
   const options = schemaType.options.list;
   const handleChange = (option) => {
-    onChange(sanity.set(option));
+    onChange(set(option));
   };
   const c = (c2) => {
     c2 = c2?.replaceAll("#", "")?.toLowerCase().trim();
     return c2;
   };
-  return /* @__PURE__ */ jsxRuntime.jsx(ui.Box, { children: /* @__PURE__ */ jsxRuntime.jsx(ui.Grid, { columns: 3, gap: 3, children: options.map((option, index) => {
-    const { title, value: value2, icon, color } = option;
-    return /* @__PURE__ */ jsxRuntime.jsx(
-      ButtonWithIcon,
-      {
-        buttonProps: {
-          paddingY: 4,
-          mode: c(props?.value) === c(value2) ? "default" : "ghost",
-          onClick: () => handleChange(value2)
-        },
-        label: title,
-        icon
-      },
-      value2
-    );
-  }) }) });
+  return /* @__PURE__ */ jsxDEV12(Box7, {
+    children: /* @__PURE__ */ jsxDEV12(Grid, {
+      columns: 3,
+      gap: 3,
+      children: options.map((option, index) => {
+        const { title, value: value2, icon, color } = option;
+        const Icon = icon;
+        return /* @__PURE__ */ jsxDEV12(ButtonWithIcon, {
+          buttonProps: {
+            paddingY: 4,
+            mode: c(props?.value) === c(value2) ? "default" : "ghost",
+            onClick: () => handleChange(value2)
+          },
+          label: title,
+          icon
+        }, value2, false, undefined, this);
+      })
+    }, undefined, false, undefined, this)
+  }, undefined, false, undefined, this);
 }
+
+// src/globals.ts
+import {
+  MdArticle,
+  MdBusiness as MdBusiness2,
+  MdEvent,
+  MdPageview,
+  MdQuestionAnswer,
+  MdShoppingBag,
+  MdWeb,
+  MdPerson as MdPerson2,
+  MdStore,
+  MdCreate,
+  MdPeople,
+  MdEmail
+} from "react-icons/md";
 var SCHEMA_MARKUP_TYPES = {
-  AboutPage: { title: "AboutPage", value: "AboutPage", icon: md.MdPeople },
-  ContactPage: { title: "ContactPage", value: "ContactPage", icon: md.MdEmail },
-  Article: { title: "Article", value: "Article", icon: md.MdArticle },
+  AboutPage: { title: "AboutPage", value: "AboutPage", icon: MdPeople },
+  ContactPage: { title: "ContactPage", value: "ContactPage", icon: MdEmail },
+  Article: { title: "Article", value: "Article", icon: MdArticle },
   CreativeWork: {
     title: "CreativeWork",
     value: "CreativeWork",
-    icon: md.MdCreate
+    icon: MdCreate
   },
-  Event: { title: "Event", value: "Event", icon: md.MdEvent },
-  FAQPage: { title: "FAQPage", value: "FAQPage", icon: md.MdQuestionAnswer },
-  // BreadcrumbList: { title: "BreadcrumbList", value: "BreadcrumbList" },
+  Event: { title: "Event", value: "Event", icon: MdEvent },
+  FAQPage: { title: "FAQPage", value: "FAQPage", icon: MdQuestionAnswer },
   LocalBusiness: {
     title: "LocalBusiness",
     value: "LocalBusiness",
-    icon: md.MdStore
+    icon: MdStore
   },
   Organization: {
     title: "Organization",
     value: "Organization",
-    icon: md.MdBusiness
+    icon: MdBusiness2
   },
-  Person: { title: "Person", value: "Person", icon: md.MdPerson },
-  Product: { title: "Product", value: "Product", icon: md.MdShoppingBag },
-  WebPage: { title: "WebPage", value: "WebPage", icon: md.MdPageview },
-  WebSite: { title: "WebSite", value: "WebSite", icon: md.MdWeb }
+  Person: { title: "Person", value: "Person", icon: MdPerson2 },
+  Product: { title: "Product", value: "Product", icon: MdShoppingBag },
+  WebPage: { title: "WebPage", value: "WebPage", icon: MdPageview },
+  WebSite: { title: "WebSite", value: "WebSite", icon: MdWeb }
 };
 
 // src/schemas/fields/schema-markup/schemaMarkup.ts
-var schemaMarkup = sanity.defineType({
+var schemaMarkup = defineType15({
   name: "schemaMarkup",
   title: "Schema Markup",
   components: {
@@ -1207,7 +1406,7 @@ var schemaMarkup = sanity.defineType({
   },
   type: "object",
   fields: [
-    sanity.defineField({
+    defineField15({
       name: "type",
       title: "Schema Type",
       type: "string",
@@ -1220,59 +1419,56 @@ var schemaMarkup = sanity.defineType({
       },
       validation: (Rule) => Rule.required()
     }),
-    // Minimal common fields:
-    sanity.defineField({
+    defineField15({
       name: "name",
       type: "string",
       hidden: ({ parent }) => !needs(parent, "name")
     }),
-    sanity.defineField({
+    defineField15({
       name: "description",
       type: "text",
       rows: 3,
       hidden: ({ parent }) => !needs(parent, "description")
     }),
-    sanity.defineField({
+    defineField15({
       name: "inLanguage",
       type: "string",
       hidden: ({ parent }) => !needs(parent, "inLanguage")
     }),
-    // defineField({
-    // 	name: "image",
-    // 	type: "jsonldImageObject",
-    // 	hidden: ({ parent }) => !needs(parent, "image"),
-    // }),
-    // Type-specific groups (conditionally shown)
-    // e.g., Article
-    sanity.defineField({
+    defineField15({
       name: "article",
       type: "schemaMarkupArticleFields",
       hidden: ({ parent }) => parent?.type !== "Article"
     }),
-    // Product
-    sanity.defineField({
+    defineField15({
       name: "product",
       type: "schemaMarkupProductFields",
       hidden: ({ parent }) => parent?.type !== "Product"
     })
-    // ...repeat for Event, FAQPage, BreadcrumbList, etc.
   ],
-  // components: { input: JsonLdInput }, // custom UI that merges defaults + shows preview
   preview: { select: { title: "type", subtitle: "name" } }
 });
+
+// src/schemas/fields/metadata/indexing.ts
+import { defineField as defineField16 } from "sanity";
+
+// src/components/core/IndexingControls.tsx
+import { set as set2 } from "sanity";
+import { Button as Button4, Flex as Flex9, Stack as Stack4 } from "@sanity/ui";
+import { useCallback as useCallback2 } from "react";
+import { MdInfo, MdPlaylistRemove } from "react-icons/md";
+import { IoArrowRedo } from "react-icons/io5";
+import { jsxDEV as jsxDEV13 } from "react/jsx-dev-runtime";
 function getNested(obj, key) {
-  return obj && Object.prototype.hasOwnProperty.call(obj, key) ? obj[key] : void 0;
+  return obj && Object.prototype.hasOwnProperty.call(obj, key) ? obj[key] : undefined;
 }
 function IndexingControls(props) {
   const { value = {}, onChange } = props;
   const noFollow = !!getNested(value, "noFollow");
   const noIndex = !!getNested(value, "noIndex");
-  const setValue = react.useCallback(
-    (key, val) => {
-      onChange?.(sanity.set(val, [key]));
-    },
-    [onChange]
-  );
+  const setValue = useCallback2((key, val) => {
+    onChange?.(set2(val, [key]));
+  }, [onChange]);
   let note = "";
   if (!noIndex && !noFollow) {
     note = "This page will be indexed by search engines, and links on this page will be crawled and considered for ranking.";
@@ -1283,49 +1479,53 @@ function IndexingControls(props) {
   } else if (noIndex && noFollow) {
     note = "This page will not be indexed by search engines, and links on this page will not be crawled or considered for ranking.";
   }
-  return /* @__PURE__ */ jsxRuntime.jsxs(ui.Stack, { space: 3, children: [
-    /* @__PURE__ */ jsxRuntime.jsx(
-      CardWithIcon,
-      {
-        icon: md.MdInfo,
+  return /* @__PURE__ */ jsxDEV13(Stack4, {
+    space: 3,
+    children: [
+      /* @__PURE__ */ jsxDEV13(CardWithIcon, {
+        icon: MdInfo,
         tone: noIndex && noFollow ? "critical" : "suggest",
         text: note
-      }
-    ),
-    /* @__PURE__ */ jsxRuntime.jsxs(ui.Flex, { gap: 3, children: [
-      /* @__PURE__ */ jsxRuntime.jsx(
-        ui.Button,
-        {
-          width: "fill",
-          icon: io5.IoArrowRedo,
-          mode: noFollow ? "default" : "ghost",
-          selected: noFollow,
-          text: "No Follow",
-          tone: noFollow ? "critical" : "default",
-          onClick: () => setValue("noFollow", !noFollow)
-        }
-      ),
-      /* @__PURE__ */ jsxRuntime.jsx(
-        ui.Button,
-        {
-          width: "fill",
-          icon: md.MdPlaylistRemove,
-          mode: noIndex ? "default" : "ghost",
-          selected: noIndex,
-          text: "No Index",
-          tone: noIndex ? "critical" : "default",
-          onClick: () => setValue("noIndex", !noIndex)
-        }
-      )
-    ] })
-  ] });
+      }, undefined, false, undefined, this),
+      /* @__PURE__ */ jsxDEV13(Flex9, {
+        gap: 3,
+        children: [
+          /* @__PURE__ */ jsxDEV13(Button4, {
+            width: "fill",
+            icon: IoArrowRedo,
+            mode: noFollow ? "default" : "ghost",
+            selected: noFollow,
+            text: "No Follow",
+            tone: noFollow ? "critical" : "default",
+            onClick: () => setValue("noFollow", !noFollow)
+          }, undefined, false, undefined, this),
+          /* @__PURE__ */ jsxDEV13(Button4, {
+            width: "fill",
+            icon: MdPlaylistRemove,
+            mode: noIndex ? "default" : "ghost",
+            selected: noIndex,
+            text: "No Index",
+            tone: noIndex ? "critical" : "default",
+            onClick: () => setValue("noIndex", !noIndex)
+          }, undefined, false, undefined, this)
+        ]
+      }, undefined, true, undefined, this)
+    ]
+  }, undefined, true, undefined, this);
 }
+// src/components/core/SchemaFieldWithDefault.tsx
+import { Box as Box9 } from "@sanity/ui";
+import { MdCheck as MdCheck2, MdWarning as MdWarning2 } from "react-icons/md";
+import { jsxDEV as jsxDEV14 } from "react/jsx-dev-runtime";
+// src/components/core/SeoLayoutWrapper.tsx
+import { jsxDEV as jsxDEV15 } from "react/jsx-dev-runtime";
 function SeoLayoutWrapper(props) {
-  return /* @__PURE__ */ jsxRuntime.jsx(SeoDefaultsProvider, { children: props.renderDefault(props) });
+  return /* @__PURE__ */ jsxDEV15(SeoDefaultsProvider, {
+    children: props.renderDefault(props)
+  }, undefined, false, undefined, this);
 }
-
 // src/schemas/fields/metadata/indexing.ts
-var indexing_default = sanity.defineField({
+var indexing_default = defineField16({
   name: "searchVisibility",
   title: "Search Visibility",
   type: "object",
@@ -1345,123 +1545,137 @@ var indexing_default = sanity.defineField({
     }
   ]
 });
+
+// src/schemas/fields/metadata/favicon.ts
+import { defineField as defineField17 } from "sanity";
+
+// src/components/core/Favicon/FaviconPreview.tsx
+import { Box as Box11, Card as Card9, Flex as Flex13, useRootTheme as useRootTheme3 } from "@sanity/ui";
+import { useMemo } from "react";
+
+// src/components/core/Favicon/WindowControls.tsx
+import { Flex as Flex11 } from "@sanity/ui";
+import { jsxDEV as jsxDEV16 } from "react/jsx-dev-runtime";
 function WindowControls() {
   const CONTROLS = [
     { bg: "#ff5f57", title: "Close" },
     { bg: "#ffbd2e", title: "Minimize" },
     { bg: "#28c940", title: "Maximize" }
   ];
-  return /* @__PURE__ */ jsxRuntime.jsx(
-    ui.Flex,
-    {
-      align: "center",
+  return /* @__PURE__ */ jsxDEV16(Flex11, {
+    align: "center",
+    style: {
+      gap: 6,
+      paddingRight: 16
+    },
+    children: CONTROLS.map((c, i) => /* @__PURE__ */ jsxDEV16("span", {
+      title: c.title,
       style: {
-        gap: 6,
-        paddingRight: 16
-      },
-      children: CONTROLS.map((c, i) => /* @__PURE__ */ jsxRuntime.jsx(
-        "span",
-        {
-          title: c.title,
-          style: {
-            display: "inline-block",
-            width: 11,
-            height: 11,
-            borderRadius: "50%",
-            background: c.bg,
-            border: "0.5px solid #bfbfbf",
-            boxSizing: "border-box",
-            boxShadow: i === 0 ? "0 0.5px 0.5px #c14545" : i === 2 ? "0 0.5px 0.5px #30993d" : "0 0.5px 0.5px #bfa350"
-          }
-        },
-        i
-      ))
-    }
-  );
+        display: "inline-block",
+        width: 11,
+        height: 11,
+        borderRadius: "50%",
+        background: c.bg,
+        border: "0.5px solid #bfbfbf",
+        boxSizing: "border-box",
+        boxShadow: i === 0 ? "0 0.5px 0.5px #c14545" : i === 2 ? "0 0.5px 0.5px #30993d" : "0 0.5px 0.5px #bfa350"
+      }
+    }, i, false, undefined, this))
+  }, undefined, false, undefined, this);
 }
 
+// src/components/core/Favicon/BrowserTab.tsx
+import { Flex as Flex12, Text as Text12, useRootTheme as useRootTheme2 } from "@sanity/ui";
+
 // src/components/core/Favicon/favicon-preview.module.css
-var favicon_preview_default = {};
+var favicon_preview_module_default = {
+  card: "card_znijeg",
+  "image-preview": "image-preview_znijeg"
+};
+
+// src/components/core/Favicon/BrowserTab.tsx
+import { jsxDEV as jsxDEV17 } from "react/jsx-dev-runtime";
 function BrowserTab({
   url = "https://example.com",
   favicon = "https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg",
   title = "Facebook"
 }) {
-  const theme = ui.useRootTheme();
-  return /* @__PURE__ */ jsxRuntime.jsxs(
-    ui.Flex,
-    {
-      gap: 2,
-      "data-theme": theme.scheme,
-      className: favicon_preview_default.card,
-      style: {
-        borderRadius: "10px 10px 0 0",
-        background: "var(--tab-bg)",
-        boxShadow: "var(--tab-shadow)",
-        maxWidth: 220,
-        minWidth: 140,
-        height: 36,
-        display: "flex",
-        alignItems: "center",
-        padding: "0 16px",
-        border: "var(--tab-border)",
-        borderBottom: "none"
-      },
-      children: [
-        /* @__PURE__ */ jsxRuntime.jsx(
-          "img",
-          {
-            src: favicon,
-            width: 16,
-            height: 16,
-            alt: "Favicon on tab",
-            style: {
-              borderRadius: 4,
-              background: "var(--tab-favicon-bg)",
-              display: "block"
-            }
-          }
-        ),
-        /* @__PURE__ */ jsxRuntime.jsx(ui.Flex, { direction: "column", justify: "center", align: "center", children: /* @__PURE__ */ jsxRuntime.jsx(
-          ui.Text,
-          {
-            size: 1,
-            style: {
-              fontWeight: 500,
-              color: "var(--tab-url-text-color)",
-              opacity: 0.93,
-              height: "100%",
-              whiteSpace: "nowrap",
-              textOverflow: "ellipsis",
-              userSelect: "none",
-              fontFamily: "inherit"
-            },
-            children: title
-          }
-        ) })
-      ]
-    }
-  );
+  const theme = useRootTheme2();
+  return /* @__PURE__ */ jsxDEV17(Flex12, {
+    gap: 2,
+    "data-theme": theme.scheme,
+    className: favicon_preview_module_default.card,
+    style: {
+      borderRadius: "10px 10px 0 0",
+      background: "var(--tab-bg)",
+      boxShadow: "var(--tab-shadow)",
+      maxWidth: 220,
+      minWidth: 140,
+      height: 36,
+      display: "flex",
+      alignItems: "center",
+      padding: "0 16px",
+      border: "var(--tab-border)",
+      borderBottom: "none"
+    },
+    children: [
+      /* @__PURE__ */ jsxDEV17("img", {
+        src: favicon,
+        width: 16,
+        height: 16,
+        alt: "Favicon on tab",
+        style: {
+          borderRadius: 4,
+          background: "var(--tab-favicon-bg)",
+          display: "block"
+        }
+      }, undefined, false, undefined, this),
+      /* @__PURE__ */ jsxDEV17(Flex12, {
+        direction: "column",
+        justify: "center",
+        align: "center",
+        children: /* @__PURE__ */ jsxDEV17(Text12, {
+          size: 1,
+          style: {
+            fontWeight: 500,
+            color: "var(--tab-url-text-color)",
+            opacity: 0.93,
+            height: "100%",
+            whiteSpace: "nowrap",
+            textOverflow: "ellipsis",
+            userSelect: "none",
+            fontFamily: "inherit"
+          },
+          children: title
+        }, undefined, false, undefined, this)
+      }, undefined, false, undefined, this)
+    ]
+  }, undefined, true, undefined, this);
 }
+
+// src/components/core/Favicon/FaviconPreview.tsx
+import { buildSrc } from "@sanity-image/url-builder";
+import { useDataset, useProjectId } from "sanity";
+import { jsxDEV as jsxDEV18 } from "react/jsx-dev-runtime";
 function FaviconPreview(props) {
   const defaults = useSeoDefaults();
-  const theme = ui.useRootTheme();
-  const dataset = sanity.useDataset();
-  const projectId = sanity.useProjectId();
-  const url = react.useMemo(() => {
+  const theme = useRootTheme3();
+  const dataset = useDataset();
+  const projectId = useProjectId();
+  const url = useMemo(() => {
     const domain = defaults?.siteUrl ? defaults.siteUrl : "https://example.com";
     return domain.replace("https://", "");
   }, [defaults]);
-  const faviconUrl = react.useMemo(() => {
-    return props.value?.asset?._ref ? urlBuilder.buildSrc({
+  const faviconUrl = useMemo(() => {
+    return props.value?.asset?._ref ? buildSrc({
       id: props.value?.asset?._ref,
       baseUrl: `https://cdn.sanity.io/images/${projectId}/${dataset}/`
     })?.src : null;
   }, [props.value?.asset?._ref, projectId, dataset]);
-  return /* @__PURE__ */ jsxRuntime.jsxs("div", { className: favicon_preview_default.card, children: [
-    /* @__PURE__ */ jsxRuntime.jsx(
-      ui.Card,
-      {
+  return /* @__PURE__ */ jsxDEV18("div", {
+    className: favicon_preview_module_default.card,
+    children: [
+      /* @__PURE__ */ jsxDEV18(Card9, {
         "data-tab-display": true,
         "data-theme": theme.scheme,
         shadow: 2,
@@ -1470,26 +1684,32 @@ function FaviconPreview(props) {
         style: {
           width: "100%"
         },
-        children: /* @__PURE__ */ jsxRuntime.jsxs(ui.Flex, { paddingX: 4, paddingY: 2, justify: "start", align: "center", children: [
-          /* @__PURE__ */ jsxRuntime.jsx(WindowControls, {}),
-          /* @__PURE__ */ jsxRuntime.jsx(
-            BrowserTab,
-            {
+        children: /* @__PURE__ */ jsxDEV18(Flex13, {
+          paddingX: 4,
+          paddingY: 2,
+          justify: "start",
+          align: "center",
+          children: [
+            /* @__PURE__ */ jsxDEV18(WindowControls, {}, undefined, false, undefined, this),
+            /* @__PURE__ */ jsxDEV18(BrowserTab, {
               url,
               title: defaults?.siteTitle,
               favicon: faviconUrl
-            }
-          ),
-          /* @__PURE__ */ jsxRuntime.jsx(BrowserTab, {})
-        ] })
-      }
-    ),
-    /* @__PURE__ */ jsxRuntime.jsx(ui.Box, { className: favicon_preview_default?.["image-preview"], children: props.renderDefault(props) })
-  ] });
+            }, undefined, false, undefined, this),
+            /* @__PURE__ */ jsxDEV18(BrowserTab, {}, undefined, false, undefined, this)
+          ]
+        }, undefined, true, undefined, this)
+      }, undefined, false, undefined, this),
+      /* @__PURE__ */ jsxDEV18(Box11, {
+        className: favicon_preview_module_default?.["image-preview"],
+        children: props.renderDefault(props)
+      }, undefined, false, undefined, this)
+    ]
+  }, undefined, true, undefined, this);
 }
 
 // src/schemas/fields/metadata/favicon.ts
-var favicon_default = sanity.defineField({
+var favicon_default = defineField17({
   name: "favicon",
   type: "image",
   components: {
@@ -1510,7 +1730,13 @@ var fields_default = [
   page_metadata_default,
   meta_description_default
 ];
-var schemaMarkupDefaults = sanity.defineType({
+
+// src/schemas/singleton/schema-defaults.ts
+import { AiOutlineGlobal } from "react-icons/ai";
+import { MdSettingsSuggest } from "react-icons/md";
+import { defineType as defineType16, defineField as defineField18 } from "sanity";
+import { IoSparklesSharp } from "react-icons/io5";
+var schemaMarkupDefaults = defineType16({
   name: "schemaMarkupDefaults",
   title: "Schema Markup Defaults",
   type: "document",
@@ -1519,48 +1745,21 @@ var schemaMarkupDefaults = sanity.defineType({
       name: "global",
       title: "Global Defaults",
       default: true,
-      icon: ai.AiOutlineGlobal
+      icon: AiOutlineGlobal
     },
     {
       name: "automapping",
       title: "Automapping",
-      icon: io5.IoSparklesSharp
+      icon: IoSparklesSharp
     },
     {
       name: "type-specific",
       title: "Type-Specific Defaults",
-      icon: md.MdSettingsSuggest
+      icon: MdSettingsSuggest
     }
   ],
-  // mark as singleton in your desk (see snippet below)
   fields: [
-    // IN OTHER PLACE ALREADY
-    // ---- General ----
-    // defineField({
-    // 	name: "baseUrl",
-    // 	title: "Base URL",
-    // 	type: "url",
-    // 	description: "Root URL used to build canonical links in JSON-LD.",
-    // 	validation: (r) => r.required(),
-    // }),
-    // defineField({
-    // 	name: "defaultLocale",
-    // 	title: "Default Locale",
-    // 	type: "string",
-    // 	description: "2-letter language code (e.g., en, it, de).",
-    // 	validation: (r) => r.required().max(2),
-    // }),
-    // GETTING THESE FROM CODEBASE, NOT CMS
-    // defineField({
-    // 	name: "locales",
-    // 	title: "Available Locales",
-    // 	type: "array",
-    // 	of: [{ type: "string" }],
-    // 	description:
-    // 		"List of supported locales. First should match defaultLocale.",
-    // 	validation: (r) => r.min(1),
-    // }),
-    sanity.defineField({
+    defineField18({
       name: "sameAs",
       title: "Global Profiles (sameAs)",
       type: "array",
@@ -1568,7 +1767,7 @@ var schemaMarkupDefaults = sanity.defineType({
       of: [{ type: "url" }],
       description: "Social/profile URLs applied when relevant."
     }),
-    sanity.defineField({
+    defineField18({
       name: "organization",
       title: "Default Organization",
       group: "global",
@@ -1576,29 +1775,28 @@ var schemaMarkupDefaults = sanity.defineType({
       to: [{ type: "schemaMarkupOrganization" }],
       description: "Used as publisher/brand when none specified."
     }),
-    sanity.defineField({
+    defineField18({
       name: "publisher",
       title: "Default Publisher (Overrides Organization)",
       group: "global",
       type: "reference",
       to: [{ type: "schemaMarkupOrganization" }]
     }),
-    // ---- Image & Media Fallbacks ----
-    sanity.defineField({
+    defineField18({
       name: "logo",
       title: "Global Logo",
       group: "global",
       type: "image",
       description: "Default logo used for Organization and WebSite schemas when no specific logo is provided."
     }),
-    sanity.defineField({
+    defineField18({
       name: "imageFallback",
       title: "Default Image",
       group: "global",
       type: "image",
       description: "Used if an entity has no image set or auto-mapped."
     }),
-    sanity.defineField({
+    defineField18({
       name: "imageFieldMapping",
       hidden: true,
       title: "Image Auto-Map Order",
@@ -1609,8 +1807,7 @@ var schemaMarkupDefaults = sanity.defineType({
       options: { layout: "tags" },
       initialValue: ["coverImage", "seo.image", "ogImage", "mainImage"]
     }),
-    // ---- Auto-Mapping Toggles ----
-    sanity.defineField({
+    defineField18({
       name: "autoMap",
       title: "Automatic Field Mapping",
       group: "automapping",
@@ -1620,13 +1817,13 @@ var schemaMarkupDefaults = sanity.defineType({
           name: "title",
           type: "boolean",
           initialValue: true,
-          description: "Map doc title \u2192 name/headline."
+          description: "Map doc title → name/headline."
         },
         {
           name: "description",
           type: "boolean",
           initialValue: true,
-          description: "Map doc excerpt/description \u2192 description."
+          description: "Map doc excerpt/description → description."
         },
         {
           name: "image",
@@ -1638,32 +1835,25 @@ var schemaMarkupDefaults = sanity.defineType({
           name: "dates",
           type: "boolean",
           initialValue: true,
-          description: "Map publishedAt/updatedAt \u2192 datePublished/dateModified."
+          description: "Map publishedAt/updatedAt → datePublished/dateModified."
         },
         {
           name: "authors",
           type: "boolean",
           initialValue: true,
-          description: "Map authors[] \u2192 Person/Organization authors."
+          description: "Map authors[] → Person/Organization authors."
         }
       ]
     }),
-    // ---- Type-Specific Defaults ----
-    sanity.defineField({
+    defineField18({
       name: "webSite",
       title: "WebSite Defaults",
       group: "type-specific",
       type: "object",
       options: { collapsible: true, collapsed: true },
       fields: [
-        // { name: "name", type: "string" },
-        // {
-        // 	name: "inLanguage",
-        // 	type: "string",
-        // 	description: "BCP-47 code. Fallback to defaultLocale.",
-        // },
         { name: "publisher", type: "schemaMarkupOrganization" },
-        sanity.defineField({
+        defineField18({
           name: "searchAction",
           title: "SearchAction",
           type: "object",
@@ -1682,7 +1872,7 @@ var schemaMarkupDefaults = sanity.defineType({
         })
       ]
     }),
-    sanity.defineField({
+    defineField18({
       name: "webPage",
       title: "WebPage Defaults",
       group: "type-specific",
@@ -1693,7 +1883,7 @@ var schemaMarkupDefaults = sanity.defineType({
         { name: "primaryImageOfPage", type: "image" }
       ]
     }),
-    sanity.defineField({
+    defineField18({
       name: "article",
       title: "Article Defaults",
       group: "type-specific",
@@ -1708,7 +1898,7 @@ var schemaMarkupDefaults = sanity.defineType({
         }
       ]
     }),
-    sanity.defineField({
+    defineField18({
       name: "product",
       title: "Product Defaults",
       group: "type-specific",
@@ -1736,7 +1926,7 @@ var schemaMarkupDefaults = sanity.defineType({
         }
       ]
     }),
-    sanity.defineField({
+    defineField18({
       name: "event",
       title: "Event Defaults",
       group: "type-specific",
@@ -1757,7 +1947,7 @@ var schemaMarkupDefaults = sanity.defineType({
         { name: "organizer", type: "schemaMarkupOrganization" }
       ]
     }),
-    sanity.defineField({
+    defineField18({
       name: "localBusiness",
       title: "LocalBusiness Defaults",
       group: "type-specific",
@@ -1770,8 +1960,7 @@ var schemaMarkupDefaults = sanity.defineType({
         { name: "aggregateRating", type: "schemaMarkupAggregateRating" }
       ]
     }),
-    // ---- Rendering / Behavior ----
-    sanity.defineField({
+    defineField18({
       name: "rendering",
       title: "Rendering Options",
       type: "object",
@@ -1796,11 +1985,15 @@ var schemaMarkupDefaults = sanity.defineType({
     select: { baseUrl: "baseUrl", locale: "defaultLocale" },
     prepare: ({ baseUrl, locale }) => ({
       title: "Schema Markup Defaults",
-      subtitle: `${baseUrl || "\u2014"} \xB7 ${locale || "locale not set"}`
+      subtitle: `${baseUrl || "—"} · ${locale || "locale not set"}`
     })
   }
 });
-var seoDefaults = sanity.defineType({
+
+// src/schemas/singleton/seo-defaults.ts
+import { MdSearch, MdShare } from "react-icons/md";
+import { defineField as defineField19, defineType as defineType17 } from "sanity";
+var seoDefaults = defineType17({
   name: "seoDefaults",
   title: "SEO Defaults",
   type: "document",
@@ -1809,16 +2002,16 @@ var seoDefaults = sanity.defineType({
       name: "metadata",
       title: "Metadata",
       default: true,
-      icon: md.MdSearch
+      icon: MdSearch
     },
     {
       name: "social",
       title: "Social",
-      icon: md.MdShare
+      icon: MdShare
     }
   ],
   fields: [
-    sanity.defineField({
+    defineField19({
       name: "siteTitle",
       title: "Site Title",
       type: "string",
@@ -1826,7 +2019,7 @@ var seoDefaults = sanity.defineType({
       validation: (Rule) => Rule.required(),
       group: "metadata"
     }),
-    sanity.defineField({
+    defineField19({
       name: "pageTitleTemplate",
       title: "Page Title Template",
       type: "string",
@@ -1835,14 +2028,13 @@ var seoDefaults = sanity.defineType({
       initialValue: "{pageTitle} - {siteTitle}",
       group: "metadata"
     }),
-    sanity.defineField({
+    defineField19({
       name: "metaDescription",
       type: "metaDescription",
       group: "metadata",
       description: "The default meta description for all pages."
-      // validation: (Rule) => Rule.required(),
     }),
-    sanity.defineField({
+    defineField19({
       name: "siteUrl",
       title: "Site URL",
       type: "url",
@@ -1850,12 +2042,12 @@ var seoDefaults = sanity.defineType({
       validation: (Rule) => Rule.required(),
       group: "metadata"
     }),
-    sanity.defineField({
+    defineField19({
       name: "favicon",
       type: "favicon",
       group: "metadata"
     }),
-    sanity.defineField({
+    defineField19({
       name: "twitterHandle",
       title: "Twitter Handle",
       type: "string",
@@ -1873,18 +2065,21 @@ var seoDefaults = sanity.defineType({
     }
   }
 });
-var socialNetworks = sanity.defineType({
+
+// src/schemas/singleton/social-networks.ts
+import { defineField as defineField20, defineType as defineType18 } from "sanity";
+var socialNetworks = defineType18({
   name: "socialNetworks",
   title: "Social Networks",
   type: "document",
   fields: [
-    sanity.defineField({
+    defineField20({
       name: "platform",
       title: "Platform",
       type: "string",
       validation: (Rule) => Rule.required()
     }),
-    sanity.defineField({
+    defineField20({
       name: "url",
       title: "URL",
       type: "url",
@@ -1897,7 +2092,7 @@ var socialNetworks = sanity.defineType({
 var singleton_default = [schemaMarkupDefaults, seoDefaults, socialNetworks];
 
 // src/index.ts
-var index_default = sanity.definePlugin({
+var src_default = definePlugin({
   name: "crawl-me-maybe",
   schema: {
     types: [...fields_default, ...global_default, ...entities_default, ...singleton_default]
@@ -1908,7 +2103,8 @@ var index_default = sanity.definePlugin({
     }
   }
 });
+export {
+  src_default as default
+};
 
-module.exports = index_default;
-//# sourceMappingURL=index.js.map
-//# sourceMappingURL=index.js.map
+//# debugId=7AF168DBEAB7952C64756E2164756E21

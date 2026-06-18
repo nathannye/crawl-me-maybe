@@ -1,5 +1,2 @@
-import * as sanity from 'sanity';
-
-declare const _default: sanity.Plugin<void>;
-
-export { _default as default };
+declare const _default: import("sanity").Plugin<void>;
+export default _default;
