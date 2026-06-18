@@ -2,14 +2,12 @@
   "name": "@crawl-me-maybe/web",
   "version": "0.0.7",
   "type": "module",
-  "main": "./dist/index.cjs",
-  "module": "./dist/index.js",
+  "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
-      "import": "./dist/index.js",
-      "require": "./dist/index.cjs"
+      "import": "./dist/index.js"
     }
   },
   "publishConfig": {
@@ -19,7 +17,7 @@
     "dist"
   ],
   "scripts": {
-    "build": "rm -rf dist && bun build src/index.ts --outfile dist/index.js --format esm --sourcemap --external @sanity/client --external @sanity-image/url-builder --external @sanity/image-url --external schema-dts && bun build src/index.ts --outfile dist/index.cjs --format cjs --external @sanity/client --external @sanity-image/url-builder --external @sanity/image-url --external schema-dts && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src"
+    "build": "rm -rf dist && bun build src/index.ts --outfile dist/index.js --format esm --sourcemap --external @sanity/client --external @sanity-image/url-builder --external @sanity/image-url --external schema-dts && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src"
   },
   "dependencies": {
     "@sanity-image/url-builder": "^1.0.0",
