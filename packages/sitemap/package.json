@@ -2,7 +2,7 @@
   "name": "@crawl-me-maybe/sitemap",
   "version": "0.0.10",
   "sideEffects": false,
-  "author": "Nathan Nye <nathan@nye.design> (https://nye.design)",
+  "author": "Nathan Nye <nathan@nye.dev> (https://nye.dev)",
   "license": "MIT",
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",

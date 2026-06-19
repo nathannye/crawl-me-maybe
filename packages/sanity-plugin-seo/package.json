@@ -1,5 +1,5 @@
 {
-  "name": "@crawl-me-maybe/sanity",
+  "name": "@crawl-me-maybe/sanity-plugin-seo",
   "version": "0.0.6",
   "author": "Nathan Nye",
   "main": "./dist/index.js",

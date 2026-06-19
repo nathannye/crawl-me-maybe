@@ -3,6 +3,21 @@
 # Crawl me maybe
 A suite of framework-agnostic tools for CMS-driven SEO.
 
+Other plugins place most of the work on editors, schema markup and bunches of metadata that the user must duplicate. Your users are busy, pass this dupliated content once in your template and save them the time.
+
+## Features
+- Schema Markup handlers for every non-deprecated type (full list here)
+- Global schema markup defaults
+- Global schema markup dataset that can be re-used
+- Sanity Plugin 
+- Global defaults with visual indications of completeness
+- Social previews
+- Search result previews
+- Dynamic favicons
+
+
+## Schema Markup (JSON-LD)
+
 
 
 ## Web (SEO runtime)
