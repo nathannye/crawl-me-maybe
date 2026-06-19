@@ -2,15 +2,15 @@
 
 > This library is under active development. APIs and data shapes may change.
 
-Schema.org JSON-LD builders for Sanity-driven content. Pairs with `@crawl-me-maybe/sanity` for CMS fields and `@crawl-me-maybe/web` for merged SEO metadata.
+Schema.org JSON-LD builders for Sanity-driven content. Pairs with `@crawl-me-maybe/sanity` for CMS fields and `@crawl-me-maybe/meta` for merged SEO metadata.
 
 ## Installation
 
 ```bash
-npm install @crawl-me-maybe/schema-markup @crawl-me-maybe/web
+npm install @crawl-me-maybe/schema-markup @crawl-me-maybe/meta
 ```
 
-Both packages are required. `@crawl-me-maybe/web` handles meta title merging, favicons, and Sanity image URLs. This package turns that data into JSON-LD.
+Both packages are required. `@crawl-me-maybe/meta` handles meta title merging, favicons, and Sanity image URLs. This package turns that data into JSON-LD.
 
 ## Quick Start
 
@@ -50,7 +50,7 @@ const { meta, schemas } = buildSeoPayload({
 
 ### `buildSeoPayload(params)`
 
-Merges SEO metadata via `@crawl-me-maybe/web`, then composes JSON-LD when `schemaDefaults` is provided.
+Merges SEO metadata via `@crawl-me-maybe/meta`, then composes JSON-LD when `schemaDefaults` is provided.
 
 **Returns:** `{ meta: MergedMetadata, schemas: Thing[] | undefined }`
 

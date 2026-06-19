@@ -1,35 +1,8 @@
-// src/automap.ts
-var fieldMappings = {
-  title: "title",
-  description: "description",
-  image: "metaImage",
-  datePublished: "_createdAt",
-  dateModified: "_updatedAt"
-};
-var shouldAutomap = (automapSettings, property) => {
-  return automapSettings[property] !== false;
-};
-var automap = (automapSettings, baseSeoObject, extra) => {
-  const automappedValues = Object.keys(fieldMappings).reduce((acc, key) => {
-    if (shouldAutomap(automapSettings, key)) {
-      const field = fieldMappings[key];
-      acc[key] = baseSeoObject[field] || extra?.[field];
-    }
-    return acc;
-  }, {
-    title: undefined,
-    description: undefined,
-    image: undefined,
-    datePublished: undefined,
-    dateModified: undefined
-  });
-  return automappedValues;
-};
 // src/build.ts
 import {
   mergeSeoData,
   setConfig
-} from "@crawl-me-maybe/web";
+} from "@crawl-me-maybe/meta";
 
 // src/schema-utils.ts
 function coalesce(...values) {
@@ -40,34 +13,8 @@ function coalesce(...values) {
   return;
 }
 
-// src/builders/about-page.ts
-function buildAboutPage({
-  seo,
-  schemaDefaults,
-  extra
-}) {
-  const defaults = schemaDefaults?.webPage || {};
-  const autoMap = schemaDefaults?.autoMap || {};
-  const { title, description, image, dateModified, datePublished } = automap(autoMap, seo, extra);
-  return {
-    "@context": "https://schema.org",
-    "@type": "AboutPage",
-    name: title,
-    description: coalesce(description, extra?.description),
-    url: coalesce(seo.canonicalUrl, extra?.url),
-    image,
-    inLanguage: coalesce(extra?.inLanguage, defaults.inLanguage),
-    datePublished: coalesce(extra?.datePublished, extra?._createdAt),
-    dateModified: coalesce(extra?.dateModified, extra?._updatedAt),
-    about: extra?.about,
-    isPartOf: seo.canonicalUrl ? {
-      "@type": "WebSite",
-      "@id": `${seo.canonicalUrl}#website`
-    } : undefined
-  };
-}
 // src/utils/image.ts
-import { urlFor } from "@crawl-me-maybe/web";
+import { urlFor } from "@crawl-me-maybe/meta";
 var formatImageUrl = (imageReference) => {
   if (!imageReference)
     return null;
@@ -116,6 +63,33 @@ function createSchemaImageObject(image, fallback) {
   };
 }
 
+// src/builders/about-page.ts
+function buildAboutPage({
+  seo,
+  schemaDefaults,
+  extra
+}) {
+  const defaults = schemaDefaults?.webPage || {};
+  const name = coalesce(extra?.name, extra?.title, seo.title);
+  const description = coalesce(extra?.description, seo.description);
+  const image = createSchemaImageObject(coalesce(extra?.image, seo.metaImage), schemaDefaults?.imageFallback);
+  return {
+    "@context": "https://schema.org",
+    "@type": "AboutPage",
+    name,
+    description,
+    url: coalesce(seo.canonicalUrl, extra?.url),
+    image,
+    inLanguage: coalesce(extra?.inLanguage, defaults.inLanguage),
+    datePublished: coalesce(extra?.datePublished, extra?._createdAt),
+    dateModified: coalesce(extra?.dateModified, extra?._updatedAt),
+    about: extra?.about,
+    isPartOf: seo.canonicalUrl ? {
+      "@type": "WebSite",
+      "@id": `${seo.canonicalUrl}#website`
+    } : undefined
+  };
+}
 // src/builders/utils.ts
 function normalizeId(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
@@ -191,21 +165,20 @@ function buildArticle({
   extra
 }) {
   const defaults = schemaDefaults?.article || {};
-  const autoMap = schemaDefaults?.autoMap || {};
-  const headline = autoMap.title !== false ? seo.title : extra?.headline;
-  const description = autoMap.description !== false ? seo.description : extra?.description;
-  const image = createSchemaImageObject(autoMap.image !== false ? seo.metaImage : extra?.image, schemaDefaults?.imageFallback);
+  const headline = coalesce(extra?.headline, extra?.title, seo.title);
+  const description = coalesce(extra?.description, seo.description);
+  const image = createSchemaImageObject(coalesce(extra?.image, seo.metaImage), schemaDefaults?.imageFallback);
   const authors = extra?.author || [];
-  const authorSchema = autoMap.authors !== false && authors.length > 0 ? authors.map((author) => buildPersonOrOrg(author, true, seo.canonicalUrl)).filter(Boolean) : undefined;
+  const authorSchema = authors.length > 0 ? authors.map((author) => buildPersonOrOrg(author, true, seo.canonicalUrl)).filter(Boolean) : undefined;
   const publisher = coalesce(extra?.publisher, defaults.publisher, schemaDefaults?.publisher, schemaDefaults?.organization);
   return {
     "@context": "https://schema.org",
     "@type": "Article",
-    headline: coalesce(headline, extra?.headline),
-    description: coalesce(description, extra?.description),
+    headline,
+    description,
     image,
-    datePublished: formatSchemaDate(autoMap.dates !== false ? extra?._createdAt || extra?.datePublished : extra?.datePublished),
-    dateModified: formatSchemaDate(autoMap.dates !== false ? extra?._updatedAt || extra?.dateModified : extra?.dateModified),
+    datePublished: formatSchemaDate(coalesce(extra?.datePublished, extra?._createdAt)),
+    dateModified: formatSchemaDate(coalesce(extra?.dateModified, extra?._updatedAt)),
     author: authorSchema,
     publisher: buildOrgSchema(publisher, true, seo.canonicalUrl),
     mainEntityOfPage: coalesce(seo.canonicalUrl, extra?.mainEntityOfPage),
@@ -224,19 +197,14 @@ function buildContactPage({
   extra
 }) {
   const defaults = schemaDefaults?.webPage || {};
-  const autoMap = schemaDefaults?.autoMap || {};
-  const {
-    title: name,
-    description,
-    image,
-    dateModified,
-    datePublished
-  } = automap(autoMap, seo, extra);
+  const name = coalesce(extra?.name, extra?.title, seo.title);
+  const description = coalesce(extra?.description, seo.description);
+  const image = createSchemaImageObject(coalesce(extra?.image, seo.metaImage), schemaDefaults?.imageFallback);
   return {
     "@context": "https://schema.org",
     "@type": "ContactPage",
-    name: coalesce(name, extra?.name),
-    description: coalesce(description, extra?.description),
+    name,
+    description,
     url: coalesce(seo.canonicalUrl, extra?.url),
     image,
     inLanguage: extra?.inLanguage || defaults.inLanguage,
@@ -255,10 +223,9 @@ function buildEvent({
   extra
 }) {
   const defaults = schemaDefaults?.event || {};
-  const autoMap = schemaDefaults?.autoMap || {};
-  const name = autoMap.title !== false ? seo.title : extra?.name;
-  const description = autoMap.description !== false ? seo.description : extra?.description;
-  const image = createSchemaImageObject(autoMap.image !== false ? seo.metaImage : extra?.image, schemaDefaults?.imageFallback);
+  const name = coalesce(extra?.name, extra?.title, seo.title);
+  const description = coalesce(extra?.description, seo.description);
+  const image = createSchemaImageObject(coalesce(extra?.image, seo.metaImage), schemaDefaults?.imageFallback);
   const locationData = extra?.location;
   const location = locationData ? {
     "@type": locationData.url ? "VirtualLocation" : "Place",
@@ -277,8 +244,8 @@ function buildEvent({
   return {
     "@context": "https://schema.org",
     "@type": "Event",
-    name: coalesce(name, extra?.name),
-    description: coalesce(description, extra?.description),
+    name,
+    description,
     image,
     startDate: formatSchemaDate(extra?.startDate),
     endDate: formatSchemaDate(extra?.endDate),
@@ -294,12 +261,10 @@ function buildEvent({
 // src/builders/faq.ts
 function buildFAQPage({
   seo,
-  schemaDefaults,
   extra
 }) {
-  const autoMap = schemaDefaults?.autoMap || {};
-  const name = autoMap.title !== false ? seo.title : extra?.name;
-  const description = autoMap.description !== false ? seo.description : extra?.description;
+  const name = coalesce(extra?.name, extra?.title, seo.title);
+  const description = coalesce(extra?.description, seo.description);
   const mainEntity = extra?.mainEntity ? extra.mainEntity.map((item) => ({
     "@type": "Question",
     name: item.question,
@@ -357,10 +322,9 @@ function buildProduct({
   extra
 }) {
   const defaults = schemaDefaults?.product || {};
-  const autoMap = schemaDefaults?.autoMap || {};
-  const name = autoMap.title !== false ? seo.title : extra?.name;
-  const description = autoMap.description !== false ? seo.description : extra?.description;
-  const image = createSchemaImageObject(autoMap.image !== false ? seo.metaImage : extra?.image, schemaDefaults?.imageFallback);
+  const name = coalesce(extra?.name, extra?.title, seo.title);
+  const description = coalesce(extra?.description, seo.description);
+  const image = createSchemaImageObject(coalesce(extra?.image, seo.metaImage), schemaDefaults?.imageFallback);
   const brand = extra?.brand || defaults.brand;
   const offers = extra?.offers || (extra?.price ? {
     "@type": "Offer",
@@ -372,8 +336,8 @@ function buildProduct({
   return {
     "@context": "https://schema.org",
     "@type": "Product",
-    name: name || extra?.name,
-    description: description || extra?.description,
+    name,
+    description,
     image,
     brand: brand ? buildOrgSchema(brand, true, seo.canonicalUrl) : undefined,
     sku: extra?.sku,
@@ -392,13 +356,14 @@ function buildWebPage({
   extra
 }) {
   const defaults = schemaDefaults?.webPage || {};
-  const autoMap = schemaDefaults?.autoMap || {};
-  const { title: name, description, image } = automap(autoMap, seo, extra);
+  const name = coalesce(extra?.name, extra?.title, seo.title);
+  const description = coalesce(extra?.description, seo.description);
+  const image = createSchemaImageObject(coalesce(extra?.image, seo.metaImage), schemaDefaults?.imageFallback);
   return {
     "@context": "https://schema.org",
     "@type": "WebPage",
-    name: coalesce(name, extra?.name),
-    description: coalesce(description, extra?.description),
+    name,
+    description,
     url: coalesce(seo.canonicalUrl, extra?.url),
     image,
     inLanguage: coalesce(extra?.inLanguage, defaults.inLanguage),
@@ -583,9 +548,8 @@ export {
   buildEvent,
   buildContactPage,
   buildArticle,
-  buildAboutPage,
-  automap
+  buildAboutPage
 };
 
-//# debugId=23E20A45CF810AA464756E2164756E21
+//# debugId=E33BDB621C56334964756E2164756E21
 //# sourceMappingURL=index.js.map

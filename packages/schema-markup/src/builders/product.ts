@@ -1,7 +1,8 @@
 // schema/builders/product.ts
 
-import type { MergedMetadata } from "@crawl-me-maybe/web";
+import type { MergedMetadata } from "@crawl-me-maybe/meta";
 import type { SchemaDefaults } from "../compose";
+import { coalesce } from "../schema-utils";
 import type { SchemaImage } from "../types";
 import { createSchemaImageObject } from "../utils/image";
 import { buildOrgSchema } from "./utils";
@@ -16,24 +17,16 @@ export function buildProduct({
 	extra?: Record<string, unknown>;
 }): Record<string, unknown> {
 	const defaults = schemaDefaults?.product || {};
-	const autoMap = schemaDefaults?.autoMap || {};
 
-	// Use auto-mapping if enabled
-	const name =
-		autoMap.title !== false ? seo.title : (extra?.name as string | undefined);
-	const description =
-		autoMap.description !== false
-			? seo.description
-			: (extra?.description as string | undefined);
+	const name = coalesce(extra?.name, extra?.title, seo.title);
+	const description = coalesce(extra?.description, seo.description);
 	const image = createSchemaImageObject(
-		autoMap.image !== false ? seo.metaImage : (extra?.image as SchemaImage),
+		coalesce(extra?.image, seo.metaImage) as SchemaImage,
 		schemaDefaults?.imageFallback,
 	);
 
-	// Build brand (use reference since it's added as entity first)
 	const brand = extra?.brand || defaults.brand;
 
-	// Build offers
 	const offers =
 		extra?.offers ||
 		(extra?.price
@@ -49,12 +42,12 @@ export function buildProduct({
 	return {
 		"@context": "https://schema.org",
 		"@type": "Product",
-		name: name || (extra?.name as string | undefined),
-		description: description || (extra?.description as string | undefined),
+		name,
+		description,
 		image,
 		brand: brand
 			? buildOrgSchema(brand as any, true, seo.canonicalUrl)
-			: undefined, // Use reference
+			: undefined,
 		sku: extra?.sku as string | undefined,
 		mpn: extra?.mpn as string | undefined,
 		gtin: extra?.gtin as string | undefined,

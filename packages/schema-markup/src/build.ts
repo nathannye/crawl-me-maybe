@@ -4,7 +4,7 @@ import {
 	type PageMetadata,
 	type SeoDefaults,
 	setConfig,
-} from "@crawl-me-maybe/web";
+} from "@crawl-me-maybe/meta";
 import type { Thing } from "schema-dts";
 import { composeSchema, type SchemaDefaults } from "./compose";
 

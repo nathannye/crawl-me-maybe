@@ -1,4 +1,4 @@
-import { type MergedMetadata, type PageMetadata, type SeoDefaults } from "@crawl-me-maybe/web";
+import { type MergedMetadata, type PageMetadata, type SeoDefaults } from "@crawl-me-maybe/meta";
 import type { Thing } from "schema-dts";
 import { type SchemaDefaults } from "./compose";
 export type BuildSeoPayloadParams = {

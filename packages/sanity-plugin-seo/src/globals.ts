@@ -1,16 +1,16 @@
 import {
 	MdArticle,
 	MdBusiness,
+	MdCreate,
+	MdEmail,
 	MdEvent,
 	MdPageview,
+	MdPeople,
+	MdPerson,
 	MdQuestionAnswer,
 	MdShoppingBag,
-	MdWeb,
-	MdPerson,
 	MdStore,
-	MdCreate,
-	MdPeople,
-	MdEmail,
+	MdWeb,
 } from "react-icons/md";
 
 export const SCHEMA_MARKUP_TYPES = {
@@ -40,4 +40,3 @@ export const SCHEMA_MARKUP_TYPES = {
 	WebPage: { title: "WebPage", value: "WebPage", icon: MdPageview },
 	WebSite: { title: "WebSite", value: "WebSite", icon: MdWeb },
 };
-

@@ -1,4 +1,4 @@
-import type { MergedMetadata } from "@crawl-me-maybe/web";
+import type { MergedMetadata } from "@crawl-me-maybe/meta";
 import type { SchemaDefaults } from "../compose";
 export declare function buildContactPage({ seo, schemaDefaults, extra, }: {
     seo: MergedMetadata;

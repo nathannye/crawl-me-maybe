@@ -1,5 +1,5 @@
 {
-  "name": "@crawl-me-maybe/web",
+  "name": "@crawl-me-maybe/meta",
   "version": "0.0.7",
   "type": "module",
   "main": "./dist/index.js",

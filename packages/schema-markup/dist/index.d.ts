@@ -1,4 +1,3 @@
-export { automap } from "./automap";
 export type { BuildSeoPayloadParams, BuildSeoPayloadResult, } from "./build";
 export { buildSeoPayload } from "./build";
 export { buildAboutPage, buildArticle, buildContactPage, buildEvent, buildFAQPage, buildOrganization, buildOrgSchema, buildPersonOrOrg, buildPersonSchema, buildProduct, buildWebPage, buildWebSite, formatSchemaDate, normalizeId, } from "./builders";

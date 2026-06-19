@@ -1,6 +1,6 @@
 // schema/builders/article.ts
 
-import type { MergedMetadata } from "@crawl-me-maybe/web";
+import type { MergedMetadata } from "@crawl-me-maybe/meta";
 import type { SchemaDefaults } from "../compose";
 import { coalesce } from "../schema-utils";
 import type { SchemaImage, SchemaOrganization, SchemaPerson } from "../types";
@@ -17,34 +17,24 @@ export function buildArticle({
 	extra?: Record<string, unknown>;
 }): Record<string, unknown> {
 	const defaults = schemaDefaults?.article || {};
-	const autoMap = schemaDefaults?.autoMap || {};
 
-	// Use auto-mapping if enabled
-	const headline =
-		autoMap.title !== false
-			? seo.title
-			: (extra?.headline as string | undefined);
-	const description =
-		autoMap.description !== false
-			? seo.description
-			: (extra?.description as string | undefined);
+	const headline = coalesce(extra?.headline, extra?.title, seo.title);
+	const description = coalesce(extra?.description, seo.description);
 	const image = createSchemaImageObject(
-		autoMap.image !== false ? seo.metaImage : (extra?.image as SchemaImage),
+		coalesce(extra?.image, seo.metaImage) as SchemaImage,
 		schemaDefaults?.imageFallback,
 	);
 
-	// Build author array (use references since they're added as entities first)
 	const authors = (extra?.author || []) as Array<
 		SchemaPerson | SchemaOrganization
 	>;
 	const authorSchema =
-		autoMap.authors !== false && authors.length > 0
+		authors.length > 0
 			? authors
 					.map((author) => buildPersonOrOrg(author, true, seo.canonicalUrl))
 					.filter(Boolean)
 			: undefined;
 
-	// Build publisher (use reference since it's added as entity first)
 	const publisher = coalesce(
 		extra?.publisher,
 		defaults.publisher,
@@ -55,27 +45,23 @@ export function buildArticle({
 	return {
 		"@context": "https://schema.org",
 		"@type": "Article",
-		headline: coalesce(headline, extra?.headline),
-		description: coalesce(description, extra?.description),
+		headline,
+		description,
 		image,
 		datePublished: formatSchemaDate(
-			autoMap.dates !== false
-				? ((extra?._createdAt || extra?.datePublished) as
-						| string
-						| Date
-						| undefined)
-				: (extra?.datePublished as string | Date | undefined),
+			coalesce(extra?.datePublished, extra?._createdAt) as
+				| string
+				| Date
+				| undefined,
 		),
 		dateModified: formatSchemaDate(
-			autoMap.dates !== false
-				? ((extra?._updatedAt || extra?.dateModified) as
-						| string
-						| Date
-						| undefined)
-				: (extra?.dateModified as string | Date | undefined),
+			coalesce(extra?.dateModified, extra?._updatedAt) as
+				| string
+				| Date
+				| undefined,
 		),
 		author: authorSchema,
-		publisher: buildOrgSchema(publisher, true, seo.canonicalUrl), // Use reference
+		publisher: buildOrgSchema(publisher, true, seo.canonicalUrl),
 		mainEntityOfPage: coalesce(seo.canonicalUrl, extra?.mainEntityOfPage) as
 			| string
 			| undefined,

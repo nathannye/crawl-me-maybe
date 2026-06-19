@@ -21,14 +21,14 @@ Other plugins place most of the work on editors, schema markup and bunches of me
 
 
 ## Web (SEO runtime)
-`@crawl-me-maybe/web`
+`@crawl-me-maybe/meta`
 
 Framework-agnostic helpers to merge SEO metadata, generate meta titles, favicons, and Sanity image URLs.
 
 ## Schema Markup (JSON-LD)
 `@crawl-me-maybe/schema-markup`
 
-Builds Schema.org JSON-LD from Sanity content. Depends on `@crawl-me-maybe/web` for merged metadata. Pairs with `@crawl-me-maybe/sanity` for CMS field definitions.
+Builds Schema.org JSON-LD from Sanity content. Depends on `@crawl-me-maybe/meta` for merged metadata. Pairs with `@crawl-me-maybe/sanity` for CMS field definitions.
 
 ### buildSeoPayload
 Builds a complete SEO payload for a page by merging global defaults, page metadata, and optional schema config. Field names align with `@crawl-me-maybe/sanity`.

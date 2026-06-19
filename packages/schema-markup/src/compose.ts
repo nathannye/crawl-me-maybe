@@ -1,6 +1,6 @@
 // schema/compose.ts
 
-import type { MergedMetadata } from "@crawl-me-maybe/web";
+import type { MergedMetadata } from "@crawl-me-maybe/meta";
 import type { Thing } from "schema-dts";
 import {
 	buildAboutPage,
@@ -30,14 +30,6 @@ export type SchemaDefaults = {
 	organization?: SchemaOrganization;
 	publisher?: SchemaOrganization;
 	imageFallback?: SchemaImage;
-	imageFieldMapping?: string[];
-	autoMap?: {
-		title?: boolean;
-		description?: boolean;
-		image?: boolean;
-		dates?: boolean;
-		authors?: boolean;
-	};
 	webSite?: {
 		name?: string;
 		publisher?: SchemaOrganization;

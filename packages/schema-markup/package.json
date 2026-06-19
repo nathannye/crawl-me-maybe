@@ -21,14 +21,14 @@
 	"scripts": {
 		"lint": "biome check .",
 		"fix": "biome check --write .",
-		"build": "rm -rf dist && bun build src/index.ts --outfile dist/index.js --format esm --sourcemap --external @crawl-me-maybe/web --external @sanity/client --external schema-dts && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src"
+		"build": "rm -rf dist && bun build src/index.ts --outdir dist --format esm --sourcemap --external @crawl-me-maybe/meta --external @sanity/client --external schema-dts && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src"
 	},
 	"dependencies": {
-		"@crawl-me-maybe/web": "workspace:*",
+		"@crawl-me-maybe/meta": "workspace:*",
 		"schema-dts": "^1.1.5"
 	},
 	"peerDependencies": {
-		"@crawl-me-maybe/web": "^0.0.7",
+		"@crawl-me-maybe/meta": "^0.0.7",
 		"@sanity/client": "^6.0.0"
 	},
 	"devDependencies": {}

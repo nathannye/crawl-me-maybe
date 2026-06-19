@@ -1,5 +1,4 @@
 import { AiOutlineGlobal } from "react-icons/ai";
-import { IoSparklesSharp } from "react-icons/io5";
 import { MdSettingsSuggest } from "react-icons/md";
 import { defineField, defineType } from "sanity";
 
@@ -13,11 +12,6 @@ export const schemaMarkupDefaults = defineType({
 			title: "Global Defaults",
 			default: true,
 			icon: AiOutlineGlobal,
-		},
-		{
-			name: "automapping",
-			title: "Automapping",
-			icon: IoSparklesSharp,
 		},
 		{
 			name: "type-specific",
@@ -80,33 +74,33 @@ export const schemaMarkupDefaults = defineType({
 		}),
 
 		// ---- Image & Media Fallbacks ----
-		defineField({
-			name: "logo",
-			title: "Global Logo",
-			group: "global",
-			type: "image",
-			description:
-				"Default logo used for Organization and WebSite schemas when no specific logo is provided.",
-		}),
-		defineField({
-			name: "imageFallback",
-			title: "Default Image",
-			group: "global",
-			type: "image",
-			description: "Used if an entity has no image set or auto-mapped.",
-		}),
-		defineField({
-			name: "imageFieldMapping",
-			hidden: true,
-			title: "Image Auto-Map Order",
-			group: "global",
-			type: "array",
-			of: [{ type: "string" }],
-			description:
-				"Field paths (dot notation) searched on the document to auto-map an image. First match wins. Example: coverImage, seo.image, ogImage",
-			options: { layout: "tags" },
-			initialValue: ["coverImage", "seo.image", "ogImage", "mainImage"],
-		}),
+		// defineField({
+		// 	name: "logo",
+		// 	title: "Global Logo",
+		// 	group: "global",
+		// 	type: "image",
+		// 	description:
+		// 		"Default logo used for Organization and WebSite schemas when no specific logo is provided.",
+		// }),
+		// defineField({
+		// 	name: "imageFallback",
+		// 	title: "Default Image",
+		// 	group: "global",
+		// 	type: "image",
+		// 	description: "Used if an entity has no image set or auto-mapped.",
+		// }),
+		// defineField({
+		// 	name: "imageFieldMapping",
+		// 	hidden: true,
+		// 	title: "Image Auto-Map Order",
+		// 	group: "global",
+		// 	type: "array",
+		// 	of: [{ type: "string" }],
+		// 	description:
+		// 		"Field paths (dot notation) searched on the document to auto-map an image. First match wins. Example: coverImage, seo.image, ogImage",
+		// 	options: { layout: "tags" },
+		// 	initialValue: ["coverImage", "seo.image", "ogImage", "mainImage"],
+		// }),
 
 		// ---- Type-Specific Defaults ----
 		defineField({
@@ -156,22 +150,6 @@ export const schemaMarkupDefaults = defineType({
 			],
 		}),
 
-		defineField({
-			name: "article",
-			title: "Article Defaults",
-			group: "type-specific",
-			type: "object",
-			options: { collapsible: true, collapsed: true },
-			fields: [
-				{ name: "publisher", type: "schemaMarkupOrganization" },
-				{
-					name: "section",
-					type: "string",
-					description: "Default ArticleSection.",
-				},
-			],
-		}),
-
 		// ---- Rendering / Behavior ----
 		defineField({
 			name: "rendering",
@@ -196,10 +174,10 @@ export const schemaMarkupDefaults = defineType({
 	],
 
 	preview: {
-		select: { baseUrl: "baseUrl", locale: "defaultLocale" },
-		prepare: ({ baseUrl, locale }) => ({
+		select: { locale: "defaultLocale" },
+		prepare: ({ locale }) => ({
 			title: "Schema Markup Defaults",
-			subtitle: `${baseUrl || "—"} · ${locale || "locale not set"}`,
+			subtitle: `${locale || "locale not set"}`,
 		}),
 	},
 });

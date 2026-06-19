@@ -4,7 +4,7 @@ A full set of SEO and Schema Markup fields for Sanity.io. Defaults, custom compo
 > Built for Sanity v5 and v6
 
 
-<!-- > This library was built alongside `@crawl-me-maybe/web` and has specific naming needs for Schema Markup to be built properly. -->
+<!-- > This library was built alongside `@crawl-me-maybe/meta` and has specific naming needs for Schema Markup to be built properly. -->
 
 ## Features
 - 

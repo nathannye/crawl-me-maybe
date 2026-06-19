@@ -2,7 +2,6 @@
 // Main Entry Point: @crawl-me-maybe/schema-markup
 // ============================================================================
 
-export { automap } from "./automap";
 export type {
 	BuildSeoPayloadParams,
 	BuildSeoPayloadResult,

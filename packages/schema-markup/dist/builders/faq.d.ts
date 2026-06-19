@@ -1,6 +1,6 @@
-import type { MergedMetadata } from "@crawl-me-maybe/web";
+import type { MergedMetadata } from "@crawl-me-maybe/meta";
 import type { SchemaDefaults } from "../compose";
-export declare function buildFAQPage({ seo, schemaDefaults, extra, }: {
+export declare function buildFAQPage({ seo, extra, }: {
     seo: MergedMetadata;
     schemaDefaults?: SchemaDefaults;
     extra?: Record<string, unknown>;

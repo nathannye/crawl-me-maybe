@@ -1,4 +1,4 @@
-import type { MergedMetadata } from "@crawl-me-maybe/web";
+import type { MergedMetadata } from "@crawl-me-maybe/meta";
 import type { SchemaDefaults } from "../compose";
 import { coalesce } from "../schema-utils";
 import type {
@@ -20,21 +20,14 @@ export function buildEvent({
 	extra?: Record<string, unknown>;
 }): Record<string, unknown> {
 	const defaults = schemaDefaults?.event || {};
-	const autoMap = schemaDefaults?.autoMap || {};
 
-	// Use auto-mapping if enabled
-	const name =
-		autoMap.title !== false ? seo.title : (extra?.name as string | undefined);
-	const description =
-		autoMap.description !== false
-			? seo.description
-			: (extra?.description as string | undefined);
+	const name = coalesce(extra?.name, extra?.title, seo.title);
+	const description = coalesce(extra?.description, seo.description);
 	const image = createSchemaImageObject(
-		autoMap.image !== false ? seo.metaImage : (extra?.image as SchemaImage),
+		coalesce(extra?.image, seo.metaImage) as SchemaImage,
 		schemaDefaults?.imageFallback,
 	);
 
-	// Build location
 	const locationData = extra?.location as SchemaLocation | undefined;
 	const location = locationData
 		? {
@@ -52,7 +45,6 @@ export function buildEvent({
 			}
 		: undefined;
 
-	// Build organizer (use references since they're added as entities first)
 	const organizer = coalesce(
 		extra?.organizer,
 		defaults.organizer,
@@ -69,7 +61,6 @@ export function buildEvent({
 				seo.canonicalUrl,
 			);
 
-	// Build performer (use references since they're added as entities first)
 	const performer = extra?.performer
 		? (extra.performer as Array<SchemaPerson | SchemaOrganization>)
 				.map((perf) => buildPersonOrOrg(perf, true, seo.canonicalUrl))
@@ -79,8 +70,8 @@ export function buildEvent({
 	return {
 		"@context": "https://schema.org",
 		"@type": "Event",
-		name: coalesce(name, extra?.name),
-		description: coalesce(description, extra?.description),
+		name,
+		description,
 		image,
 		startDate: formatSchemaDate(extra?.startDate as string | Date | undefined),
 		endDate: formatSchemaDate(extra?.endDate as string | Date | undefined),

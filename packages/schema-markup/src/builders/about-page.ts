@@ -1,7 +1,6 @@
 // schema/builders/about-page.ts
 
-import type { MergedMetadata } from "@crawl-me-maybe/web";
-import { automap } from "../automap";
+import type { MergedMetadata } from "@crawl-me-maybe/meta";
 import type { SchemaDefaults } from "../compose";
 import { coalesce } from "../schema-utils";
 import type { SchemaImage } from "../types";
@@ -17,32 +16,19 @@ export function buildAboutPage({
 	extra?: Record<string, unknown>;
 }): Record<string, unknown> {
 	const defaults = schemaDefaults?.webPage || {};
-	const autoMap = schemaDefaults?.autoMap || {};
 
-	const { title, description, image, dateModified, datePublished } = automap(
-		autoMap,
-		seo,
-		extra,
+	const name = coalesce(extra?.name, extra?.title, seo.title);
+	const description = coalesce(extra?.description, seo.description);
+	const image = createSchemaImageObject(
+		coalesce(extra?.image, seo.metaImage) as SchemaImage,
+		schemaDefaults?.imageFallback,
 	);
-
-	// Use auto-mapping if enabled
-	// const name =
-	// 	autoMap.title !== false ? seo.title : (extra?.name as string | undefined);
-	// const description =
-	// 	autoMap.description !== false
-	// 		? seo.description
-	// 		: (extra?.description as string | undefined);
-	// const image = createSchemaImageObject(
-	// 	autoMap.image !== false ? seo.metaImage : (extra?.image as SchemaImage),
-	// 	schemaDefaults?.imageFallback,
-	// );
 
 	return {
 		"@context": "https://schema.org",
 		"@type": "AboutPage",
-		// name: name || (extra?.name as string | undefined),
-		name: title,
-		description: coalesce(description, extra?.description),
+		name,
+		description,
 		url: coalesce(seo.canonicalUrl, extra?.url) as string | undefined,
 		image,
 		inLanguage: coalesce(extra?.inLanguage, defaults.inLanguage),

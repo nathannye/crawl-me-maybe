@@ -1,4 +1,4 @@
-import { urlFor } from "@crawl-me-maybe/web";
+import { urlFor } from "@crawl-me-maybe/meta";
 import type { SanityImageAssetDocument } from "@sanity/client";
 import type { ImageObject } from "schema-dts";
 

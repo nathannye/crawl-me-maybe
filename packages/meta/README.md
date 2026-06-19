@@ -1,4 +1,4 @@
-# @crawl-me-maybe/web
+# @crawl-me-maybe/meta
 
 > This library is under active development. APIs and data shapes may change.
 
@@ -9,7 +9,7 @@ For Schema.org JSON-LD, use [`@crawl-me-maybe/schema-markup`](../schema-markup).
 ## Installation
 
 ```bash
-npm install @crawl-me-maybe/web
+npm install @crawl-me-maybe/meta
 ```
 
 ## Features
@@ -22,7 +22,7 @@ npm install @crawl-me-maybe/web
 ## Quick Start
 
 ```typescript
-import { mergeSeoData } from "@crawl-me-maybe/web";
+import { mergeSeoData } from "@crawl-me-maybe/meta";
 
 const meta = mergeSeoData(
   {
