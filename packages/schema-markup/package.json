@@ -1,0 +1,35 @@
+{
+	"name": "@crawl-me-maybe/schema-markup",
+	"version": "0.0.1",
+	"type": "module",
+	"author": "Nathan Nye <nathan@nye.design> (https://nye.design)",
+	"license": "MIT",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"publishConfig": {
+		"access": "public"
+	},
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"lint": "biome check .",
+		"fix": "biome check --write .",
+		"build": "rm -rf dist && bun build src/index.ts --outfile dist/index.js --format esm --sourcemap --external @crawl-me-maybe/web --external @sanity/client --external schema-dts && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src"
+	},
+	"dependencies": {
+		"@crawl-me-maybe/web": "workspace:*",
+		"schema-dts": "^1.1.5"
+	},
+	"peerDependencies": {
+		"@crawl-me-maybe/web": "^0.0.7",
+		"@sanity/client": "^6.0.0"
+	},
+	"devDependencies": {}
+}

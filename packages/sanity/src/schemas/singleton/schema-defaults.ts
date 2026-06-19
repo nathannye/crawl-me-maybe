@@ -1,7 +1,7 @@
 import { AiOutlineGlobal } from "react-icons/ai";
-import { MdSettingsSuggest } from "react-icons/md";
-import { defineType, defineField } from "sanity";
 import { IoSparklesSharp } from "react-icons/io5";
+import { MdSettingsSuggest } from "react-icons/md";
+import { defineField, defineType } from "sanity";
 
 export const schemaMarkupDefaults = defineType({
 	name: "schemaMarkupDefaults",
@@ -108,47 +108,6 @@ export const schemaMarkupDefaults = defineType({
 			initialValue: ["coverImage", "seo.image", "ogImage", "mainImage"],
 		}),
 
-		// ---- Auto-Mapping Toggles ----
-		defineField({
-			name: "autoMap",
-			title: "Automatic Field Mapping",
-			group: "automapping",
-			type: "object",
-			fields: [
-				{
-					name: "title",
-					type: "boolean",
-					initialValue: true,
-					description: "Map doc title → name/headline.",
-				},
-				{
-					name: "description",
-					type: "boolean",
-					initialValue: true,
-					description: "Map doc excerpt/description → description.",
-				},
-				{
-					name: "image",
-					type: "boolean",
-					initialValue: true,
-					description: "Use imageFieldMapping to find an image.",
-				},
-				{
-					name: "dates",
-					type: "boolean",
-					initialValue: true,
-					description:
-						"Map publishedAt/updatedAt → datePublished/dateModified.",
-				},
-				{
-					name: "authors",
-					type: "boolean",
-					initialValue: true,
-					description: "Map authors[] → Person/Organization authors.",
-				},
-			],
-		}),
-
 		// ---- Type-Specific Defaults ----
 		defineField({
 			name: "webSite",
@@ -210,71 +169,6 @@ export const schemaMarkupDefaults = defineType({
 					type: "string",
 					description: "Default ArticleSection.",
 				},
-			],
-		}),
-
-		defineField({
-			name: "product",
-			title: "Product Defaults",
-			group: "type-specific",
-			type: "object",
-			options: { collapsible: true, collapsed: true },
-			fields: [
-				{ name: "brand", type: "schemaMarkupOrganization" },
-				{
-					name: "priceCurrency",
-					type: "string",
-					description: "ISO 4217, e.g., USD, EUR.",
-				},
-				{
-					name: "availability",
-					type: "string",
-					options: {
-						list: [
-							{ title: "InStock", value: "InStock" },
-							{ title: "OutOfStock", value: "OutOfStock" },
-							{ title: "PreOrder", value: "PreOrder" },
-							{ title: "PreSale", value: "PreSale" },
-							{ title: "Discontinued", value: "Discontinued" },
-						],
-					},
-				},
-			],
-		}),
-
-		defineField({
-			name: "event",
-			title: "Event Defaults",
-			group: "type-specific",
-			type: "object",
-			options: { collapsible: true, collapsed: true },
-			fields: [
-				{
-					name: "eventAttendanceMode",
-					type: "string",
-					options: {
-						list: [
-							{ title: "Offline", value: "OfflineEventAttendanceMode" },
-							{ title: "Online", value: "OnlineEventAttendanceMode" },
-							{ title: "Mixed", value: "MixedEventAttendanceMode" },
-						],
-					},
-				},
-				{ name: "organizer", type: "schemaMarkupOrganization" },
-			],
-		}),
-
-		defineField({
-			name: "localBusiness",
-			title: "LocalBusiness Defaults",
-			group: "type-specific",
-			type: "object",
-			options: { collapsible: true, collapsed: true },
-			fields: [
-				{ name: "priceRange", type: "string", description: "e.g., $, $$, $$$" },
-				{ name: "address", type: "schemaMarkupAddress" },
-				{ name: "geo", type: "schemaMarkupGeo" },
-				{ name: "aggregateRating", type: "schemaMarkupAggregateRating" },
 			],
 		}),
 

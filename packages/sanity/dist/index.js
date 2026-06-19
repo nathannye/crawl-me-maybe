@@ -1228,9 +1228,8 @@ function PageSeoInput(props) {
 
 // src/schemas/fields/metadata/metadata.ts
 var metadata_default = {
-  name: "metadata",
+  name: "pageMetadata",
   title: "Metadata",
-  group: "seo",
   components: {
     input: PageSeoInput
   },
@@ -1727,9 +1726,9 @@ var fields_default = [
 
 // src/schemas/singleton/schema-defaults.ts
 import { AiOutlineGlobal } from "react-icons/ai";
-import { MdSettingsSuggest } from "react-icons/md";
-import { defineType as defineType16, defineField as defineField18 } from "sanity";
 import { IoSparklesSharp } from "react-icons/io5";
+import { MdSettingsSuggest } from "react-icons/md";
+import { defineField as defineField18, defineType as defineType16 } from "sanity";
 var schemaMarkupDefaults = defineType16({
   name: "schemaMarkupDefaults",
   title: "Schema Markup Defaults",
@@ -1802,44 +1801,6 @@ var schemaMarkupDefaults = defineType16({
       initialValue: ["coverImage", "seo.image", "ogImage", "mainImage"]
     }),
     defineField18({
-      name: "autoMap",
-      title: "Automatic Field Mapping",
-      group: "automapping",
-      type: "object",
-      fields: [
-        {
-          name: "title",
-          type: "boolean",
-          initialValue: true,
-          description: "Map doc title → name/headline."
-        },
-        {
-          name: "description",
-          type: "boolean",
-          initialValue: true,
-          description: "Map doc excerpt/description → description."
-        },
-        {
-          name: "image",
-          type: "boolean",
-          initialValue: true,
-          description: "Use imageFieldMapping to find an image."
-        },
-        {
-          name: "dates",
-          type: "boolean",
-          initialValue: true,
-          description: "Map publishedAt/updatedAt → datePublished/dateModified."
-        },
-        {
-          name: "authors",
-          type: "boolean",
-          initialValue: true,
-          description: "Map authors[] → Person/Organization authors."
-        }
-      ]
-    }),
-    defineField18({
       name: "webSite",
       title: "WebSite Defaults",
       group: "type-specific",
@@ -1890,68 +1851,6 @@ var schemaMarkupDefaults = defineType16({
           type: "string",
           description: "Default ArticleSection."
         }
-      ]
-    }),
-    defineField18({
-      name: "product",
-      title: "Product Defaults",
-      group: "type-specific",
-      type: "object",
-      options: { collapsible: true, collapsed: true },
-      fields: [
-        { name: "brand", type: "schemaMarkupOrganization" },
-        {
-          name: "priceCurrency",
-          type: "string",
-          description: "ISO 4217, e.g., USD, EUR."
-        },
-        {
-          name: "availability",
-          type: "string",
-          options: {
-            list: [
-              { title: "InStock", value: "InStock" },
-              { title: "OutOfStock", value: "OutOfStock" },
-              { title: "PreOrder", value: "PreOrder" },
-              { title: "PreSale", value: "PreSale" },
-              { title: "Discontinued", value: "Discontinued" }
-            ]
-          }
-        }
-      ]
-    }),
-    defineField18({
-      name: "event",
-      title: "Event Defaults",
-      group: "type-specific",
-      type: "object",
-      options: { collapsible: true, collapsed: true },
-      fields: [
-        {
-          name: "eventAttendanceMode",
-          type: "string",
-          options: {
-            list: [
-              { title: "Offline", value: "OfflineEventAttendanceMode" },
-              { title: "Online", value: "OnlineEventAttendanceMode" },
-              { title: "Mixed", value: "MixedEventAttendanceMode" }
-            ]
-          }
-        },
-        { name: "organizer", type: "schemaMarkupOrganization" }
-      ]
-    }),
-    defineField18({
-      name: "localBusiness",
-      title: "LocalBusiness Defaults",
-      group: "type-specific",
-      type: "object",
-      options: { collapsible: true, collapsed: true },
-      fields: [
-        { name: "priceRange", type: "string", description: "e.g., $, $$, $$$" },
-        { name: "address", type: "schemaMarkupAddress" },
-        { name: "geo", type: "schemaMarkupGeo" },
-        { name: "aggregateRating", type: "schemaMarkupAggregateRating" }
       ]
     }),
     defineField18({
@@ -2060,30 +1959,8 @@ var seoDefaults = defineType17({
   }
 });
 
-// src/schemas/singleton/social-networks.ts
-import { defineField as defineField20, defineType as defineType18 } from "sanity";
-var socialNetworks = defineType18({
-  name: "socialNetworks",
-  title: "Social Networks",
-  type: "document",
-  fields: [
-    defineField20({
-      name: "platform",
-      title: "Platform",
-      type: "string",
-      validation: (Rule) => Rule.required()
-    }),
-    defineField20({
-      name: "url",
-      title: "URL",
-      type: "url",
-      validation: (Rule) => Rule.required()
-    })
-  ]
-});
-
 // src/schemas/singleton/index.ts
-var singleton_default = [schemaMarkupDefaults, seoDefaults, socialNetworks];
+var singleton_default = [schemaMarkupDefaults, seoDefaults];
 
 // src/index.ts
 var src_default = definePlugin({
@@ -2101,4 +1978,4 @@ export {
   src_default as default
 };
 
-//# debugId=05534D09A401D7C364756E2164756E21
+//# debugId=45E8700002DF275464756E2164756E21

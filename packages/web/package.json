@@ -17,13 +17,14 @@
     "dist"
   ],
   "scripts": {
-    "build": "rm -rf dist && bun build src/index.ts --outfile dist/index.js --format esm --sourcemap --external @sanity/client --external @sanity-image/url-builder --external @sanity/image-url --external schema-dts && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src"
+    "lint": "biome check .",
+    "fix": "biome check --write .",
+    "build": "rm -rf dist && bun build src/index.ts --outfile dist/index.js --format esm --sourcemap --external @sanity/client --external @sanity-image/url-builder --external @sanity/image-url && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src"
   },
   "dependencies": {
     "@sanity-image/url-builder": "^1.0.0",
     "@sanity/client": "^6.0.0",
-    "@sanity/image-url": "^1.2.0",
-    "schema-dts": "^1.1.5"
+    "@sanity/image-url": "^1.2.0"
   },
   "peerDependencies": {
     "@sanity/client": "^6.0.0"

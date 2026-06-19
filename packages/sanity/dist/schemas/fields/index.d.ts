@@ -48,7 +48,6 @@ declare const _default: (({
 } & import("sanity").FieldDefinitionBase & import("sanity").WidenValidation & import("sanity").WidenInitialValue) | {
     name: string;
     title: string;
-    group: string;
     components: {
         input: typeof import("../../components/core/PageSeoInput/PageSeoInput").default;
     };

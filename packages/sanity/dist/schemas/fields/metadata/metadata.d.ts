@@ -3,7 +3,6 @@ import PageSeoInput from "../../../components/core/PageSeoInput/PageSeoInput";
 declare const _default: {
     name: string;
     title: string;
-    group: string;
     components: {
         input: typeof PageSeoInput;
     };

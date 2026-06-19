@@ -1,0 +1,1 @@
+- [] Add canonicalUrlFormat option for reference or not? Usually just pass manually

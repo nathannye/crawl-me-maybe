@@ -14,10 +14,5 @@ declare const _default: (({
         title: string;
         subtitle: string;
     }, Record<"title" | "subtitle", any>> | undefined;
-}) | ({
-    type: "document";
-    name: "socialNetworks";
-} & Omit<import("sanity").DocumentDefinition, "preview"> & {
-    preview?: import("sanity").PreviewConfig<Record<string, string>, Record<never, any>> | undefined;
 }))[];
 export default _default;

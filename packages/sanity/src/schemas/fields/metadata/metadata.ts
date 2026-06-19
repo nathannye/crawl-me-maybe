@@ -2,9 +2,8 @@ import InputWithGlobalDefault from "../../../components/core/InputWithGlobalDefa
 import PageSeoInput from "../../../components/core/PageSeoInput/PageSeoInput";
 
 export default {
-	name: "metadata",
+	name: "pageMetadata",
 	title: "Metadata",
-	group: "seo",
 	components: {
 		input: PageSeoInput,
 	},

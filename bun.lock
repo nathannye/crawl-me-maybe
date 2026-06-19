@@ -33,6 +33,18 @@
         "sanity": "^5 || ^6.0.0",
       },
     },
+    "packages/schema-markup": {
+      "name": "@crawl-me-maybe/schema-markup",
+      "version": "0.0.1",
+      "dependencies": {
+        "@crawl-me-maybe/web": "workspace:*",
+        "schema-dts": "^1.1.5",
+      },
+      "peerDependencies": {
+        "@crawl-me-maybe/web": "^0.0.7",
+        "@sanity/client": "^6.0.0",
+      },
+    },
     "packages/sitemap": {
       "name": "@crawl-me-maybe/sitemap",
       "version": "0.0.10",
@@ -47,7 +59,6 @@
         "@sanity-image/url-builder": "^1.0.0",
         "@sanity/client": "^6.0.0",
         "@sanity/image-url": "^1.2.0",
-        "schema-dts": "^1.1.5",
       },
       "peerDependencies": {
         "@sanity/client": "^6.0.0",
@@ -316,6 +327,8 @@
     "@bramus/specificity": ["@bramus/specificity@2.4.2", "", { "dependencies": { "css-tree": "^3.0.0" }, "bin": { "specificity": "bin/cli.js" } }, "sha512-ctxtJ/eA+t+6q2++vj5j7FYX3nRu311q1wfYH3xjlLOsczhlhxAg2FWNUXhpGvAw3BWo1xBcvOV6/YLc2r5FJw=="],
 
     "@crawl-me-maybe/sanity": ["@crawl-me-maybe/sanity@workspace:packages/sanity"],
+
+    "@crawl-me-maybe/schema-markup": ["@crawl-me-maybe/schema-markup@workspace:packages/schema-markup"],
 
     "@crawl-me-maybe/sitemap": ["@crawl-me-maybe/sitemap@workspace:packages/sitemap"],
 

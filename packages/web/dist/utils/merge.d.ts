@@ -32,7 +32,7 @@ export type PageMetadata<MetaKey extends string = "meta"> = {
         description?: string;
         canonicalUrl?: string;
         metaImage?: SanityImageAssetDocument;
-        searchVisibility?: {
+        searchIndexing?: {
             noIndex?: boolean;
             noFollow?: boolean;
         };
