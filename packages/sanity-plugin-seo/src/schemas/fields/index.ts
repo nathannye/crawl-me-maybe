@@ -4,7 +4,7 @@ import { schemaMarkupGeo } from "./schema-markup/geo";
 import metaDescription from "./metadata/meta-description";
 import metadata from "./metadata/metadata";
 import { schemaMarkup } from "./schema-markup/schemaMarkup";
-import indexing from "./metadata/indexing";
+import indexing from "./metadata/search-indexing";
 import favicon from "./metadata/favicon";
 
 export default [

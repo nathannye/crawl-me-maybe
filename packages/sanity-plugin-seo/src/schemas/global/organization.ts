@@ -1,7 +1,7 @@
 // const merge = (globalOfType, pageOfType, concat: string[]) => {};
 
 import { MdBusiness } from "react-icons/md";
-import { defineType, defineField } from "sanity";
+import { defineField, defineType } from "sanity";
 
 export const schemaMarkupOrganization = defineType({
 	name: "schemaMarkupOrganization",
