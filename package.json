@@ -1,7 +1,7 @@
 {
   "name": "crawl-me-maybe",
   "version": "1.0.0",
-  "author": "Nathan Nye <nathan@nye.design> (https://nye.design)",
+  "author": "Nathan Nye <nathan@nye.dev> (https://nye.dev)",
   "license": "MIT",
   "main": "index.ts",
   "workspaces": [
