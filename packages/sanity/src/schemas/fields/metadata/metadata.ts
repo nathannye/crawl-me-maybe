@@ -29,15 +29,8 @@ export default {
 				),
 		},
 		{
-			name: "searchVisibility",
-			type: "searchVisibility",
-		},
-		{
-			name: "canonicalUrl",
-			title: "Canonical URL",
-			type: "url",
-			description:
-				"If this webpage has multiple URLs, specify the primary canonical URL that Google should index here",
+			name: "searchIndexing",
+			type: "searchIndexing",
 		},
 		{
 			name: "metaImage",

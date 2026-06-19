@@ -37,7 +37,7 @@ declare const _default: (({
     }, Record<"title" | "subtitle", any>> | undefined;
 }) | ({
     type: "object";
-    name: "searchVisibility";
+    name: "searchIndexing";
 } & Omit<import("sanity").ObjectDefinition, "preview"> & {
     preview?: import("sanity").PreviewConfig<Record<string, string>, Record<never, any>> | undefined;
 } & import("sanity").FieldDefinitionBase & import("sanity").WidenValidation & import("sanity").WidenInitialValue) | ({
@@ -74,15 +74,6 @@ declare const _default: (({
         options?: undefined;
         rows?: undefined;
         description?: undefined;
-        validation?: undefined;
-    } | {
-        name: string;
-        title: string;
-        type: string;
-        description: string;
-        components?: undefined;
-        options?: undefined;
-        rows?: undefined;
         validation?: undefined;
     } | {
         name: string;

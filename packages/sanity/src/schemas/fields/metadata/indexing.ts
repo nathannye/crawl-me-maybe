@@ -1,10 +1,9 @@
 import { defineField } from "sanity";
 import { IndexingControls } from "../../../components/core";
 
-
 export default defineField({
-	name: "searchVisibility",
-	title: "Search Visibility",
+	name: "searchIndexing",
+	title: "Search Indexing",
 	type: "object",
 	components: {
 		input: IndexingControls,

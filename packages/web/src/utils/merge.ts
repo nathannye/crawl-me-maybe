@@ -31,7 +31,7 @@ export type PageMetadata<MetaKey extends string = "meta"> = {
 		description?: string;
 		canonicalUrl?: string;
 		metaImage?: SanityImageAssetDocument;
-		searchVisibility?: {
+		searchIndexing?: {
 			noIndex?: boolean;
 			noFollow?: boolean;
 		};
@@ -135,7 +135,7 @@ export const mergeSeoData = <MetaKey extends string = "meta">(
 		favicons: createFavicons(seoDefaults.favicon),
 		twitterHandle: seoDefaults.twitterHandle,
 		robots: buildRobotsString(
-			pageMeta?.searchVisibility || { noIndex: false, noFollow: false },
+			pageMeta?.searchIndexing || { noIndex: false, noFollow: false },
 		),
 		schemaMarkup: schemaMarkupType,
 	};

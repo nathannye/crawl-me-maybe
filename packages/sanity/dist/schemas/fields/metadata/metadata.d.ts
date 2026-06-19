@@ -32,15 +32,6 @@ declare const _default: {
         validation?: undefined;
     } | {
         name: string;
-        title: string;
-        type: string;
-        description: string;
-        components?: undefined;
-        options?: undefined;
-        rows?: undefined;
-        validation?: undefined;
-    } | {
-        name: string;
         components: {
             input: typeof InputWithGlobalDefault;
         };

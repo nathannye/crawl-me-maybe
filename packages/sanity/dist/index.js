@@ -1226,8 +1226,8 @@ function PageSeoInput(props) {
   }, undefined, true, undefined, this);
 }
 
-// src/schemas/fields/metadata/page-metadata.ts
-var page_metadata_default = {
+// src/schemas/fields/metadata/metadata.ts
+var metadata_default = {
   name: "metadata",
   title: "Metadata",
   group: "seo",
@@ -1251,14 +1251,8 @@ var page_metadata_default = {
       validation: (Rule) => Rule.max(160).warning("Long titles (over 160 characters) will be truncated by Google.")
     },
     {
-      name: "searchVisibility",
-      type: "searchVisibility"
-    },
-    {
-      name: "canonicalUrl",
-      title: "Canonical URL",
-      type: "url",
-      description: "If this webpage has multiple URLs, specify the primary canonical URL that Google should index here"
+      name: "searchIndexing",
+      type: "searchIndexing"
     },
     {
       name: "metaImage",
@@ -1526,8 +1520,8 @@ function SeoLayoutWrapper(props) {
 }
 // src/schemas/fields/metadata/indexing.ts
 var indexing_default = defineField16({
-  name: "searchVisibility",
-  title: "Search Visibility",
+  name: "searchIndexing",
+  title: "Search Indexing",
   type: "object",
   components: {
     input: IndexingControls
@@ -1727,7 +1721,7 @@ var fields_default = [
   schemaMarkupGeo,
   schemaMarkupAggregateRating,
   schemaMarkup,
-  page_metadata_default,
+  metadata_default,
   meta_description_default
 ];
 
@@ -2107,4 +2101,4 @@ export {
   src_default as default
 };
 
-//# debugId=7AF168DBEAB7952C64756E2164756E21
+//# debugId=05534D09A401D7C364756E2164756E21
