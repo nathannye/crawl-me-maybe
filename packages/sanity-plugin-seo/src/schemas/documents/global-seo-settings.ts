@@ -1,10 +1,10 @@
 import { MdSearch, MdShare } from "react-icons/md";
-import { defineField, defineType } from "sanity";
+import { defineField, defineType, type Rule, type StringRule } from "sanity";
 import FaviconPreview from "../../components/core/Favicon/FaviconPreview";
 
 export const seoDefaults = defineType({
-	name: "seoDefaults",
-	title: "SEO Defaults",
+	name: "globalSeoSettings",
+	title: "Global SEO Settings",
 	type: "document",
 	groups: [
 		{
@@ -25,7 +25,7 @@ export const seoDefaults = defineType({
 			title: "Site Title",
 			type: "string",
 			description:
-				"The title of the site. Used for each page and in schema markup.",
+				"The title of the site injected into the Page Title Template field below.",
 			validation: (Rule) => Rule.required(),
 			group: "metadata",
 		}),
@@ -44,14 +44,13 @@ export const seoDefaults = defineType({
 			type: "metaDescription",
 			group: "metadata",
 			description: "The default meta description for all pages.",
-			// validation: (Rule) => Rule.required(),
 		}),
 		defineField({
 			name: "siteUrl",
 			title: "Site URL",
 			type: "url",
 			description:
-				"Root URL of the website (e.g. https://your-domain.com). Used for canonical and OG tags.",
+				"Root URL of the website (e.g. https://your-domain.com). Used for canonical and Open Graph tags.",
 			validation: (Rule) => Rule.required(),
 			group: "metadata",
 		}),
@@ -65,16 +64,27 @@ export const seoDefaults = defineType({
 			title: "Twitter Handle",
 			type: "string",
 			description: "Example: @yourbrand",
+			validation: (rule: StringRule) =>
+				rule.custom((val: string | undefined) => {
+					if (!val) return true;
+					if (typeof val !== "string") return "Twitter handle must be a string";
+					if (!val.startsWith("@")) return "Twitter handle must start with @";
+					return true;
+				}),
 			group: "social",
+		}),
+		defineField({
+			name: "logo",
+			title: "Global Logo",
+			group: "global",
+			type: "image",
+			description:
+				"Logo used behind the scenes to populate Organization and WebSite schema markup.",
 		}),
 	],
 	preview: {
-		select: {
-			title: "siteTitle",
-			subtitle: "siteUrl",
-		},
-		prepare(selection) {
-			return { title: "SEO Defaults" };
+		prepare() {
+			return { title: "Global SEO Settings" };
 		},
 	},
 });

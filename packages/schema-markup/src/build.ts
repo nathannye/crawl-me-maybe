@@ -1,71 +1,26 @@
-import {
-	type MergedMetadata,
-	mergeSeoData,
-	type PageMetadata,
-	type SeoDefaults,
-	setConfig,
-} from "@crawl-me-maybe/meta";
+
 import type { Thing } from "schema-dts";
-import { composeSchema, type SchemaDefaults } from "./compose";
 
-export type BuildSeoPayloadParams = {
-	globalSeoDefaults?: SeoDefaults;
-	schemaDefaults?: SchemaDefaults;
-	pageMetadata?: PageMetadata;
-	pageSchemaType?: string;
-	seoFieldName?: string;
-	extraSchemaData?: Record<string, unknown>;
-	isHomepage?: boolean;
-	projectId: string;
-	dataset: string;
+
+type SchemaSet = {
+	schemaType: string;
+	schemaData: Thing | undefined;
 };
 
-export type BuildSeoPayloadResult = {
-	meta: MergedMetadata;
-	schemas: Thing[] | undefined;
+const schemaBuilders = {
+	WebPage: buildWebPage,
+} 
+
+export const buildSchemaMarkup = (schemaSets: SchemaSet[]): Thing[] => {
+	return schemaSets.map(({ schemaType, schemaData }) => {
+		if (!schemaData) return undefined;
+
+
+
+		return {
+			"@context": "https://schema.org",
+			"@type": schemaType,
+			
+		} as Thing;
+	});
 };
-
-/**
- * Builds the complete SEO payload for a page
- * Merges global defaults with page-specific metadata
- */
-export function buildSeoPayload({
-	pageMetadata,
-	globalSeoDefaults,
-	schemaDefaults,
-	pageSchemaType = "WebPage",
-	seoFieldName = "metadata",
-	isHomepage = false,
-	extraSchemaData,
-	projectId,
-	dataset,
-}: BuildSeoPayloadParams): BuildSeoPayloadResult {
-	if (!projectId || !dataset) {
-		console.warn(
-			"No projectId or dataset provided to buildSeoPayload, favicons and image Objects will not be created",
-		);
-	}
-
-	setConfig({ projectId, dataset });
-
-	const merged = mergeSeoData(
-		pageMetadata,
-		globalSeoDefaults,
-		seoFieldName as any,
-	);
-
-	const schemas = schemaDefaults
-		? composeSchema({
-				seo: merged,
-				schemaDefaults,
-				type: pageSchemaType || "WebPage",
-				extra: extraSchemaData,
-				isHomepage,
-			})
-		: undefined;
-
-	return {
-		meta: merged,
-		schemas,
-	};
-}

@@ -1,7 +1,3 @@
-// ============================================================================
-// Main Entry Point: @crawl-me-maybe/schema-markup
-// ============================================================================
-
 export type {
 	BuildSeoPayloadParams,
 	BuildSeoPayloadResult,

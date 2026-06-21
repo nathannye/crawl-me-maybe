@@ -3,7 +3,7 @@ import SeoLayoutWrapper from "./components/core/SeoLayoutWrapper";
 
 import fieldGroups from "./schemas/fields";
 import global from "./schemas/global";
-import singleton from "./schemas/singleton";
+import singleton from "./schemas/documents";
 
 export default definePlugin({
 	name: "crawl-me-maybe",

@@ -1,8 +1,8 @@
-import { Card, Stack, Text, Box, Avatar, Flex } from "@sanity/ui";
-import styles from "./TwitterCard.module.css";
-import { truncate } from "../../../utils/string";
+import { Avatar, Box, Card, Flex, Stack, Text } from "@sanity/ui";
 import type { PreviewCardProps } from "../../../types";
+import { truncate } from "../../../utils/string";
 import SocialCardWrapper from "../../partials/SocialCardWrapper";
+import styles from "./TwitterCard.module.css";
 
 export function TwitterCard(props: PreviewCardProps) {
 	const fallback = {

@@ -1,9 +1,8 @@
-import { Card, Stack, Text, Box, Flex, Avatar } from "@sanity/ui";
-import styles from "./GoogleEntry.module.css";
-import { truncate } from "../../../utils/string";
+import { Avatar, Box, Flex, Stack, Text, useRootTheme } from "@sanity/ui";
 import type { PreviewCardProps } from "../../../types";
-import { useRootTheme } from "@sanity/ui";
+import { truncate } from "../../../utils/string";
 import SocialCardWrapper from "../../partials/SocialCardWrapper";
+import styles from "./GoogleEntry.module.css";
 
 export function GoogleEntry(props: PreviewCardProps) {
 	const fallback = {
