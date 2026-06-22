@@ -3,7 +3,7 @@ import path from "node:path";
 import { generateRobotsTxt } from "./robots";
 import { createIndexSitemap, generateSitemap } from "./sitemap";
 import type { LocaleConfig, SitemapConfig, SitemapEntry } from "./types";
-import { createFile } from "./utils";
+import { createFile } from "./file";
 
 // Export types for consumers
 export type { LocaleConfig, SitemapConfig, SitemapEntry };

@@ -1,7 +1,5 @@
 import type { RobotsRule } from "./types";
 
-export type { RobotsRule };
-
 export const DEFAULT_ROBOTS_RULES: RobotsRule[] = [
 	{
 		userAgent: "*",

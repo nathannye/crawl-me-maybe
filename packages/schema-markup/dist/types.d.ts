@@ -1,3 +1,4 @@
+import type { ImageInput } from "./utils/image";
 export type SchemaAddress = {
     streetAddress?: string;
     addressLocality?: string;
@@ -21,7 +22,7 @@ export type SchemaPerson = {
     url?: string;
     sameAs?: string[];
     jobTitle?: string;
-    image?: string;
+    image?: ImageInput;
     affiliation?: SchemaOrganization[];
 };
 export type SchemaContactPoint = {
@@ -36,7 +37,7 @@ export type SchemaOrganization = {
     "@id"?: string;
     name: string;
     url?: string;
-    logo?: string;
+    logo?: ImageInput;
     sameAs?: string[];
     department?: SchemaOrganization[];
     contactPoint?: SchemaContactPoint[];

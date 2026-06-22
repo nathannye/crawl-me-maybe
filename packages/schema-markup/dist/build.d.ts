@@ -1,4 +1,5 @@
 import type { BreadcrumbList, OpeningHoursSpecification, PostalAddress, Thing, WithContext } from "schema-dts";
+import { type ImageInput } from "./utils/image";
 type SchemaNode = Record<string, unknown>;
 export type BuildSchemaMarkupInput = {
     identity: Identity;
@@ -15,21 +16,21 @@ export type PersonIdentity = {
     type: "person";
     name: string;
     description?: string;
-    image?: string;
+    image?: ImageInput;
     sameAs?: string[];
 };
 export type OrganizationIdentity = {
     type: "organization";
     name: string;
     description?: string;
-    logo?: string;
+    logo?: ImageInput;
     sameAs?: string[];
 };
 export type LocalBusinessIdentity = {
     type: "localBusiness";
     name: string;
     description?: string;
-    logo?: string;
+    logo?: ImageInput;
     phone?: string;
     email?: string;
     address?: PostalAddress;

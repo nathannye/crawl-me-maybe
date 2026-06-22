@@ -1,5 +1,6 @@
+import { generateLocalizedEntries } from "./localize";
 import type { LocaleConfig, SitemapEntry } from "./types";
-import { createSitemapXml, generateLocalizedEntries } from "./utils";
+import { createSitemapXml } from "./xml";
 
 export type SitemapGeneratorConfig = {
 	domain: string;

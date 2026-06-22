@@ -43,6 +43,25 @@ function mapEntityReferences(entities, mapToReference, baseUrl) {
   return entities.map((entity) => mapToReference(entity, baseUrl)).filter(Boolean);
 }
 
+// src/utils/image.ts
+function buildImageObject(input) {
+  if (!input) {
+    return;
+  }
+  if (typeof input === "string") {
+    return {
+      "@type": "ImageObject",
+      url: input
+    };
+  }
+  return {
+    "@type": "ImageObject",
+    url: input.url,
+    width: input.width,
+    height: input.height
+  };
+}
+
 // src/build.ts
 var TYPE_PRIORITY = [
   "Organization",
@@ -168,7 +187,7 @@ var buildIdentityNodes = (identity, siteUrl) => {
           "@id": id,
           name: identity.name,
           description: identity.description,
-          image: identity.image,
+          image: buildImageObject(identity.image),
           sameAs: identity.sameAs,
           url: siteUrl
         },
@@ -187,7 +206,7 @@ var buildIdentityNodes = (identity, siteUrl) => {
           "@id": id,
           name: identity.name,
           description: identity.description,
-          logo: identity.logo,
+          logo: buildImageObject(identity.logo),
           sameAs: identity.sameAs,
           url: siteUrl
         },
@@ -206,7 +225,7 @@ var buildIdentityNodes = (identity, siteUrl) => {
           "@id": id,
           name: identity.name,
           description: identity.description,
-          logo: identity.logo,
+          logo: buildImageObject(identity.logo),
           telephone: identity.phone,
           email: identity.email,
           address: identity.address,
@@ -352,7 +371,7 @@ function buildOrganizationCore(org, baseUrl) {
     "@id": id,
     name: org.name,
     url: org.url,
-    logo: org.logo,
+    logo: buildImageObject(org.logo),
     sameAs: org.sameAs,
     department: departments,
     contactPoint
@@ -378,7 +397,7 @@ function buildPersonSchema(person, asReference = false, baseUrl) {
     url: person.url,
     sameAs: person.sameAs,
     jobTitle: person.jobTitle,
-    image: person.image
+    image: buildImageObject(person.image)
   };
 }
 function buildOrgSchema(org, asReference = false, baseUrl) {
@@ -495,5 +514,5 @@ export {
   asIdReference
 };
 
-//# debugId=8B5E021735BBDB0164756E2164756E21
+//# debugId=76AE2B40C167835964756E2164756E21
 //# sourceMappingURL=index.js.map

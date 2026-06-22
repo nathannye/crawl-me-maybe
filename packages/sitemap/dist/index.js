@@ -1,5 +1,184 @@
-// src/index.ts
-var { default: fs2} = (() => ({}));
+// src/robots.ts
+var DEFAULT_ROBOTS_RULES = [
+  {
+    userAgent: "*",
+    allow: "/",
+    disallow: ["/admin", "/api/"]
+  }
+];
+function serializeRobotsRules(rules) {
+  const ruleArray = Array.isArray(rules) ? rules : [rules];
+  return ruleArray.map((rule) => {
+    const agents = Array.isArray(rule.userAgent) ? rule.userAgent : [rule.userAgent];
+    const lines = agents.map((a) => `User-agent: ${a}`);
+    if (rule.allow) {
+      const allows = Array.isArray(rule.allow) ? rule.allow : [rule.allow];
+      for (const a of allows)
+        lines.push(`Allow: ${a}`);
+    }
+    if (rule.disallow) {
+      const disallows = Array.isArray(rule.disallow) ? rule.disallow : [rule.disallow];
+      for (const d of disallows)
+        lines.push(`Disallow: ${d}`);
+    }
+    return lines.join(`
+`);
+  }).join(`
+
+`);
+}
+function createRobotsTxt(indexUrl) {
+  if (!indexUrl || typeof indexUrl !== "string") {
+    throw new Error("createRobotsTxt: indexUrl must be a non-empty string");
+  }
+  let content = serializeRobotsRules(DEFAULT_ROBOTS_RULES).trim();
+  if (!content.endsWith(`
+`))
+    content += `
+`;
+  content += `Sitemap: ${indexUrl}
+`;
+  return content;
+}
+async function generateRobotsTxt(domain, sitemapUrls = ["/sitemap.xml"], rules) {
+  let content = serializeRobotsRules(rules ?? DEFAULT_ROBOTS_RULES).trim();
+  if (!content.endsWith(`
+`))
+    content += `
+`;
+  const domainUrl = domain.endsWith("/") ? domain.slice(0, -1) : domain;
+  for (const rel of sitemapUrls) {
+    content += `Sitemap: ${domainUrl}${rel.startsWith("/") ? rel : `/${rel}`}
+`;
+  }
+  return content;
+}
+// src/localize.ts
+function localizeUrl(baseUrl, locale, domain, localeMode = "prefix", prefixDefault = false) {
+  const normalizedUrl = baseUrl?.startsWith("/") ? baseUrl : `/${baseUrl || ""}`;
+  if (locale.default) {
+    if (!prefixDefault) {
+      return domain + normalizedUrl;
+    }
+  }
+  if (localeMode === "subdomain") {
+    const urlObj = new URL(domain);
+    const hostname = urlObj.hostname.replace(/^www\./, "");
+    const subdomain = `${locale.code}.${hostname}`;
+    return `${urlObj.protocol}//${subdomain}${urlObj.port ? `:${urlObj.port}` : ""}${normalizedUrl}`;
+  }
+  const prefix = `/${locale.code}`;
+  return domain + prefix + normalizedUrl;
+}
+function generateLocalizedEntries(baseEntries, locales, domain, localeMode = "prefix", prefixDefault = false) {
+  const localizedEntries = [];
+  const defaultLocale = locales.find((l) => l.default);
+  for (const entry of baseEntries) {
+    if (entry.skipLocalization) {
+      localizedEntries.push({
+        ...entry,
+        url: domain + entry.url
+      });
+      continue;
+    }
+    const alternates = locales.map((locale) => ({
+      hreflang: locale.code,
+      href: localizeUrl(entry.url, locale, domain, localeMode, prefixDefault)
+    }));
+    const xDefaultLocale = defaultLocale || locales[0];
+    if (xDefaultLocale) {
+      alternates.push({
+        hreflang: "x-default",
+        href: localizeUrl(entry.url, xDefaultLocale, domain, localeMode, prefixDefault)
+      });
+    }
+    for (const locale of locales) {
+      localizedEntries.push({
+        ...entry,
+        url: localizeUrl(entry.url, locale, domain, localeMode, prefixDefault),
+        alternates
+      });
+    }
+  }
+  return localizedEntries;
+}
+
+// src/xml.ts
+async function createSitemapXml(urls) {
+  try {
+    const now = new Date().toISOString();
+    let imageNS = false;
+    let videoNS = false;
+    let xhtmlNS = false;
+    const items = urls.map((u) => {
+      let xml = `<url><loc>${u.url}</loc><lastmod>${u.lastmod ?? now}</lastmod>`;
+      if (u.changefreq) {
+        xml += `<changefreq>${u.changefreq}</changefreq>`;
+      }
+      if (typeof u.priority === "number") {
+        xml += `<priority>${u.priority.toFixed(1)}</priority>`;
+      }
+      if (u.alternates?.length) {
+        xhtmlNS = true;
+        for (const alt of u.alternates) {
+          xml += `<xhtml:link rel="alternate" hreflang="${alt.hreflang}" href="${alt.href}" />`;
+        }
+      }
+      if (u.imageUrls?.length) {
+        imageNS = true;
+        for (const img of u.imageUrls) {
+          xml += `<image:image><image:loc>${img}</image:loc></image:image>`;
+        }
+      }
+      if (u.videoUrls?.length) {
+        videoNS = true;
+        for (const vid of u.videoUrls) {
+          xml += `<video:video><video:content_loc>${vid}</video:content_loc></video:video>`;
+        }
+      }
+      xml += "</url>";
+      return xml;
+    }).join("");
+    const ns = [
+      'xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"',
+      xhtmlNS ? 'xmlns:xhtml="http://www.w3.org/1999/xhtml"' : null,
+      imageNS ? 'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"' : null,
+      videoNS ? 'xmlns:video="http://www.google.com/schemas/sitemap-video/1.1"' : null
+    ].filter(Boolean).join(" ");
+    return `<?xml version="1.0" encoding="UTF-8"?>
+<urlset ${ns}>${items}</urlset>`;
+  } catch (err) {
+    throw new Error(`Sitemap XML creation failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
+}
+
+// src/sitemap.ts
+async function generateSitemap(config) {
+  const {
+    domain,
+    entries,
+    locales,
+    localeMode = "prefix",
+    prefixDefault = false
+  } = config;
+  const processedUrls = locales && locales.length > 0 ? generateLocalizedEntries(entries, locales, domain, localeMode, prefixDefault) : entries.map((u) => {
+    const normalizedUrl = u.url?.startsWith("/") ? u.url : `/${u.url || ""}`;
+    return { ...u, url: domain + normalizedUrl };
+  });
+  return createSitemapXml(processedUrls);
+}
+async function createIndexSitemap(files, baseUrl) {
+  try {
+    const items = files.map((f) => `<sitemap><loc>${baseUrl}/${f}</loc></sitemap>`).join("");
+    const xmlString = `<?xml version="1.0" encoding="UTF-8"?>
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${items}</sitemapindex>`;
+    return xmlString;
+  } catch (err) {
+    throw new Error(`Sitemap index XML creation failed: ${err instanceof Error ? err.message : String(err)}`);
+  }
+}
+// src/vite-plugin.ts
+var { default: fs} = (() => ({}));
 
 // node:path
 function assertPath(path) {
@@ -322,147 +501,23 @@ var delimiter = ":";
 var posix = ((p) => (p.posix = p, p))({ resolve, normalize, isAbsolute, join, relative, _makeLong, dirname, basename, extname, format, parse, sep, delimiter, win32: null, posix: null });
 var path_default = posix;
 
-// src/robots.ts
-var DEFAULT_ROBOTS_TXT = `User-agent: *
-Allow: /
-Disallow: /admin
-Disallow: /api/
-`;
-
-// src/utils.ts
-var { default: fs} = (() => ({}));
-function minifyXml(xml) {
-  return xml.replace(/>\s+</g, "><").replace(/\s{2,}/g, " ").trim();
-}
-function localizeUrl(baseUrl, locale, domain, localeMode = "prefix", prefixDefault = false) {
-  const normalizedUrl = baseUrl?.startsWith("/") ? baseUrl : `/${baseUrl || ""}`;
-  if (locale.default) {
-    if (!prefixDefault) {
-      return domain + normalizedUrl;
-    }
-  }
-  if (localeMode === "subdomain") {
-    const urlObj = new URL(domain);
-    const hostname = urlObj.hostname.replace(/^www\./, "");
-    const subdomain = `${locale.code}.${hostname}`;
-    return `${urlObj.protocol}//${subdomain}${urlObj.port ? `:${urlObj.port}` : ""}${normalizedUrl}`;
-  }
-  const prefix = `/${locale.code}`;
-  return domain + prefix + normalizedUrl;
-}
-async function createSitemapXml(urls, opts) {
-  try {
-    const now = new Date().toISOString();
-    let imageNS = false;
-    let videoNS = false;
-    let xhtmlNS = false;
-    const items = urls.map((u) => {
-      let xml = `<url><loc>${u.url}</loc><lastmod>${u.lastmod ?? now}</lastmod>`;
-      if (u.changefreq) {
-        xml += `<changefreq>${u.changefreq}</changefreq>`;
-      }
-      if (typeof u.priority === "number") {
-        xml += `<priority>${u.priority.toFixed(1)}</priority>`;
-      }
-      if (u.alternates?.length) {
-        xhtmlNS = true;
-        for (const alt of u.alternates) {
-          xml += `<xhtml:link rel="alternate" hreflang="${alt.hreflang}" href="${alt.href}" />`;
-        }
-      }
-      if (u.imageUrls?.length) {
-        imageNS = true;
-        for (const img of u.imageUrls) {
-          xml += `<image:image><image:loc>${img}</image:loc></image:image>`;
-        }
-      }
-      if (u.videoUrls?.length) {
-        videoNS = true;
-        for (const vid of u.videoUrls) {
-          xml += `<video:video><video:content_loc>${vid}</video:content_loc></video:video>`;
-        }
-      }
-      xml += "</url>";
-      return xml;
-    }).join("");
-    const ns = [
-      'xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"',
-      xhtmlNS ? 'xmlns:xhtml="http://www.w3.org/1999/xhtml"' : null,
-      imageNS ? 'xmlns:image="http://www.google.com/schemas/sitemap-image/1.1"' : null,
-      videoNS ? 'xmlns:video="http://www.google.com/schemas/sitemap-video/1.1"' : null
-    ].filter(Boolean).join(" ");
-    let xmlString = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset ${ns}>${items}</urlset>`;
-    if (opts?.minify) {
-      xmlString = minifyXml(xmlString);
-    }
-    return xmlString;
-  } catch (err) {
-    throw new Error(`Sitemap XML creation failed: ${err instanceof Error ? err.message : String(err)}`);
-  }
-}
-async function createIndexSitemap(files, baseUrl, opts) {
-  try {
-    const items = files.map((f) => `<sitemap><loc>${baseUrl}/${f}</loc></sitemap>`).join("");
-    let xmlString = `<?xml version="1.0" encoding="UTF-8"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${items}</sitemapindex>`;
-    if (opts?.minify) {
-      xmlString = minifyXml(xmlString);
-    }
-    return xmlString;
-  } catch (err) {
-    throw new Error(`Sitemap index XML creation failed: ${err instanceof Error ? err.message : String(err)}`);
-  }
-}
+// src/file.ts
+var {writeFileSync} = (() => ({}));
 var createFile = (outputPath, filename, content) => {
   try {
-    fs.writeFileSync(path_default.join(outputPath, filename), content);
+    writeFileSync(path_default.join(outputPath, filename), content);
   } catch (err) {
     throw new Error(`Failed to write file ${filename} to ${outputPath}: ${err instanceof Error ? err.message : String(err)}`);
   }
 };
-function generateLocalizedEntries(baseEntries, locales, domain, localeMode = "prefix", prefixDefault = false) {
-  const localizedEntries = [];
-  const defaultLocale = locales.find((l) => l.default);
-  for (const entry of baseEntries) {
-    if (entry.skipLocalization) {
-      localizedEntries.push({
-        ...entry,
-        url: domain + entry.url
-      });
-      continue;
-    }
-    const alternates = locales.map((locale) => ({
-      hreflang: locale.code,
-      href: localizeUrl(entry.url, locale, domain, localeMode, prefixDefault)
-    }));
-    const xDefaultLocale = defaultLocale || locales[0];
-    if (xDefaultLocale) {
-      alternates.push({
-        hreflang: "x-default",
-        href: localizeUrl(entry.url, xDefaultLocale, domain, localeMode, prefixDefault)
-      });
-    }
-    for (const locale of locales) {
-      localizedEntries.push({
-        ...entry,
-        url: localizeUrl(entry.url, locale, domain, localeMode, prefixDefault),
-        alternates
-      });
-    }
-  }
-  return localizedEntries;
-}
 
-// src/index.ts
+// src/vite-plugin.ts
 var DEFAULT_CONFIG = {
   domain: "https://yoursite.com",
   outDir: "dist",
-  disableMinification: false,
-  sitemaps: { pages: async () => [] },
-  robots: async () => DEFAULT_ROBOTS_TXT
+  sitemaps: { pages: async () => [] }
 };
-function crawlMeMaybeSitemap(config = DEFAULT_CONFIG) {
+function vitePluginSitemap(config) {
   const pluginConfig = config || DEFAULT_CONFIG;
   const domain = pluginConfig?.domain;
   if (!domain) {
@@ -470,47 +525,28 @@ function crawlMeMaybeSitemap(config = DEFAULT_CONFIG) {
   }
   const outDir = pluginConfig?.outDir || "dist";
   const resolvedOutDir = path_default.resolve(process.cwd(), outDir);
-  const minify = !pluginConfig?.disableMinification;
   const locales = pluginConfig?.locales;
   const localeMode = pluginConfig?.localeMode || "prefix";
   const prefixDefault = pluginConfig?.prefixDefault ?? false;
   const createRobots = async (sitemapsUrls = ["/sitemap.xml"]) => {
-    let userRobots = DEFAULT_ROBOTS_TXT;
-    if (pluginConfig.robots && typeof pluginConfig.robots === "function") {
-      try {
-        const result = await pluginConfig.robots();
-        if (typeof result === "string") {
-          userRobots = result;
-        }
-      } catch (err) {
-        console.warn("[SEO] Error in user robots async callback", err);
-      }
-    }
-    let content = userRobots.trim();
-    if (!content.endsWith(`
-`))
-      content += `
-`;
-    const domainUrl = domain.endsWith("/") ? domain.slice(0, -1) : domain;
-    for (const rel of sitemapsUrls) {
-      content += `Sitemap: ${domainUrl}${rel.startsWith("/") ? rel : `${"/"}${rel}`}
-`;
-    }
+    const content = await generateRobotsTxt(domain, sitemapsUrls, pluginConfig.robots);
     createFile(resolvedOutDir, "robots.txt", content);
   };
   const createSitemap = async (filename, urls) => {
-    const processedUrls = locales && locales.length > 0 ? generateLocalizedEntries(urls, locales, domain, localeMode, prefixDefault) : urls.map((u) => {
-      const normalizedUrl = u.url?.startsWith("/") ? u.url : `/${u.url || ""}`;
-      return { ...u, url: domain + normalizedUrl };
+    const xml = await generateSitemap({
+      domain,
+      entries: urls,
+      locales,
+      localeMode,
+      prefixDefault
     });
-    const xml = await createSitemapXml(processedUrls, { minify });
     createFile(resolvedOutDir, filename, xml);
   };
   return {
     name: "vite-plugin-sitemap",
     apply: "build",
     async closeBundle() {
-      fs2.mkdirSync(resolvedOutDir, { recursive: true });
+      fs.mkdirSync(resolvedOutDir, { recursive: true });
       const { sitemaps } = pluginConfig;
       if (!sitemaps) {
         console.warn("⚠️ No sitemaps configuration found");
@@ -531,7 +567,7 @@ function crawlMeMaybeSitemap(config = DEFAULT_CONFIG) {
         await createSitemap(`sitemap-${name}.xml`, urls);
         allSitemaps.push(`/sitemap-${name}.xml`);
       }
-      const indexXml = await createIndexSitemap(allSitemaps.map((s) => s.slice(1)), domain, { minify });
+      const indexXml = await createIndexSitemap(allSitemaps.map((s) => s.slice(1)), domain);
       createFile(resolvedOutDir, "sitemap.xml", indexXml);
       await createRobots(["/sitemap.xml"]);
       console.log(`✅ Generated ${allSitemaps.length} sitemaps + index + robots.txt`);
@@ -539,8 +575,13 @@ function crawlMeMaybeSitemap(config = DEFAULT_CONFIG) {
   };
 }
 export {
-  crawlMeMaybeSitemap as default
+  vitePluginSitemap,
+  generateSitemap,
+  generateRobotsTxt,
+  createRobotsTxt,
+  createIndexSitemap,
+  DEFAULT_ROBOTS_RULES
 };
 
-//# debugId=530CB96175F1E00464756E2164756E21
+//# debugId=7B960964DDD3878A64756E2164756E21
 //# sourceMappingURL=index.js.map
