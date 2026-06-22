@@ -1,9 +1,11 @@
 export type { SanityWebConfig } from "./config";
 export { getConfig, setConfig } from "./config";
+export { createFavicons } from "./favicon";
 export type {
-	Favicon,
+	// Favicon,
 	GlobalSeoSettings,
 	MergedMetadata,
 	RawPageMetadata,
-} from "./utils";
-export { buildMetadata, createFavicons, createMetaTitle } from "./utils";
+} from "./merge";
+export { buildMetadata } from "./merge";
+export { createMetaTitle } from "./meta-title";

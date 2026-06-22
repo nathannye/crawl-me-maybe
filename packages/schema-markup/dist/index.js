@@ -1,9 +1,7 @@
 // src/build.ts
-import {
-  mergeSeoData,
-  setConfig
-} from "@crawl-me-maybe/meta";
-
+var schemaBuilders = {
+  WebPage: buildWebPage
+};
 // src/schema-utils.ts
 function coalesce(...values) {
   for (const value of values) {
@@ -350,7 +348,7 @@ function buildProduct({
   };
 }
 // src/builders/webpage.ts
-function buildWebPage({
+function buildWebPage2({
   seo,
   schemaDefaults,
   extra
@@ -487,7 +485,7 @@ function composeSchema({
     Product: buildProduct,
     Event: buildEvent,
     FAQPage: buildFAQPage,
-    WebPage: buildWebPage,
+    WebPage: buildWebPage2,
     AboutPage: buildAboutPage,
     ContactPage: buildContactPage
   };
@@ -500,36 +498,6 @@ function composeSchema({
   }
   return schemas.filter(Boolean);
 }
-
-// src/build.ts
-function buildSeoPayload({
-  pageMetadata,
-  globalSeoDefaults,
-  schemaDefaults,
-  pageSchemaType = "WebPage",
-  seoFieldName = "metadata",
-  isHomepage = false,
-  extraSchemaData,
-  projectId,
-  dataset
-}) {
-  if (!projectId || !dataset) {
-    console.warn("No projectId or dataset provided to buildSeoPayload, favicons and image Objects will not be created");
-  }
-  setConfig({ projectId, dataset });
-  const merged = mergeSeoData(pageMetadata, globalSeoDefaults, seoFieldName);
-  const schemas = schemaDefaults ? composeSchema({
-    seo: merged,
-    schemaDefaults,
-    type: pageSchemaType || "WebPage",
-    extra: extraSchemaData,
-    isHomepage
-  }) : undefined;
-  return {
-    meta: merged,
-    schemas
-  };
-}
 export {
   normalizeId,
   formatSchemaDate,
@@ -537,8 +505,7 @@ export {
   composeSchema,
   coalesce,
   buildWebSite,
-  buildWebPage,
-  buildSeoPayload,
+  buildWebPage2 as buildWebPage,
   buildProduct,
   buildPersonSchema,
   buildPersonOrOrg,
@@ -551,5 +518,5 @@ export {
   buildAboutPage
 };
 
-//# debugId=E33BDB621C56334964756E2164756E21
+//# debugId=0D1DC7CEB030E8FA64756E2164756E21
 //# sourceMappingURL=index.js.map

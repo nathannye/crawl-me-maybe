@@ -6,7 +6,7 @@ function setConfig(newConfig) {
 function getConfig() {
   return config;
 }
-// src/utils/sanity-image.ts
+// src/sanity-image.ts
 import { buildSrc } from "@sanity-image/url-builder";
 function urlFor(imageRef) {
   const config2 = getConfig();
@@ -48,7 +48,7 @@ function urlFor(imageRef) {
   return chain;
 }
 
-// src/utils/favicon.ts
+// src/favicon.ts
 var createFavicons = (favicon) => {
   if (!favicon?.asset)
     return null;
@@ -76,7 +76,7 @@ var createFavicons = (favicon) => {
   }
   return favicons;
 };
-// src/utils/meta-title.ts
+// src/meta-title.ts
 var createMetaTitle = (pageTitle = "", siteTitle = "", template = "{pageTitle} | {siteTitle}") => {
   let metaTitle = template.replace("{pageTitle}", pageTitle).replace("{siteTitle}", siteTitle);
   metaTitle = metaTitle.replace(/\s*\|\s*$/, "").replace(/^\s*\|\s*/, "");
@@ -86,12 +86,12 @@ var createMetaTitle = (pageTitle = "", siteTitle = "", template = "{pageTitle} |
   return metaTitle;
 };
 
-// src/utils/url.ts
+// src/url.ts
 var normalizeUrl = (baseUrl, path) => {
   return new URL(path, baseUrl).toString();
 };
 
-// src/utils/merge.ts
+// src/merge.ts
 var buildRobotsString = ({
   noIndex = false,
   noFollow = false
@@ -114,6 +114,33 @@ var createCanonicalUrl = ({
   if (disableSelfCanonical)
     return canonicalUrl || undefined;
   return normalizeUrl(siteUrl, slug);
+};
+var buildOpenGraphMetadata = ({
+  siteUrl,
+  siteTitle,
+  pageTitle,
+  pageDescription,
+  ogType
+}) => {
+  const obj = {
+    siteName: siteTitle,
+    url: siteUrl,
+    title: pageTitle,
+    description: pageDescription,
+    type: ogType || "website"
+  };
+  return obj;
+};
+var buildTwitterMetadata = ({
+  siteUrl,
+  twitterHandle,
+  twitterCardStyle
+}) => {
+  return {
+    card: twitterCardStyle || "summary_large_image",
+    creator: twitterHandle,
+    site: siteUrl
+  };
 };
 var buildMetadata = (page, seoDefaults, options) => {
   const { disableSelfCanonical = false } = options || {};
@@ -159,14 +186,28 @@ var buildMetadata = (page, seoDefaults, options) => {
   const metaTitle = createMetaTitle(page.title, seoDefaults.siteTitle, seoDefaults.pageTitleTemplate);
   const description = pageMeta?.description || seoDefaults.metaDescription;
   const favicons = createFavicons(seoDefaults.favicon);
+  const openGraph = buildOpenGraphMetadata({
+    siteUrl: seoDefaults.siteUrl,
+    pageTitle: page.title,
+    pageDescription: page.description,
+    siteTitle: seoDefaults.siteTitle,
+    ogType: options?.ogType
+  });
+  const twitter = buildTwitterMetadata({
+    siteUrl: seoDefaults.siteUrl,
+    twitterHandle: seoDefaults.twitterHandle,
+    twitterCardStyle: options?.twitterCardStyle
+  });
   return {
     title: metaTitle,
     description,
     canonicalUrl,
     metaImage: pageMeta?.metaImage,
     favicons,
-    twitterHandle: seoDefaults.twitterHandle,
-    robots
+    twitter,
+    openGraph,
+    robots,
+    ...options?.metadata || {}
   };
 };
 export {
@@ -177,5 +218,4 @@ export {
   buildMetadata
 };
 
-//# debugId=0FD29D04C951947664756E2164756E21
-//# sourceMappingURL=index.js.map
+//# debugId=AE7C268BFE06E6B264756E2164756E21
