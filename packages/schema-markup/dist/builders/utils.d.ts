@@ -1,8 +1,10 @@
 import type { SchemaOrganization, SchemaPerson } from "../types";
+import { normalizeId } from "./fragments";
 /**
  * Normalize a name to create a valid @id
  */
-export declare function normalizeId(name: string): string;
+export { normalizeId };
+export declare function buildOrganizationCore(org: SchemaOrganization, baseUrl?: string): Record<string, unknown>;
 /**
  * Helper to build Person schema or return reference if @id exists
  */

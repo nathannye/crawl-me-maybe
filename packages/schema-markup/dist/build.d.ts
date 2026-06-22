@@ -1,7 +1,12 @@
 import type { Thing } from "schema-dts";
-type SchemaSet = {
-    schemaType: string;
-    schemaData: Thing | undefined;
+type SchemaNode = Record<string, unknown>;
+export type SchemaSet = {
+    schemaType?: string;
+    schemaData: Thing | SchemaNode | undefined;
 };
-export declare const buildSchemaMarkup: (schemaSets: SchemaSet[]) => Thing[];
+export type BuildSchemaMarkupInput = SchemaSet[] | {
+    nodes?: Array<Thing | SchemaNode | undefined>;
+    schemaSets?: SchemaSet[];
+};
+export declare const buildSchemaMarkup: (input: BuildSchemaMarkupInput) => string[];
 export {};
