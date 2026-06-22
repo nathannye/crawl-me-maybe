@@ -26,8 +26,8 @@ export type LocaleConfig = {
  * See: https://www.sitemaps.org/protocol.html
  */
 export type SitemapEntry = {
-	/** Absolute or site-relative URL (should start with / or be fully qualified) */
-	url: string;
+	/** Site-relative path or slug (e.g. "/about" or "about") */
+	path: string;
 	/** Optional ISO date or yyyy-mm-dd string for the last modification timestamp */
 	lastmod?: string;
 	/** Change frequency relative hint for crawlers */
@@ -49,7 +49,9 @@ export type SitemapEntry = {
 	skipLocalization?: boolean;
 };
 
-export type SitemapEntryWithAlternates = SitemapEntry & {
+export type SitemapEntryWithAlternates = Omit<SitemapEntry, "path"> & {
+	/** Fully resolved absolute URL for sitemap XML output */
+	url: string;
 	alternates?: { hreflang: string; href: string }[];
 };
 

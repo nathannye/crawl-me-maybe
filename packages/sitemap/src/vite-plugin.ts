@@ -31,10 +31,10 @@ export function vitePluginSitemap(config?: SitemapConfig) {
 	const localeMode = pluginConfig?.localeMode || "prefix";
 	const prefixDefault = pluginConfig?.prefixDefault ?? false;
 
-	const createRobots = async (sitemapsUrls: string[] = ["/sitemap.xml"]) => {
+	const createRobots = async (sitemapIndex = "sitemap.xml") => {
 		const content = await generateRobotsTxt(
 			domain,
-			sitemapsUrls,
+			sitemapIndex,
 			pluginConfig.robots,
 		);
 		createFile(resolvedOutDir, "robots.txt", content);
@@ -68,7 +68,7 @@ export function vitePluginSitemap(config?: SitemapConfig) {
 				// Single sitemap mode
 				const urls = await sitemaps();
 				await createSitemap("sitemap.xml", urls);
-				await createRobots(["/sitemap.xml"]);
+				await createRobots("sitemap.xml");
 				console.log("✅ Generated single sitemap");
 				return;
 			}
@@ -87,7 +87,7 @@ export function vitePluginSitemap(config?: SitemapConfig) {
 				domain,
 			);
 			createFile(resolvedOutDir, "sitemap.xml", indexXml);
-			await createRobots(["/sitemap.xml"]);
+			await createRobots("sitemap.xml");
 			console.log(
 				`✅ Generated ${allSitemaps.length} sitemaps + index + robots.txt`,
 			);

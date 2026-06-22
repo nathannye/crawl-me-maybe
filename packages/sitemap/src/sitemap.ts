@@ -1,4 +1,5 @@
-import { generateLocalizedEntries } from "./localize";
+import { normalizeDomain } from "./domain";
+import { generateLocalizedEntries, resolveUrl } from "./localize";
 import type { LocaleConfig, SitemapEntry } from "./types";
 import { createSitemapXml } from "./xml";
 
@@ -30,12 +31,10 @@ export async function generateSitemap(
 					localeMode,
 					prefixDefault,
 				)
-			: entries.map((u) => {
-					const normalizedUrl = u.url?.startsWith("/")
-						? u.url
-						: `/${u.url || ""}`;
-					return { ...u, url: domain + normalizedUrl };
-				});
+			: entries.map(({ path, ...rest }) => ({
+					...rest,
+					url: resolveUrl(path, domain),
+				}));
 
 	return createSitemapXml(processedUrls);
 }
@@ -45,8 +44,9 @@ export async function createIndexSitemap(
 	baseUrl: string,
 ): Promise<string> {
 	try {
+		const normalizedBase = normalizeDomain(baseUrl);
 		const items: string = files
-			.map((f) => `<sitemap><loc>${baseUrl}/${f}</loc></sitemap>`)
+			.map((f) => `<sitemap><loc>${normalizedBase}/${f}</loc></sitemap>`)
 			.join("");
 		const xmlString = `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${items}</sitemapindex>`;
 		return xmlString;

@@ -1,4 +1,5 @@
 import type { RobotsRule } from "./types";
+import { normalizeDomain } from "./domain";
 
 export const DEFAULT_ROBOTS_RULES: RobotsRule[] = [
 	{
@@ -34,38 +35,50 @@ function serializeRobotsRules(rules: RobotsRule | RobotsRule[]): string {
 		.join("\n\n");
 }
 
+function toSitemapPath(filename: string): string {
+	const trimmed = filename.replace(/^\/+/, "");
+	return `/${trimmed}`;
+}
+
+function toSitemapUrl(domain: string, filename: string): string {
+	return `${normalizeDomain(domain)}${toSitemapPath(filename)}`;
+}
+
 /**
- * Generates a robots.txt string from a single fully-qualified sitemap URL,
- * using the default crawler rules.
- * @param indexUrl - Fully-qualified URL for the produced sitemap.xml
+ * Generates a robots.txt string using the default crawler rules.
+ * @param domain - Site origin (e.g. https://example.com)
+ * @param sitemapIndex - Sitemap index filename only (e.g. "sitemap.xml")
  */
-export function createRobotsTxt(indexUrl: string): string {
-	if (!indexUrl || typeof indexUrl !== "string") {
-		throw new Error("createRobotsTxt: indexUrl must be a non-empty string");
+export function createRobotsTxt(
+	domain: string,
+	sitemapIndex: string = "sitemap.xml",
+): string {
+	if (!domain || typeof domain !== "string") {
+		throw new Error("createRobotsTxt: domain must be a non-empty string");
+	}
+	if (!sitemapIndex || typeof sitemapIndex !== "string") {
+		throw new Error("createRobotsTxt: sitemapIndex must be a non-empty string");
 	}
 	let content = serializeRobotsRules(DEFAULT_ROBOTS_RULES).trim();
 	if (!content.endsWith("\n")) content += "\n";
-	content += `Sitemap: ${indexUrl}\n`;
+	content += `Sitemap: ${toSitemapUrl(domain, sitemapIndex)}\n`;
 	return content;
 }
 
 /**
  * Builds a complete robots.txt string from structured rules, appending the
- * correct `Sitemap:` lines at the end.
- * @param domain - The site domain (e.g. https://example.com)
- * @param sitemapUrls - Site-relative sitemap paths (e.g. ["/sitemap.xml"])
- * @param rules - Optional rule(s) object; falls back to DEFAULT_ROBOTS_RULES
+ * sitemap index URL at the end.
+ * @param domain - Site origin (e.g. https://example.com)
+ * @param sitemapIndex - Sitemap index filename only (e.g. "sitemap.xml")
+ * @param rules - Optional rule(s); falls back to DEFAULT_ROBOTS_RULES
  */
 export async function generateRobotsTxt(
 	domain: string,
-	sitemapUrls: string[] = ["/sitemap.xml"],
+	sitemapIndex: string = "sitemap.xml",
 	rules?: RobotsRule | RobotsRule[],
 ): Promise<string> {
 	let content = serializeRobotsRules(rules ?? DEFAULT_ROBOTS_RULES).trim();
 	if (!content.endsWith("\n")) content += "\n";
-	const domainUrl = domain.endsWith("/") ? domain.slice(0, -1) : domain;
-	for (const rel of sitemapUrls) {
-		content += `Sitemap: ${domainUrl}${rel.startsWith("/") ? rel : `/${rel}`}\n`;
-	}
+	content += `Sitemap: ${toSitemapUrl(domain, sitemapIndex)}\n`;
 	return content;
 }

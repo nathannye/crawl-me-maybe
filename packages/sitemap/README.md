@@ -1,263 +1,171 @@
-# SEO Sitemap Plugin
+# @crawl-me-maybe/sitemap
 
-## Overview
-A generic sitemap generation Vite plugin. Outputs sitemap.xml and robots.txt files after build.
-**This does not scan your directory for outputted routes, that approach only works for fully static sites. ISR and SSR are offlimits, hence I made this.**
+Generate `sitemap.xml` and `robots.txt` from your own route data. Does not scan the filesystem — you provide paths/slugs and the package resolves them against your `domain`.
 
-- **Framework-agnostic:** Works in any Node/Vite build script. 
-- **Supports multiple sitemaps:** Single-callback or multi-sitemap object.
-- **Multi-language support:** Automatic generation of hreflang alternates for internationalized sites.
+## Install
 
----
-
-## Table of Contents
-
-- [Installation](#installation)
-- [Configuration](#configuration)
-  - [Vercel Output Directory](#vercel-output-directory)
-- [Usage: Single Sitemap (Callback)](#usage-single-sitemap-callback)
-- [Usage: Multi-Sitemap (Object)](#usage-multi-sitemap-object)
-  - [Why Not Arbitrary Splits?](#why-not-arbitrary-splits)
-- [Multi-Language Support](#multi-language-support)
-  - [Prefix Mode](#prefix-mode)
-  - [Subdomain Mode](#subdomain-mode)
-  - [Skipping Localization](#skipping-localization)
-- [API: SitemapEntry](#api-sitemapentry)
-- [Best Practices & Tips](#best-practices--tips)
-- [Example: Minimal Setup](#example-minimal-setup)
-- [License](#license)
-
----
-
-## Installation
-
-```
-pnpm i -D @crawl-me-maybe/sitemap
+```bash
+pnpm add -D @crawl-me-maybe/sitemap
 ```
 
-```js
-import crawlMeMaybeSitemap from "@crawl-me-maybe/sitemap"; // Adjust path as needed
+```ts
+import {
+  vitePluginSitemap,
+  generateSitemap,
+  generateRobotsTxt,
+} from "@crawl-me-maybe/sitemap";
+```
+
+## SitemapEntry
+
+Entries use a site-relative `path`. The domain is applied at generation time.
+
+```ts
+{ path: "/about", lastmod: "2025-01-01" }
+{ path: "blog/post-1", skipLocalization: true }
 ```
 
 ---
 
-## Configuration
+## Vite plugin
 
-| Name      | Type     | Required | Description                                                         |
-|-----------|----------|----------|---------------------------------------------------------------------|
-| `domain`    | string   | Yes      | The full site origin (e.g. `https://yoursite.com`); used in URLs    |
-| `outDir`   | string   | No       | Directory for output files. Recommend `.vercel/output/static` for Vercel; defaults to `dist` |
-| `sitemaps`  | Callback/Obj | Yes  | Your pages. See usage examples below                                |
-| `disableMinification` | Boolean | No | Minification is on by default, set this to true to stop XML from being minified. |
-| `locales` | LocaleConfig[] | No | Array of locale configurations for multi-language support. See [Multi-Language Support](#multi-language-support) |
-| `localeMode` | 'prefix' \| 'subdomain' | No | How to format localized URLs. Defaults to `'prefix'`. See [Multi-Language Support](#multi-language-support) |
+Runs on `closeBundle` and writes files to `outDir` (default: `dist`).
 
+### Single sitemap
 
-### Vercel Output Directory
-For Vercel static deployments:
-```js
-outDir: ".vercel/output/static"
-```
-This ensures generated files are available for routing.
+```ts
+// vite.config.ts
+import { vitePluginSitemap } from "@crawl-me-maybe/sitemap";
 
----
-
-## Usage: Single Sitemap (Callback)
-For most sites (typically under 50,000 URLs):
-```js
-sitemapPlugin({
-  domain: "https://yoursite.com",
-  // Vercel output:
-  outDir: ".vercel/output/static",
-
-  // One big sitemap
-  sitemaps: async () => [
-    { url: "/", lastmod: "2025-01-01" },
-    { url: "/about", lastmod: "2025-01-02" },
-    // ...more entries
+export default {
+  plugins: [
+    vitePluginSitemap({
+      domain: "https://example.com",
+      outDir: "dist",
+      sitemaps: async () => [
+        { path: "/" },
+        { path: "/about" },
+      ],
+    }),
   ],
-});
+};
 ```
-This writes `sitemap.xml` and `robots.txt` in `outDir`.
 
----
+Writes `dist/sitemap.xml` and `dist/robots.txt`.
 
-## Usage: Multi-Sitemap (Object)
-If your site has *more than 50K URLs* (the maximum allowed per sitemap file by Google and other search engines), **do not split sitemaps arbitrarily by count**. Instead, split your sitemaps by logical content types like `pages`, `posts`, `products`, etc.
+### Multiple sitemaps
 
-```js
-sitemapPlugin({
-  domain: "https://yoursite.com",
+Split by content type when you exceed ~50k URLs per file. The plugin writes `sitemap-{name}.xml` for each key and a `sitemap.xml` index.
+
+```ts
+vitePluginSitemap({
+  domain: "https://example.com",
   sitemaps: {
-    pages: async () => [/* ... all core pages ... */],
-    blog: async () => [/* ... blog posts ... */],
-    products: async () => [/* ... product URLs ... */],
-    // etc.
+    pages: async () => [{ path: "/" }, { path: "/about" }],
+    blog: async () => [{ path: "/blog/hello" }],
+    products: async () => [{ path: "/products/widget" }],
   },
 });
 ```
-The plugin outputs one `sitemap-[key].xml` per key, plus a `sitemap.xml` index.
 
+### Localized sitemaps
 
-### Why Not Arbitrary Splits?
-Splitting purely by number (`sitemap-001.xml`, `sitemap-002.xml`) is discouraged: search engines prefer semantically meaningful sitemaps (content type, section, language, etc), which helps with crawl diagnostics and priority. Plus, if you're sorry ass has to look thru an xml sitemap, going through numeric ones to find what you need is a dreadful experience.
+Add `locales` to generate hreflang alternates. Default locale has no prefix unless `prefixDefault: true`.
 
----
-
-## Multi-Language Support
-
-The plugin supports automatic generation of language alternates using `hreflang` tags. This is essential for international SEO, helping search engines serve the correct language version to users.
-
-### Prefix Mode
-
-The default mode adds the locale code as a URL path prefix (except for the default locale):
-
-```js
-sitemapPlugin({
+```ts
+vitePluginSitemap({
   domain: "https://example.com",
   locales: [
     { code: "en", default: true },
     { code: "fr" },
     { code: "es" },
   ],
-  localeMode: "prefix", // This is the default
+  localeMode: "prefix", // or "subdomain"
   sitemaps: async () => [
-    { url: "/about" },
-    { url: "/products" },
+    { path: "/about" },
+    { path: "/feed.xml", skipLocalization: true },
   ],
 });
 ```
 
-**Generated URLs:**
-- English (default): `https://example.com/about`
-- French: `https://example.com/fr/about`
-- Spanish: `https://example.com/es/about`
+### Custom robots rules
 
-Each URL will include `<xhtml:link>` tags pointing to all language alternates, plus an `x-default` fallback.
+Same shape as Next.js `MetadataRoute.Robots` rules. The sitemap line is appended automatically.
 
-### Subdomain Mode
-
-Uses subdomains for each locale (automatically removes `www` from the domain):
-
-```js
-sitemapPlugin({
-  domain: "https://www.example.com",
-  locales: [
-    { code: "en", default: true },
-    { code: "fr" },
-    { code: "de" },
+```ts
+vitePluginSitemap({
+  domain: "https://example.com",
+  robots: [
+    { userAgent: "Googlebot", allow: ["/"], disallow: "/private/" },
+    { userAgent: ["Applebot", "Bingbot"], disallow: ["/"] },
   ],
-  localeMode: "subdomain",
-  sitemaps: async () => [
-    { url: "/about" },
+  sitemaps: async () => [{ path: "/" }],
+});
+```
+
+---
+
+## `generateSitemap`
+
+Build sitemap XML as a string (no file write). Useful in API routes, build scripts, or SSR.
+
+```ts
+import { generateSitemap } from "@crawl-me-maybe/sitemap";
+
+const xml = await generateSitemap({
+  domain: "https://example.com",
+  entries: [{ path: "/" }, { path: "/about" }],
+});
+```
+
+With locales:
+
+```ts
+const xml = await generateSitemap({
+  domain: "https://example.com",
+  entries: [{ path: "/about" }],
+  locales: [{ code: "en", default: true }, { code: "fr" }],
+  localeMode: "prefix",
+});
+```
+
+---
+
+## `generateRobotsTxt`
+
+Build `robots.txt` as a string. Pass the sitemap **filename only** (no domain) — e.g. `"sitemap.xml"`.
+
+```ts
+import { generateRobotsTxt } from "@crawl-me-maybe/sitemap";
+
+const robots = await generateRobotsTxt(
+  "https://example.com",
+  "sitemap.xml",
+);
+
+const robotsWithRules = await generateRobotsTxt(
+  "https://example.com",
+  "sitemap.xml",
+  [
+    { userAgent: "*", allow: "/", disallow: ["/admin", "/api/"] },
   ],
-});
-```
-
-**Generated URLs:**
-- English (default): `https://www.example.com/about`
-- French: `https://fr.example.com/about`
-- German: `https://de.example.com/about`
-
-### Skipping Localization
-
-Some pages shouldn't be localized (e.g., sitemap, feeds). Use `skipLocalization`:
-
-```js
-sitemaps: async () => [
-  { url: "/about" }, // Will be localized
-  { url: "/sitemap.xml", skipLocalization: true }, // Won't be localized
-  { url: "/feed.xml", skipLocalization: true },
-]
-```
-
-### LocaleConfig Type
-
-```typescript
-type LocaleConfig = {
-  code: string;      // Language/locale code (e.g., 'en', 'fr', 'es')
-  default?: boolean; // If true, this locale won't get prefix/subdomain
-};
-```
-
-**Notes:**
-- Only one locale should be marked as `default: true`
-- The default locale appears at the root path (no prefix/subdomain)
-- All URLs automatically include `x-default` hreflang pointing to the default locale (or first locale if no default is set)
-- Compatible with both single and multi-sitemap modes
-
----
-
-## API: SitemapEntry
-Each entry only requires a url, other properties for bonus points:
-```typescript
-{
-  url: string,       // e.g. "/blog/post-1"
-  lastmod?: string,  // ISO or yyyy-mm-dd
-  changefreq?: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never"
-  imageUrls?: string[], 
-  videoUrls?: string[], 
-  priority?: number,
-  skipLocalization?: boolean  // If true, won't generate locale variants for this URL
-}
+);
 ```
 
 ---
 
-## Best Practices & Tips
-- **Provide a valid `domain`** (with protocol and no trailing slash)
-- **Use the single callback** unless your sitemap will exceed 50,000 URLs total or for a given content type
-- **If over 50,000 URLs, split sitemaps by content type or site section—never by a blind limit per file**
-- **Set `outDir`** for static host/adapter compatibility (e.g. `.vercel/output/static` for Vercel, `dist` for others)
-- **Call from any Node build script** (Vite, Rollup, or custom)
-- **robots.txt is always generated**
+## Config reference
 
----
-
-## Example: Minimal Setup
-
-### Basic (Any Node/Vite project)
-```js
-import sitemapPlugin from "@crawl-me-maybe/sitemap";
-
-sitemapPlugin({
-  domain: "https://mydomain.test",
-  sitemaps: async () => [
-    { url: "/" },
-    { url: "/about" },
-    // ...
-  ],
-  outDir: "dist", // or .vercel/output/static
-});
-```
-
----
-
-### With Sanity (Minimal)
-
-
-```js
-import sitemapPlugin from "@crawl-me-maybe/sitemap";
-import { createClient } from "path-to-sanity-client";
-
-const client = createClient({
-  projectId: "your_project_id",
-  dataset: "production",
-  apiVersion: "2025-10-15", // use today's date
-  useCdn: process.env.NODE_ENV === "production"
-});
-
-sitemapPlugin({
-  domain: "https://mydomain.test",
-  sitemaps: async () => {
-    // Fetch all published slugs for your content type(s)
-    const pages = await client.fetch(`*[_type == "page" && defined(slug.current)]{ "url": "/" + slug.current }`);
-    return pages;
-  },
-  outDir: "dist",
-});
-```
----
+| Option | Type | Description |
+|--------|------|-------------|
+| `domain` | `string` | Site origin, e.g. `https://example.com` |
+| `outDir` | `string` | Output directory (default: `dist`) |
+| `sitemaps` | fn or object | Entry callback(s) |
+| `robots` | `RobotsRule` or array | Crawler rules |
+| `locales` | `LocaleConfig[]` | Locale list for hreflang |
+| `localeMode` | `"prefix"` \| `"subdomain"` | URL strategy (default: `prefix`) |
+| `prefixDefault` | `boolean` | Prefix the default locale too (default: `false`) |
 
 ## License
-MIT. No tracking. No telemetry. Use and hack freely.
+
+MIT
