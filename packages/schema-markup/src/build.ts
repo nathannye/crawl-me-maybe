@@ -1,18 +1,20 @@
-import type { Thing } from "schema-dts";
+import type { BreadcrumbList, Thing, WithContext } from "schema-dts";
+import type { SchemaOrganization, SchemaPerson } from "./types";
+import { buildPersonOrOrg } from "./builders/utils";
 
 type SchemaNode = Record<string, unknown>;
 
-export type SchemaSet = {
-	schemaType?: string;
-	schemaData: Thing | SchemaNode | undefined;
+export type BuildSchemaMarkupInput = {
+	identity: SchemaOrganization | SchemaPerson;
+	siteUrl: string;
+	siteName: string;
+	siteDescription?: string;
+	pageUrl: string;
+	pageTitle: string;
+	pageDescription?: string;
+	breadcrumb?: WithContext<BreadcrumbList>;
+	mainEntity?: Thing | SchemaNode;
 };
-
-export type BuildSchemaMarkupInput =
-	| SchemaSet[]
-	| {
-			nodes?: Array<Thing | SchemaNode | undefined>;
-			schemaSets?: SchemaSet[];
-	  };
 
 const TYPE_PRIORITY = [
 	"Organization",
@@ -70,22 +72,12 @@ const ensureContext = (node: SchemaNode): SchemaNode => {
 	return node;
 };
 
-const normalizeInput = (input: BuildSchemaMarkupInput): SchemaNode[] => {
-	if (Array.isArray(input)) {
-		return input.map((set) => set.schemaData).filter(Boolean) as SchemaNode[];
-	}
-
-	const fromSets = (input.schemaSets || []).map((set) => set.schemaData);
-	const fromNodes = input.nodes || [];
-	return [...fromSets, ...fromNodes].filter(Boolean) as SchemaNode[];
-};
-
 type RankedNode = {
 	node: SchemaNode;
 	order: number;
 };
 
-export const buildSchemaMarkup = (input: BuildSchemaMarkupInput): string[] => {
+const assembleNodes = (nodes: Array<Thing | SchemaNode | undefined>): string[] => {
 	const collected: RankedNode[] = [];
 	const seenIds = new Set<string>();
 	const processingIds = new Set<string>();
@@ -135,7 +127,8 @@ export const buildSchemaMarkup = (input: BuildSchemaMarkupInput): string[] => {
 		processingIds.delete(id);
 	};
 
-	for (const node of normalizeInput(input)) {
+	for (const node of nodes) {
+		if (!node) continue;
 		const processed = processValue(node, true);
 		if (!hasObjectShape(processed)) continue;
 		addNode(processed);
@@ -152,4 +145,32 @@ export const buildSchemaMarkup = (input: BuildSchemaMarkupInput): string[] => {
 	});
 
 	return ranked.map(({ node }) => JSON.stringify(node));
+};
+
+export const buildSchemaMarkup = (input: BuildSchemaMarkupInput): string[] => {
+	const identityNode = buildPersonOrOrg(input.identity, false, input.siteUrl);
+	const identityRef = buildPersonOrOrg(input.identity, true, input.siteUrl);
+	const websiteId = `${input.siteUrl}#website`;
+
+	const websiteNode: SchemaNode = {
+		"@type": "WebSite",
+		"@id": websiteId,
+		name: input.siteName,
+		url: input.siteUrl,
+		description: input.siteDescription,
+		publisher: identityRef,
+	};
+
+	const webpageNode: SchemaNode = {
+		"@type": "WebPage",
+		"@id": `${input.pageUrl}#webpage`,
+		url: input.pageUrl,
+		name: input.pageTitle,
+		description: input.pageDescription,
+		isPartOf: { "@id": websiteId },
+		breadcrumb: input.breadcrumb,
+		mainEntity: input.mainEntity,
+	};
+
+	return assembleNodes([identityNode, websiteNode, webpageNode]);
 };
