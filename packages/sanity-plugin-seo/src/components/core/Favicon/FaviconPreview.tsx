@@ -1,12 +1,12 @@
 import { Box, Card, Flex, Text, useRootTheme } from "@sanity/ui";
-import type { ImageInputProps } from "sanity";
-import { useSeoDefaults } from "../../../context/SeoDefaultsContext";
+import { buildSrc } from "@sanity-image/url-builder";
 import { useMemo } from "react";
-import WindowControls from "./WindowControls";
+import type { ImageInputProps } from "sanity";
+import { useDataset, useProjectId } from "sanity";
+import { useSeoDefaults } from "../../../context/SeoDefaultsContext";
 import BrowserTab from "./BrowserTab";
 import styles from "./favicon-preview.module.css";
-import { buildSrc } from "@sanity-image/url-builder";
-import { useDataset, useProjectId } from "sanity";
+import WindowControls from "./WindowControls";
 
 export default function FaviconPreview(props: ImageInputProps) {
 	const defaults = useSeoDefaults();

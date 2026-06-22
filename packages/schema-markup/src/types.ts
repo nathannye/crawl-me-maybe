@@ -1,7 +1,3 @@
-import type { SanityImageAssetDocument } from "@sanity/client";
-
-export type SchemaImage = SanityImageAssetDocument;
-
 export type SchemaAddress = {
 	streetAddress?: string;
 	addressLocality?: string;
@@ -28,7 +24,7 @@ export type SchemaPerson = {
 	url?: string;
 	sameAs?: string[];
 	jobTitle?: string;
-	image?: SchemaImage;
+	image?: string;
 	affiliation?: SchemaOrganization[];
 };
 
@@ -45,7 +41,7 @@ export type SchemaOrganization = {
 	"@id"?: string;
 	name: string;
 	url?: string;
-	logo?: SchemaImage;
+	logo?: string;
 	sameAs?: string[];
 	department?: SchemaOrganization[];
 	contactPoint?: SchemaContactPoint[];

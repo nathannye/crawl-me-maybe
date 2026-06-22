@@ -1,5 +1,4 @@
 import type { SanityImageAssetDocument } from "@sanity/client";
-import { type Favicon } from "./favicon";
 type OpenGraphType = "website" | "article" | "product";
 type TwitterCardStyle = "summary_large_image" | "summary" | "app" | "player";
 type TwitterMetadata = {
@@ -42,7 +41,6 @@ export type MergedMetadata = {
     description?: string;
     canonicalUrl?: string;
     metaImage?: SanityImageAssetDocument;
-    favicons?: Favicon[] | null;
     twitterHandle?: string;
     robots?: string;
     schemaMarkup?: string;

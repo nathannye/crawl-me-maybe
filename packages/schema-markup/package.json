@@ -1,6 +1,6 @@
 {
 	"name": "@crawl-me-maybe/schema-markup",
-	"version": "0.0.1",
+	"version": "0.1.0",
 	"type": "module",
 	"author": "Nathan Nye <nathan@nye.dev> (https://nye.dev)",
 	"license": "MIT",
@@ -21,15 +21,11 @@
 	"scripts": {
 		"lint": "biome check .",
 		"fix": "biome check --write .",
-		"build": "rm -rf dist && bun build src/index.ts --outdir dist --format esm --sourcemap --external @crawl-me-maybe/meta --external @sanity/client --external schema-dts && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src"
+		"build": "rm -rf dist && bun build src/index.ts --outdir dist --format esm --sourcemap --external schema-dts && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src"
 	},
 	"dependencies": {
 		"@crawl-me-maybe/meta": "workspace:*",
 		"schema-dts": "^1.1.5"
-	},
-	"peerDependencies": {
-		"@crawl-me-maybe/meta": "^0.0.7",
-		"@sanity/client": "^6.0.0"
 	},
 	"devDependencies": {}
 }

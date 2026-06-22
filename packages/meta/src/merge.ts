@@ -1,5 +1,4 @@
 import type { SanityImageAssetDocument } from "@sanity/client";
-import { createFavicons, type Favicon } from "./favicon";
 import { createMetaTitle } from "./meta-title";
 import { normalizeUrl } from "./url";
 
@@ -50,7 +49,6 @@ export type MergedMetadata = {
 	description?: string;
 	canonicalUrl?: string;
 	metaImage?: SanityImageAssetDocument;
-	favicons?: Favicon[] | null;
 	twitterHandle?: string;
 	robots?: string;
 	schemaMarkup?: string;
@@ -151,7 +149,6 @@ export const buildMetadata = (
 			title: undefined,
 			description: undefined,
 			canonicalUrl: undefined,
-			favicons: undefined,
 			twitterHandle: undefined,
 			robots: undefined,
 			schemaMarkup: undefined,
@@ -169,7 +166,6 @@ export const buildMetadata = (
 			title: seoDefaults?.siteTitle,
 			description: seoDefaults?.metaDescription,
 			canonicalUrl: seoDefaults?.siteUrl,
-			favicons: createFavicons(seoDefaults?.favicon),
 			twitterHandle: seoDefaults?.twitterHandle,
 		};
 	}
@@ -199,7 +195,6 @@ export const buildMetadata = (
 		seoDefaults.pageTitleTemplate,
 	);
 	const description = pageMeta?.description || seoDefaults.metaDescription;
-	const favicons = createFavicons(seoDefaults.favicon);
 
 	const openGraph = buildOpenGraphMetadata({
 		siteUrl: seoDefaults.siteUrl,
@@ -220,7 +215,6 @@ export const buildMetadata = (
 		description: description,
 		canonicalUrl: canonicalUrl,
 		metaImage: pageMeta?.metaImage,
-		favicons: favicons,
 		twitter: twitter,
 		openGraph: openGraph,
 		robots: robots,
