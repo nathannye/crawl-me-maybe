@@ -181,10 +181,10 @@ function generateSitemap(config) {
   }));
   return createSitemapXml(processedUrls);
 }
-function generateIndexSitemap(files, baseUrl) {
+function generateIndexSitemap(baseUrl, childSitemapNames) {
   try {
     const normalizedBase = normalizeDomain(baseUrl);
-    const normalizedFiles = files.map((f) => f.replace(/^\/+/, ""));
+    const normalizedFiles = childSitemapNames.map((f) => f.replace(/^\/+/, ""));
     const items = normalizedFiles.map((f) => `<sitemap><loc>${normalizedBase}/${f}</loc></sitemap>`).join("");
     return `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${items}</sitemapindex>`;
@@ -273,7 +273,7 @@ function vitePluginSitemap(config) {
         writeSitemap(`sitemap-${name}.xml`, urls);
         indexFiles.push(`sitemap-${name}.xml`);
       }
-      const indexXml = generateIndexSitemap(indexFiles, domain);
+      const indexXml = generateIndexSitemap(domain, indexFiles);
       createFile(resolvedOutDir, "sitemap.xml", indexXml);
       writeRobots("sitemap.xml");
       console.log(`✅ Generated ${indexFiles.length} sitemaps + index + robots.txt`);
@@ -284,5 +284,5 @@ export {
   vitePluginSitemap
 };
 
-//# debugId=CC3EFC677AE9D2C364756E2164756E21
+//# debugId=82EE08DA0129C9F564756E2164756E21
 //# sourceMappingURL=vite.js.map

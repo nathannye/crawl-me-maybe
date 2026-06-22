@@ -176,10 +176,10 @@ function generateSitemap(config) {
   }));
   return createSitemapXml(processedUrls);
 }
-function generateIndexSitemap(files, baseUrl) {
+function generateIndexSitemap(baseUrl, childSitemapNames) {
   try {
     const normalizedBase = normalizeDomain(baseUrl);
-    const normalizedFiles = files.map((f) => f.replace(/^\/+/, ""));
+    const normalizedFiles = childSitemapNames.map((f) => f.replace(/^\/+/, ""));
     const items = normalizedFiles.map((f) => `<sitemap><loc>${normalizedBase}/${f}</loc></sitemap>`).join("");
     return `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${items}</sitemapindex>`;
@@ -194,5 +194,5 @@ export {
   DEFAULT_ROBOTS_RULES
 };
 
-//# debugId=3D289BFFA0A49CDE64756E2164756E21
+//# debugId=1E4AA3AB54EDE05D64756E2164756E21
 //# sourceMappingURL=index.js.map

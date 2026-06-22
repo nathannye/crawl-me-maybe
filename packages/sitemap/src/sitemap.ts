@@ -50,14 +50,17 @@ export function generateSitemap(config: SitemapGeneratorConfig): string {
 
 /**
  * Generates a sitemap index XML string referencing child sitemap files.
- * @param files - Sitemap filenames without a leading slash (e.g. "sitemap-pages.xml", not "/sitemap-pages.xml")
  * @param baseUrl - Site origin used to build absolute `<loc>` URLs
+ * @param childSitemapNames - Sitemap filenames without a leading slash (e.g. "sitemap-pages.xml", not "/sitemap-pages.xml")
  * @returns Sitemap index XML string
  */
-export function generateIndexSitemap(files: string[], baseUrl: string): string {
+export function generateIndexSitemap(
+	baseUrl: string,
+	childSitemapNames: string[],
+): string {
 	try {
 		const normalizedBase = normalizeDomain(baseUrl);
-		const normalizedFiles = files.map((f) => f.replace(/^\/+/, ""));
+		const normalizedFiles = childSitemapNames.map((f) => f.replace(/^\/+/, ""));
 		const items: string = normalizedFiles
 			.map((f) => `<sitemap><loc>${normalizedBase}/${f}</loc></sitemap>`)
 			.join("");

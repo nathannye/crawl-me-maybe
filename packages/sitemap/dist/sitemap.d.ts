@@ -20,8 +20,8 @@ export type SitemapGeneratorConfig = {
 export declare function generateSitemap(config: SitemapGeneratorConfig): string;
 /**
  * Generates a sitemap index XML string referencing child sitemap files.
- * @param files - Sitemap filenames without a leading slash (e.g. "sitemap-pages.xml", not "/sitemap-pages.xml")
  * @param baseUrl - Site origin used to build absolute `<loc>` URLs
+ * @param childSitemapNames - Sitemap filenames without a leading slash (e.g. "sitemap-pages.xml", not "/sitemap-pages.xml")
  * @returns Sitemap index XML string
  */
-export declare function generateIndexSitemap(files: string[], baseUrl: string): string;
+export declare function generateIndexSitemap(baseUrl: string, childSitemapNames: string[]): string;

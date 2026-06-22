@@ -4,8 +4,6 @@ Most sitemap generators either crawl your built site, scan your filesystem, or e
 
 That's fine until your routes come from a CMS, database, API, or an ISR/SSR application where new pages can appear long after the last build finishes.
 
-In those situations, you usually already know what URLs exist. Generating a sitemap shouldn't require rediscovering them.
-
 This package takes a simpler approach. You provide routes, it generates sitemap.xml and robots.txt. Build-time with Vite, runtime from an API route, or both. No crawling, no filesystem scanning, and no strong opinions about where your content lives.
 
 ## Features
@@ -191,8 +189,8 @@ import { generateIndexSitemap } from "@crawl-me-maybe/sitemap";
 
 export async function GET() {
   const xml = generateIndexSitemap(
-    ["sitemap-pages.xml", "sitemap-blog.xml"],
     "https://example.com",
+    ["sitemap-pages.xml", "sitemap-blog.xml"],
   );
 
   return new Response(xml, {

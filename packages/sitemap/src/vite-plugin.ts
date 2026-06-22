@@ -63,7 +63,7 @@ export function vitePluginSitemap(config: SitemapConfig) {
 				indexFiles.push(`sitemap-${name}.xml`);
 			}
 
-			const indexXml = generateIndexSitemap(indexFiles, domain);
+			const indexXml = generateIndexSitemap(domain, indexFiles);
 			createFile(resolvedOutDir, "sitemap.xml", indexXml);
 			writeRobots("sitemap.xml");
 			console.log(
