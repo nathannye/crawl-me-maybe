@@ -1,13 +1,19 @@
 # @crawl-me-maybe/sitemap
 
-Generate `sitemap.xml` and `robots.txt` from your own route data. Does not scan the filesystem — you provide paths/slugs and the package resolves them against your `domain`.
+Most sitemap generators either crawl your built site, scan your filesystem, or expect you to be using a specific framework.
+
+That's fine until your routes come from a CMS, database, API, or an ISR/SSR application where new pages can appear long after the last build finishes.
+
+In those situations, you usually already know what URLs exist. Generating a sitemap shouldn't require rediscovering them.
+
+This package takes a simpler approach. You provide routes, it generates sitemap.xml and robots.txt. Build-time with Vite, runtime from an API route, or both. No crawling, no filesystem scanning, and no strong opinions about where your content lives.
 
 ## Features
-
+- Framework agnostic sitemap generation
+- Build-time generation with Vite
+- Runtime generation for ISR and SSR applications
 - Localized sitemaps with hreflang alternates
-- `robots.txt` with sitemap link
-- Sitemap and robots utilities compatible with API routes
-- Vite plugin for statically generated sitemaps
+- robots.txt generation with sitemap link
 
 ## Table of contents
 
