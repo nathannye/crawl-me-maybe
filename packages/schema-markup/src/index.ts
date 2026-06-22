@@ -22,6 +22,7 @@ export {
 } from "./builders";
 export type { SchemaDefaults } from "./compose";
 export { composeSchema } from "./compose";
+export type { BuilderInput } from "./define-builder";
 export { coalesce } from "./schema-utils";
 export type {
 	SchemaAddress,

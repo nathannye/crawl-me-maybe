@@ -1,14 +1,11 @@
 // schema/builders/organization.ts
 
-import type { SchemaDefaults } from "../compose";
-import { coalesce } from "../schema-utils";
 import type { SchemaOrganization } from "../types";
 import { createSchemaImageObject } from "../utils/image";
 import { buildOrgSchema, normalizeId } from "./utils";
 
 export function buildOrganization(
 	organization: SchemaOrganization,
-	schemaDefaults?: SchemaDefaults,
 	baseUrl?: string,
 	asReference = false,
 ): Record<string, unknown> {
@@ -51,11 +48,8 @@ export function buildOrganization(
 		"@id": id,
 		name: organization.name,
 		url: organization.url,
-		logo: createSchemaImageObject(
-			organization.logo,
-			coalesce(schemaDefaults?.logo, schemaDefaults?.imageFallback),
-		),
-		sameAs: coalesce(organization.sameAs, schemaDefaults?.sameAs),
+		logo: createSchemaImageObject(organization.logo),
+		sameAs: organization.sameAs,
 		department: departments,
 		contactPoint,
 	};
