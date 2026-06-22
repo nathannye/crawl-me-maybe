@@ -1,4 +1,4 @@
 import type { Event } from "schema-dts";
-import { defineBuilder } from "../define-builder";
+import { defineBuilder, type SchemaBuilder } from "../define-builder";
 
-export const buildEvent = defineBuilder<Event>("Event");
+export const buildEvent: SchemaBuilder<Event> = defineBuilder<Event>("Event");

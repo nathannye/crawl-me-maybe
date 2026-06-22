@@ -1,8 +1,4 @@
-// schema/builders/utils.ts
-import type { SanityImageAssetDocument } from "@sanity/client";
-import type { ImageObject } from "schema-dts";
-import type { SchemaImage, SchemaOrganization, SchemaPerson } from "../types";
-import { createSchemaImageObject } from "../utils/image";
+import type { SchemaOrganization, SchemaPerson } from "../types";
 
 /**
  * Normalize a name to create a valid @id
@@ -44,7 +40,7 @@ export function buildPersonSchema(
 		url: person.url,
 		sameAs: person.sameAs,
 		jobTitle: person.jobTitle,
-		image: createSchemaImageObject(person.image),
+		image: person.image,
 	};
 }
 
@@ -96,7 +92,7 @@ export function buildOrgSchema(
 		"@id": id,
 		name: org.name,
 		url: org.url,
-		logo: createSchemaImageObject(org.logo), // Logo should be provided or defaults applied upstream
+		logo: org.logo,
 		sameAs: org.sameAs,
 		department: departments,
 		contactPoint,

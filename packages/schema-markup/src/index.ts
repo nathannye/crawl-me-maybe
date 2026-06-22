@@ -1,9 +1,3 @@
-export type {
-	BuildSeoPayloadParams,
-	BuildSeoPayloadResult,
-} from "./build";
-export { buildSeoPayload } from "./build";
-
 export {
 	buildAboutPage,
 	buildArticle,
@@ -20,8 +14,6 @@ export {
 	formatSchemaDate,
 	normalizeId,
 } from "./builders";
-export type { SchemaDefaults } from "./compose";
-export { composeSchema } from "./compose";
 export type { BuilderInput } from "./define-builder";
 export { coalesce } from "./schema-utils";
 export type {
@@ -37,4 +29,3 @@ export type {
 	SchemaPerson,
 	SchemaSearchAction,
 } from "./types";
-export { createSchemaImageObject } from "./utils/image";

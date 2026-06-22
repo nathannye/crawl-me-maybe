@@ -6,8 +6,12 @@ export type BuilderInput<T extends Thing> = Simplify<
 	Omit<T, "@type" | "@context">
 >;
 
-export function defineBuilder<T extends Thing>(type: string) {
-	return (input: BuilderInput<T>): WithContext<T> =>
+export type SchemaBuilder<T extends Thing> = (
+	input: BuilderInput<T>,
+) => WithContext<T>;
+
+export function defineBuilder<T extends Thing>(type: string): SchemaBuilder<T> {
+	return (input: BuilderInput<T>) =>
 		({
 			"@context": "https://schema.org",
 			"@type": type,

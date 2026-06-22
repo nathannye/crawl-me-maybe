@@ -1,7 +1,4 @@
-// schema/builders/organization.ts
-
 import type { SchemaOrganization } from "../types";
-import { createSchemaImageObject } from "../utils/image";
 import { buildOrgSchema, normalizeId } from "./utils";
 
 export function buildOrganization(
@@ -48,7 +45,7 @@ export function buildOrganization(
 		"@id": id,
 		name: organization.name,
 		url: organization.url,
-		logo: createSchemaImageObject(organization.logo),
+		logo: organization.logo,
 		sameAs: organization.sameAs,
 		department: departments,
 		contactPoint,

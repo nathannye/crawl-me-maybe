@@ -1,4 +1,5 @@
 import type { Product } from "schema-dts";
-import { defineBuilder } from "../define-builder";
+import { defineBuilder, type SchemaBuilder } from "../define-builder";
 
-export const buildProduct = defineBuilder<Product>("Product");
+export const buildProduct: SchemaBuilder<Product> =
+	defineBuilder<Product>("Product");

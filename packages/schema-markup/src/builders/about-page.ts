@@ -1,4 +1,5 @@
 import type { AboutPage } from "schema-dts";
-import { defineBuilder } from "../define-builder";
+import { defineBuilder, type SchemaBuilder } from "../define-builder";
 
-export const buildAboutPage = defineBuilder<AboutPage>("AboutPage");
+export const buildAboutPage: SchemaBuilder<AboutPage> =
+	defineBuilder<AboutPage>("AboutPage");
