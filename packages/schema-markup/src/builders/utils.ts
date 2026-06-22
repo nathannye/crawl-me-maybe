@@ -1,13 +1,44 @@
 import type { SchemaOrganization, SchemaPerson } from "../types";
+import {
+	asIdReference,
+	createSchemaId,
+	mapContactPoints,
+	normalizeId,
+} from "./fragments";
 
 /**
  * Normalize a name to create a valid @id
  */
-export function normalizeId(name: string): string {
-	return name
-		.toLowerCase()
-		.replace(/[^a-z0-9]+/g, "-")
-		.replace(/^-|-$/g, "");
+export { normalizeId };
+
+export function buildOrganizationCore(
+	org: SchemaOrganization,
+	baseUrl?: string,
+): Record<string, unknown> {
+	const base = baseUrl || org.url || "";
+	const id = createSchemaId({
+		kind: "organization",
+		name: org.name,
+		baseUrl: base,
+		explicitId: org["@id"],
+	});
+
+	const departments = org.department
+		? org.department.map((dept) => buildOrgSchema(dept, true, baseUrl)).filter(Boolean)
+		: undefined;
+
+	const contactPoint = mapContactPoints(org.contactPoint);
+
+	return {
+		"@type": "Organization",
+		"@id": id,
+		name: org.name,
+		url: org.url,
+		logo: org.logo,
+		sameAs: org.sameAs,
+		department: departments,
+		contactPoint,
+	};
 }
 
 /**
@@ -20,17 +51,16 @@ export function buildPersonSchema(
 ): Record<string, unknown> | undefined {
 	if (!person) return undefined;
 
-	// Generate full URL for @id
 	const base = baseUrl || "";
-	const id = person["@id"]
-		? person["@id"].startsWith("http")
-			? person["@id"]
-			: `${base}${person["@id"]}`
-		: `${base}#person-${normalizeId(person.name)}`;
+	const id = createSchemaId({
+		kind: "person",
+		name: person.name,
+		baseUrl: base,
+		explicitId: person["@id"],
+	});
 
-	// If requesting as reference, return just the reference
 	if (asReference) {
-		return { "@id": id };
+		return asIdReference(id);
 	}
 
 	return {
@@ -54,49 +84,19 @@ export function buildOrgSchema(
 ): Record<string, unknown> | undefined {
 	if (!org) return undefined;
 
-	// Generate full URL for @id
 	const base = baseUrl || org.url || "";
-	const id = org["@id"]
-		? org["@id"].startsWith("http")
-			? org["@id"]
-			: `${base}${org["@id"]}`
-		: `${base}#organization-${normalizeId(org.name)}`;
+	const id = createSchemaId({
+		kind: "organization",
+		name: org.name,
+		baseUrl: base,
+		explicitId: org["@id"],
+	});
 
-	// If requesting as reference, return just the reference
 	if (asReference) {
-		return { "@id": id };
+		return asIdReference(id);
 	}
 
-	// Build department references (they'll be added as entities separately)
-	const departments = org.department
-		? org.department
-				.map((dept) => buildOrgSchema(dept, true, baseUrl))
-				.filter(Boolean)
-		: undefined;
-
-	// Build contact points
-	const contactPoint = org.contactPoint
-		? org.contactPoint.map((cp) => ({
-				"@type": "ContactPoint",
-				contactType: cp.contactType,
-				telephone: cp.telephone,
-				email: cp.email,
-				url: cp.url,
-				areaServed: cp.areaServed,
-				availableLanguage: cp.availableLanguage,
-			}))
-		: undefined;
-
-	return {
-		"@type": "Organization",
-		"@id": id,
-		name: org.name,
-		url: org.url,
-		logo: org.logo,
-		sameAs: org.sameAs,
-		department: departments,
-		contactPoint,
-	};
+	return buildOrganizationCore(org, baseUrl);
 }
 
 /**

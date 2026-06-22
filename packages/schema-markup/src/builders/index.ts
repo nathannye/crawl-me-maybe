@@ -3,6 +3,7 @@ export * from "./article";
 export * from "./contact-page";
 export * from "./event";
 export * from "./faq";
+export * from "./fragments";
 export * from "./organization";
 export * from "./product";
 export * from "./utils";
