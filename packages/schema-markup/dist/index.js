@@ -1,3 +1,120 @@
+// src/build.ts
+var TYPE_PRIORITY = [
+  "Organization",
+  "Person",
+  "LocalBusiness",
+  "WebSite",
+  "WebPage",
+  "ProfilePage",
+  "QAPage",
+  "BreadcrumbList",
+  "Article",
+  "Course",
+  "Dataset",
+  "DiscussionForumPosting",
+  "JobPosting",
+  "Movie",
+  "Product",
+  "Recipe",
+  "SoftwareApplication",
+  "VacationRental",
+  "VideoObject",
+  "Event",
+  "ItemList",
+  "Question",
+  "Answer",
+  "Review",
+  "Comment",
+  "AggregateRating"
+];
+var typeWeight = new Map(TYPE_PRIORITY.map((type, index) => [type, index]));
+var hasObjectShape = (value) => {
+  return typeof value === "object" && value !== null && !Array.isArray(value);
+};
+var hasType = (value) => {
+  return typeof value["@type"] === "string";
+};
+var hasId = (value) => {
+  return typeof value["@id"] === "string" && value["@id"].length > 0;
+};
+var ensureContext = (node) => {
+  if (hasType(node) && node["@context"] === undefined) {
+    return {
+      "@context": "https://schema.org",
+      ...node
+    };
+  }
+  return node;
+};
+var normalizeInput = (input) => {
+  if (Array.isArray(input)) {
+    return input.map((set) => set.schemaData).filter(Boolean);
+  }
+  const fromSets = (input.schemaSets || []).map((set) => set.schemaData);
+  const fromNodes = input.nodes || [];
+  return [...fromSets, ...fromNodes].filter(Boolean);
+};
+var buildSchemaMarkup = (input) => {
+  const collected = [];
+  const seenIds = new Set;
+  const processingIds = new Set;
+  let orderCounter = 0;
+  const addNode = (node) => {
+    const normalized = ensureContext(node);
+    if (hasId(normalized)) {
+      if (seenIds.has(normalized["@id"]))
+        return;
+      seenIds.add(normalized["@id"]);
+    }
+    collected.push({
+      node: normalized,
+      order: orderCounter++
+    });
+  };
+  const processValue = (value, isRoot = false) => {
+    if (Array.isArray(value)) {
+      return value.map((item) => processValue(item, false));
+    }
+    if (!hasObjectShape(value))
+      return value;
+    if (!isRoot && hasType(value) && hasId(value)) {
+      registerEntity(value);
+      return { "@id": value["@id"] };
+    }
+    const output = {};
+    for (const [key, child] of Object.entries(value)) {
+      output[key] = processValue(child, false);
+    }
+    return output;
+  };
+  const registerEntity = (entity) => {
+    const id = entity["@id"];
+    if (seenIds.has(id) || processingIds.has(id))
+      return;
+    processingIds.add(id);
+    const processedEntity = processValue(entity, true);
+    if (hasObjectShape(processedEntity)) {
+      addNode(processedEntity);
+    }
+    processingIds.delete(id);
+  };
+  for (const node of normalizeInput(input)) {
+    const processed = processValue(node, true);
+    if (!hasObjectShape(processed))
+      continue;
+    addNode(processed);
+  }
+  const ranked = collected.sort((a, b) => {
+    const aType = hasType(a.node) ? a.node["@type"] : "";
+    const bType = hasType(b.node) ? b.node["@type"] : "";
+    const aWeight = typeWeight.get(aType) ?? Number.MAX_SAFE_INTEGER;
+    const bWeight = typeWeight.get(bType) ?? Number.MAX_SAFE_INTEGER;
+    if (aWeight !== bWeight)
+      return aWeight - bWeight;
+    return a.order - b.order;
+  });
+  return ranked.map(({ node }) => JSON.stringify(node));
+};
 // src/define-builder.ts
 function defineBuilder(type) {
   return (input) => ({
@@ -252,138 +369,12 @@ var buildVideoObject = defineBuilder("VideoObject");
 var buildWebPage = defineBuilder("WebPage");
 // src/builders/website.ts
 var buildWebSite = defineBuilder("WebSite");
-// src/build.ts
-var TYPE_PRIORITY = [
-  "Organization",
-  "Person",
-  "LocalBusiness",
-  "WebSite",
-  "WebPage",
-  "ProfilePage",
-  "QAPage",
-  "BreadcrumbList",
-  "Article",
-  "Course",
-  "Dataset",
-  "DiscussionForumPosting",
-  "JobPosting",
-  "Movie",
-  "Product",
-  "Recipe",
-  "SoftwareApplication",
-  "VacationRental",
-  "VideoObject",
-  "Event",
-  "ItemList",
-  "Question",
-  "Answer",
-  "Review",
-  "Comment",
-  "AggregateRating"
-];
-var typeWeight = new Map(TYPE_PRIORITY.map((type, index) => [type, index]));
-var hasObjectShape = (value) => {
-  return typeof value === "object" && value !== null && !Array.isArray(value);
-};
-var hasType = (value) => {
-  return typeof value["@type"] === "string";
-};
-var hasId = (value) => {
-  return typeof value["@id"] === "string" && value["@id"].length > 0;
-};
-var ensureContext = (node) => {
-  if (hasType(node) && node["@context"] === undefined) {
-    return {
-      "@context": "https://schema.org",
-      ...node
-    };
-  }
-  return node;
-};
-var normalizeInput = (input) => {
-  if (Array.isArray(input)) {
-    return input.map((set) => set.schemaData).filter(Boolean);
-  }
-  const fromSets = (input.schemaSets || []).map((set) => set.schemaData);
-  const fromNodes = input.nodes || [];
-  return [...fromSets, ...fromNodes].filter(Boolean);
-};
-var buildSchemaMarkup = (input) => {
-  const collected = [];
-  const seenIds = new Set;
-  const processingIds = new Set;
-  let orderCounter = 0;
-  const addNode = (node) => {
-    const normalized = ensureContext(node);
-    if (hasId(normalized)) {
-      if (seenIds.has(normalized["@id"]))
-        return;
-      seenIds.add(normalized["@id"]);
-    }
-    collected.push({
-      node: normalized,
-      order: orderCounter++
-    });
-  };
-  const processValue = (value, isRoot = false) => {
-    if (Array.isArray(value)) {
-      return value.map((item) => processValue(item, false));
-    }
-    if (!hasObjectShape(value))
-      return value;
-    if (!isRoot && hasType(value) && hasId(value)) {
-      registerEntity(value);
-      return { "@id": value["@id"] };
-    }
-    const output = {};
-    for (const [key, child] of Object.entries(value)) {
-      output[key] = processValue(child, false);
-    }
-    return output;
-  };
-  const registerEntity = (entity) => {
-    const id = entity["@id"];
-    if (seenIds.has(id) || processingIds.has(id))
-      return;
-    processingIds.add(id);
-    const processedEntity = processValue(entity, true);
-    if (hasObjectShape(processedEntity)) {
-      addNode(processedEntity);
-    }
-    processingIds.delete(id);
-  };
-  for (const node of normalizeInput(input)) {
-    const processed = processValue(node, true);
-    if (!hasObjectShape(processed))
-      continue;
-    addNode(processed);
-  }
-  const ranked = collected.sort((a, b) => {
-    const aType = hasType(a.node) ? a.node["@type"] : "";
-    const bType = hasType(b.node) ? b.node["@type"] : "";
-    const aWeight = typeWeight.get(aType) ?? Number.MAX_SAFE_INTEGER;
-    const bWeight = typeWeight.get(bType) ?? Number.MAX_SAFE_INTEGER;
-    if (aWeight !== bWeight)
-      return aWeight - bWeight;
-    return a.order - b.order;
-  });
-  return ranked.map(({ node }) => JSON.stringify(node));
-};
-// src/schema-utils.ts
-function coalesce(...values) {
-  for (const value of values) {
-    if (value !== undefined && value !== null)
-      return value;
-  }
-  return;
-}
 export {
   normalizeId,
   mapEntityReferences,
   mapContactPoints,
   formatSchemaDate,
   createSchemaId,
-  coalesce,
   buildWebsiteReference,
   buildWebSite,
   buildWebPage,
@@ -421,5 +412,5 @@ export {
   asIdReference
 };
 
-//# debugId=ED4657F87D9157FD64756E2164756E21
+//# debugId=AE862E9C37D0C1B664756E2164756E21
 //# sourceMappingURL=index.js.map
