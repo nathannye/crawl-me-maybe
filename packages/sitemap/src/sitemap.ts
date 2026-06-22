@@ -39,7 +39,7 @@ export async function generateSitemap(
 	return createSitemapXml(processedUrls);
 }
 
-export async function createIndexSitemap(
+export async function generateIndexSitemap(
 	files: string[],
 	baseUrl: string,
 ): Promise<string> {

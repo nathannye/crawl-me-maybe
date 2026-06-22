@@ -1,7 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import { generateRobotsTxt } from "./robots";
-import { createIndexSitemap, generateSitemap } from "./sitemap";
+import { generateIndexSitemap, generateSitemap } from "./sitemap";
 import type { LocaleConfig, SitemapConfig, SitemapEntry } from "./types";
 import { createFile } from "./file";
 
@@ -82,7 +82,7 @@ export function vitePluginSitemap(config?: SitemapConfig) {
 				allSitemaps.push(`/sitemap-${name}.xml`);
 			}
 
-			const indexXml = await createIndexSitemap(
+			const indexXml = await generateIndexSitemap(
 				allSitemaps.map((s: string) => s.slice(1)),
 				domain,
 			);
