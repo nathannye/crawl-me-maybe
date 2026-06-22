@@ -1,9 +1,9 @@
 import fs from "node:fs";
 import path from "node:path";
 import { generateRobotsTxt } from "./robots";
-import { generateSitemap } from "./sitemap";
+import { createIndexSitemap, generateSitemap } from "./sitemap";
 import type { LocaleConfig, SitemapConfig, SitemapEntry } from "./types";
-import { createFile, createIndexSitemap } from "./utils";
+import { createFile } from "./utils";
 
 // Export types for consumers
 export type { LocaleConfig, SitemapConfig, SitemapEntry };
@@ -11,7 +11,6 @@ export type { LocaleConfig, SitemapConfig, SitemapEntry };
 const DEFAULT_CONFIG: SitemapConfig = {
 	domain: "https://yoursite.com",
 	outDir: "dist",
-	disableMinification: false,
 	sitemaps: { pages: async () => [] },
 };
 

@@ -48,7 +48,6 @@ export async function createIndexSitemap(
 			.map((f) => `<sitemap><loc>${baseUrl}/${f}</loc></sitemap>`)
 			.join("");
 		const xmlString = `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${items}</sitemapindex>`;
-
 		return xmlString;
 	} catch (err) {
 		throw new Error(

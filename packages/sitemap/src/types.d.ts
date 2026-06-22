@@ -1,4 +1,17 @@
 /**
+ * A single crawler rule block for robots.txt generation.
+ * Mirrors the Next.js MetadataRoute.Robots rule shape.
+ */
+export type RobotsRule = {
+	/** User-agent string(s) this rule applies to (e.g. "*", "Googlebot", or an array) */
+	userAgent: string | string[];
+	/** Path(s) the crawler is allowed to access */
+	allow?: string | string[];
+	/** Path(s) the crawler is disallowed from accessing */
+	disallow?: string | string[];
+};
+
+/**
  * Configuration for a locale/language.
  */
 export type LocaleConfig = {
@@ -64,15 +77,12 @@ export type SitemapConfig = {
 		| { [key: string]: () => Promise<SitemapEntry[]> }
 		| (() => Promise<SitemapEntry[]>);
 	/**
-	 * (Optional) Async function returning extra robots.txt content for custom rules.
-	 * If not provided, a reasonable default is used.
-	 * The correct Sitemap: ... line(s) will be appended automatically.
+	 * (Optional) Crawler rules for robots.txt generation.
+	 * Accepts a single rule object or an array of rule objects (same shape as Next.js MetadataRoute.Robots).
+	 * If omitted, a sensible default allowing all crawlers is used.
+	 * The correct `Sitemap:` line(s) are always appended automatically.
 	 */
-	robots?: () => Promise<string> | string;
-	/**
-	 * (Optional) If true, disables minification for all output XML. Defaults to false (so XML is minified by default for SEO best practices).
-	 */
-	disableMinification?: boolean;
+	robots?: RobotsRule | RobotsRule[];
 	/**
 	 * (Optional) Array of locale configurations for multi-language support.
 	 * If provided, the plugin will generate locale variants for each URL.

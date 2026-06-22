@@ -3,17 +3,6 @@ import path from "node:path";
 import type { LocaleConfig, SitemapEntry } from "./types";
 
 /**
- * Minifies XML by removing unnecessary whitespace.
- * Lightweight alternative to heavy minification libraries.
- */
-function minifyXml(xml: string): string {
-	return xml
-		.replace(/>\s+</g, "><") // Remove whitespace between tags
-		.replace(/\s{2,}/g, " ") // Collapse multiple spaces
-		.trim();
-}
-
-/**
  * Generates a localized URL based on the locale mode.
  * @param baseUrl - The base URL (e.g., '/about')
  * @param locale - The locale configuration
@@ -63,8 +52,7 @@ type SitemapEntryWithAlternates = SitemapEntry & {
 
 /**
  * Generates a sitemap.xml string from a list of SitemapEntry objects.
- * Optionally minifies the output with minify-xml if opts.minify is true.
- * Throws an Error if minify or generation fails.
+ * Throws an Error if generation fails.
  */
 export async function createSitemapXml(
 	urls: SitemapEntryWithAlternates[],
@@ -118,9 +106,7 @@ export async function createSitemapXml(
 		]
 			.filter(Boolean)
 			.join(" ");
-		const xmlString = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset ${ns}>${items}</urlset>`;
-
-		return xmlString;
+		return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset ${ns}>${items}</urlset>`;
 	} catch (err) {
 		throw new Error(
 			`Sitemap XML creation failed: ${err instanceof Error ? err.message : String(err)}`,
