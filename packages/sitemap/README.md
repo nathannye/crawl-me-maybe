@@ -75,7 +75,7 @@ Runs on `closeBundle` and writes files to `outDir` (default: `dist`).
 
 ```ts
 // vite.config.ts
-import { vitePluginSitemap } from "@crawl-me-maybe/sitemap";
+import { vitePluginSitemap } from "@crawl-me-maybe/sitemap/vite";
 
 export default {
   plugins: [

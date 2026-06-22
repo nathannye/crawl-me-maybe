@@ -1,3 +1,7 @@
+// src/vite-plugin.ts
+import fs from "node:fs";
+import path2 from "node:path";
+
 // src/domain.ts
 function normalizeDomain(domain) {
   return domain.replace(/\/+$/, "");
@@ -58,6 +62,7 @@ function generateRobotsTxt(domain, sitemapIndex = "sitemap.xml", rules) {
 `;
   return content;
 }
+
 // src/localize.ts
 function resolveUrl(path, domain) {
   const slug = path.startsWith("/") ? path.slice(1) : path;
@@ -187,12 +192,97 @@ function generateIndexSitemap(files, baseUrl) {
     throw new Error(`Sitemap index XML creation failed: ${err instanceof Error ? err.message : String(err)}`);
   }
 }
-export {
-  generateSitemap,
-  generateRobotsTxt,
-  generateIndexSitemap,
-  DEFAULT_ROBOTS_RULES
+
+// src/validate-config.ts
+function validateConfig(config) {
+  if (!config) {
+    throw new Error("vitePluginSitemap: config is required");
+  }
+  if (!config.domain || typeof config.domain !== "string") {
+    throw new Error("vitePluginSitemap: domain must be a non-empty string");
+  }
+  try {
+    new URL(config.domain);
+  } catch {
+    throw new Error(`vitePluginSitemap: domain must be a valid URL origin (received "${config.domain}")`);
+  }
+  if (!config.sitemaps) {
+    throw new Error("vitePluginSitemap: sitemaps is required");
+  }
+  if (typeof config.sitemaps === "object" && !Array.isArray(config.sitemaps)) {
+    const callbacks = Object.values(config.sitemaps).filter((value) => typeof value === "function");
+    if (callbacks.length === 0) {
+      throw new Error("vitePluginSitemap: sitemaps object must include at least one callback");
+    }
+  }
+  return config;
+}
+
+// src/file.ts
+import { writeFileSync } from "node:fs";
+import path from "node:path";
+var createFile = (outputPath, filename, content) => {
+  try {
+    writeFileSync(path.join(outputPath, filename), content);
+  } catch (err) {
+    throw new Error(`Failed to write file ${filename} to ${outputPath}: ${err instanceof Error ? err.message : String(err)}`);
+  }
 };
 
-//# debugId=3D289BFFA0A49CDE64756E2164756E21
-//# sourceMappingURL=index.js.map
+// src/vite-plugin.ts
+function vitePluginSitemap(config) {
+  const pluginConfig = validateConfig(config);
+  const domain = pluginConfig.domain;
+  const outDir = pluginConfig.outDir || "dist";
+  const resolvedOutDir = path2.resolve(process.cwd(), outDir);
+  const locales = pluginConfig.locales;
+  const localeMode = pluginConfig.localeMode || "prefix";
+  const prefixDefault = pluginConfig.prefixDefault ?? false;
+  const writeRobots = (sitemapIndex = "sitemap.xml") => {
+    const content = generateRobotsTxt(domain, sitemapIndex, pluginConfig.robots);
+    createFile(resolvedOutDir, "robots.txt", content);
+  };
+  const writeSitemap = (filename, urls) => {
+    const xml = generateSitemap({
+      domain,
+      entries: urls,
+      locales,
+      localeMode,
+      prefixDefault
+    });
+    createFile(resolvedOutDir, filename, xml);
+  };
+  return {
+    name: "vite-plugin-sitemap",
+    apply: "build",
+    async closeBundle() {
+      fs.mkdirSync(resolvedOutDir, { recursive: true });
+      const { sitemaps } = pluginConfig;
+      if (typeof sitemaps === "function") {
+        const urls = await sitemaps();
+        writeSitemap("sitemap.xml", urls);
+        writeRobots("sitemap.xml");
+        console.log("✅ Generated single sitemap");
+        return;
+      }
+      const indexFiles = [];
+      for (const [name, cb] of Object.entries(sitemaps)) {
+        if (typeof cb !== "function")
+          continue;
+        const urls = await cb();
+        writeSitemap(`sitemap-${name}.xml`, urls);
+        indexFiles.push(`sitemap-${name}.xml`);
+      }
+      const indexXml = generateIndexSitemap(indexFiles, domain);
+      createFile(resolvedOutDir, "sitemap.xml", indexXml);
+      writeRobots("sitemap.xml");
+      console.log(`✅ Generated ${indexFiles.length} sitemaps + index + robots.txt`);
+    }
+  };
+}
+export {
+  vitePluginSitemap
+};
+
+//# debugId=CC3EFC677AE9D2C364756E2164756E21
+//# sourceMappingURL=vite.js.map
