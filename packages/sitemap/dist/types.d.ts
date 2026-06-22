@@ -39,9 +39,11 @@ export type SitemapEntry = {
     /** If true, this entry is not localized even when locales are configured */
     skipLocalization?: boolean;
 };
+/** Resolved sitemap entry used for XML output after path localization. */
 export type SitemapEntryWithAlternates = Omit<SitemapEntry, "path"> & {
     /** Fully resolved absolute URL for sitemap XML output */
     url: string;
+    /** hreflang alternates for localized entries */
     alternates?: {
         hreflang: string;
         href: string;

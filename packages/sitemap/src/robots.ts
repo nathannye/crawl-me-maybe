@@ -1,6 +1,7 @@
 import type { RobotsRule } from "./types";
 import { normalizeDomain } from "./domain";
 
+/** Default crawler rules used when `generateRobotsTxt` is called without custom rules. */
 export const DEFAULT_ROBOTS_RULES: RobotsRule[] = [
 	{
 		userAgent: "*",
@@ -45,38 +46,26 @@ function toSitemapUrl(domain: string, filename: string): string {
 }
 
 /**
- * Generates a robots.txt string using the default crawler rules.
+ * Builds a robots.txt string from structured rules, appending the sitemap index URL at the end.
  * @param domain - Site origin (e.g. https://example.com)
- * @param sitemapIndex - Sitemap index filename only (e.g. "sitemap.xml")
+ * @param sitemapIndex - Sitemap index filename only, without a leading slash (e.g. "sitemap.xml")
+ * @param rules - Optional rule(s); falls back to {@link DEFAULT_ROBOTS_RULES}
+ * @returns Complete robots.txt content
  */
-export function createRobotsTxt(
-	domain: string,
-	sitemapIndex: string = "sitemap.xml",
-): string {
-	if (!domain || typeof domain !== "string") {
-		throw new Error("createRobotsTxt: domain must be a non-empty string");
-	}
-	if (!sitemapIndex || typeof sitemapIndex !== "string") {
-		throw new Error("createRobotsTxt: sitemapIndex must be a non-empty string");
-	}
-	let content = serializeRobotsRules(DEFAULT_ROBOTS_RULES).trim();
-	if (!content.endsWith("\n")) content += "\n";
-	content += `Sitemap: ${toSitemapUrl(domain, sitemapIndex)}\n`;
-	return content;
-}
-
-/**
- * Builds a complete robots.txt string from structured rules, appending the
- * sitemap index URL at the end.
- * @param domain - Site origin (e.g. https://example.com)
- * @param sitemapIndex - Sitemap index filename only (e.g. "sitemap.xml")
- * @param rules - Optional rule(s); falls back to DEFAULT_ROBOTS_RULES
- */
-export async function generateRobotsTxt(
+export function generateRobotsTxt(
 	domain: string,
 	sitemapIndex: string = "sitemap.xml",
 	rules?: RobotsRule | RobotsRule[],
-): Promise<string> {
+): string {
+	if (!domain || typeof domain !== "string") {
+		throw new Error("generateRobotsTxt: domain must be a non-empty string");
+	}
+	if (!sitemapIndex || typeof sitemapIndex !== "string") {
+		throw new Error(
+			"generateRobotsTxt: sitemapIndex must be a non-empty string",
+		);
+	}
+
 	let content = serializeRobotsRules(rules ?? DEFAULT_ROBOTS_RULES).trim();
 	if (!content.endsWith("\n")) content += "\n";
 	content += `Sitemap: ${toSitemapUrl(domain, sitemapIndex)}\n`;

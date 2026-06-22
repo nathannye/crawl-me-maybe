@@ -2,37 +2,26 @@ import fs from "node:fs";
 import path from "node:path";
 import { generateRobotsTxt } from "./robots";
 import { generateIndexSitemap, generateSitemap } from "./sitemap";
-import type { LocaleConfig, SitemapConfig, SitemapEntry } from "./types";
+import type { SitemapConfig, SitemapEntry } from "./types";
+import { validateConfig } from "./validate-config";
 import { createFile } from "./file";
 
-// Export types for consumers
-export type { LocaleConfig, SitemapConfig, SitemapEntry };
+/**
+ * Vite plugin that generates sitemap.xml and robots.txt on `closeBundle`.
+ * @param config - Plugin configuration (domain and sitemaps are required)
+ */
+export function vitePluginSitemap(config: SitemapConfig) {
+	const pluginConfig = validateConfig(config);
 
-const DEFAULT_CONFIG: SitemapConfig = {
-	domain: "https://yoursite.com",
-	outDir: "dist",
-	sitemaps: { pages: async () => [] },
-};
-
-export function vitePluginSitemap(config?: SitemapConfig) {
-	// Explicitly capture config to ensure it's always available in closures
-	const pluginConfig: SitemapConfig = config || DEFAULT_CONFIG;
-
-	const domain = pluginConfig?.domain;
-	if (!domain) {
-		throw new Error(
-			"⚠️ No domain provided. Sitemap generation requires a domain.",
-		);
-	}
-
-	const outDir = pluginConfig?.outDir || "dist";
+	const domain = pluginConfig.domain;
+	const outDir = pluginConfig.outDir || "dist";
 	const resolvedOutDir = path.resolve(process.cwd(), outDir);
-	const locales = pluginConfig?.locales;
-	const localeMode = pluginConfig?.localeMode || "prefix";
-	const prefixDefault = pluginConfig?.prefixDefault ?? false;
+	const locales = pluginConfig.locales;
+	const localeMode = pluginConfig.localeMode || "prefix";
+	const prefixDefault = pluginConfig.prefixDefault ?? false;
 
-	const createRobots = async (sitemapIndex = "sitemap.xml") => {
-		const content = await generateRobotsTxt(
+	const writeRobots = (sitemapIndex = "sitemap.xml") => {
+		const content = generateRobotsTxt(
 			domain,
 			sitemapIndex,
 			pluginConfig.robots,
@@ -40,8 +29,8 @@ export function vitePluginSitemap(config?: SitemapConfig) {
 		createFile(resolvedOutDir, "robots.txt", content);
 	};
 
-	const createSitemap = async (filename: string, urls: SitemapEntry[]) => {
-		const xml = await generateSitemap({
+	const writeSitemap = (filename: string, urls: SitemapEntry[]) => {
+		const xml = generateSitemap({
 			domain,
 			entries: urls,
 			locales,
@@ -55,41 +44,30 @@ export function vitePluginSitemap(config?: SitemapConfig) {
 		name: "vite-plugin-sitemap",
 		apply: "build" as const,
 		async closeBundle() {
-			// Use the captured pluginConfig from outer scope for consistency
 			fs.mkdirSync(resolvedOutDir, { recursive: true });
 			const { sitemaps } = pluginConfig;
 
-			if (!sitemaps) {
-				console.warn("⚠️ No sitemaps configuration found");
-				return;
-			}
-
 			if (typeof sitemaps === "function") {
-				// Single sitemap mode
 				const urls = await sitemaps();
-				await createSitemap("sitemap.xml", urls);
-				await createRobots("sitemap.xml");
+				writeSitemap("sitemap.xml", urls);
+				writeRobots("sitemap.xml");
 				console.log("✅ Generated single sitemap");
 				return;
 			}
 
-			// Multi-sitemap mode (object)
-			const allSitemaps: string[] = [];
+			const indexFiles: string[] = [];
 			for (const [name, cb] of Object.entries(sitemaps)) {
 				if (typeof cb !== "function") continue;
 				const urls = await cb();
-				await createSitemap(`sitemap-${name}.xml`, urls);
-				allSitemaps.push(`/sitemap-${name}.xml`);
+				writeSitemap(`sitemap-${name}.xml`, urls);
+				indexFiles.push(`sitemap-${name}.xml`);
 			}
 
-			const indexXml = await generateIndexSitemap(
-				allSitemaps.map((s: string) => s.slice(1)),
-				domain,
-			);
+			const indexXml = generateIndexSitemap(indexFiles, domain);
 			createFile(resolvedOutDir, "sitemap.xml", indexXml);
-			await createRobots("sitemap.xml");
+			writeRobots("sitemap.xml");
 			console.log(
-				`✅ Generated ${allSitemaps.length} sitemaps + index + robots.txt`,
+				`✅ Generated ${indexFiles.length} sitemaps + index + robots.txt`,
 			);
 		},
 	};

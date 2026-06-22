@@ -170,7 +170,7 @@ Return XML from a route handler. Same entry shape as the Vite plugin — no file
 import { generateSitemap } from "@crawl-me-maybe/sitemap";
 
 export async function GET() {
-  const xml = await generateSitemap({
+  const xml = generateSitemap({
     domain: "https://example.com",
     entries: [{ path: "/" }, { path: "/about" }],
   });
@@ -190,7 +190,7 @@ Serve a sitemap index at `/sitemap.xml` and child sitemaps at `/sitemap-{name}.x
 import { generateIndexSitemap } from "@crawl-me-maybe/sitemap";
 
 export async function GET() {
-  const xml = await generateIndexSitemap(
+  const xml = generateIndexSitemap(
     ["sitemap-pages.xml", "sitemap-blog.xml"],
     "https://example.com",
   );
@@ -206,7 +206,7 @@ export async function GET() {
 import { generateSitemap } from "@crawl-me-maybe/sitemap";
 
 export async function GET() {
-  const xml = await generateSitemap({
+  const xml = generateSitemap({
     domain: "https://example.com",
     entries: [{ path: "/" }, { path: "/about" }],
   });
@@ -226,7 +226,7 @@ See [Locale modes](#locale-modes).
 import { generateSitemap } from "@crawl-me-maybe/sitemap";
 
 export async function GET() {
-  const xml = await generateSitemap({
+  const xml = generateSitemap({
     domain: "https://example.com",
     entries: [{ path: "/about" }, { path: "/contact" }],
     locales: [
@@ -256,7 +256,7 @@ Same shape as Next.js `MetadataRoute.Robots` rules. The sitemap line is appended
 import { generateRobotsTxt } from "@crawl-me-maybe/sitemap";
 
 export async function GET() {
-  const robots = await generateRobotsTxt(
+  const robots = generateRobotsTxt(
     "https://example.com",
     "sitemap.xml",
     [
@@ -278,7 +278,7 @@ export async function GET() {
 import { generateRobotsTxt } from "@crawl-me-maybe/sitemap";
 
 export async function GET() {
-  const robots = await generateRobotsTxt(
+  const robots = generateRobotsTxt(
     "https://example.com",
     "sitemap.xml",
     { userAgent: "*", allow: "/", disallow: ["/admin", "/api/"] },

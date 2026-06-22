@@ -42,23 +42,13 @@ function toSitemapPath(filename) {
 function toSitemapUrl(domain, filename) {
   return `${normalizeDomain(domain)}${toSitemapPath(filename)}`;
 }
-function createRobotsTxt(domain, sitemapIndex = "sitemap.xml") {
+function generateRobotsTxt(domain, sitemapIndex = "sitemap.xml", rules) {
   if (!domain || typeof domain !== "string") {
-    throw new Error("createRobotsTxt: domain must be a non-empty string");
+    throw new Error("generateRobotsTxt: domain must be a non-empty string");
   }
   if (!sitemapIndex || typeof sitemapIndex !== "string") {
-    throw new Error("createRobotsTxt: sitemapIndex must be a non-empty string");
+    throw new Error("generateRobotsTxt: sitemapIndex must be a non-empty string");
   }
-  let content = serializeRobotsRules(DEFAULT_ROBOTS_RULES).trim();
-  if (!content.endsWith(`
-`))
-    content += `
-`;
-  content += `Sitemap: ${toSitemapUrl(domain, sitemapIndex)}
-`;
-  return content;
-}
-async function generateRobotsTxt(domain, sitemapIndex = "sitemap.xml", rules) {
   let content = serializeRobotsRules(rules ?? DEFAULT_ROBOTS_RULES).trim();
   if (!content.endsWith(`
 `))
@@ -123,7 +113,7 @@ function generateLocalizedEntries(baseEntries, locales, domain, localeMode = "pr
 }
 
 // src/xml.ts
-async function createSitemapXml(urls) {
+function createSitemapXml(urls) {
   try {
     const now = new Date().toISOString();
     let imageNS = false;
@@ -172,7 +162,7 @@ async function createSitemapXml(urls) {
 }
 
 // src/sitemap.ts
-async function generateSitemap(config) {
+function generateSitemap(config) {
   const {
     domain,
     entries,
@@ -186,13 +176,13 @@ async function generateSitemap(config) {
   }));
   return createSitemapXml(processedUrls);
 }
-async function generateIndexSitemap(files, baseUrl) {
+function generateIndexSitemap(files, baseUrl) {
   try {
     const normalizedBase = normalizeDomain(baseUrl);
-    const items = files.map((f) => `<sitemap><loc>${normalizedBase}/${f}</loc></sitemap>`).join("");
-    const xmlString = `<?xml version="1.0" encoding="UTF-8"?>
+    const normalizedFiles = files.map((f) => f.replace(/^\/+/, ""));
+    const items = normalizedFiles.map((f) => `<sitemap><loc>${normalizedBase}/${f}</loc></sitemap>`).join("");
+    return `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${items}</sitemapindex>`;
-    return xmlString;
   } catch (err) {
     throw new Error(`Sitemap index XML creation failed: ${err instanceof Error ? err.message : String(err)}`);
   }
@@ -521,6 +511,31 @@ var delimiter = ":";
 var posix = ((p) => (p.posix = p, p))({ resolve, normalize, isAbsolute, join, relative, _makeLong, dirname, basename, extname, format, parse, sep, delimiter, win32: null, posix: null });
 var path_default = posix;
 
+// src/validate-config.ts
+function validateConfig(config) {
+  if (!config) {
+    throw new Error("vitePluginSitemap: config is required");
+  }
+  if (!config.domain || typeof config.domain !== "string") {
+    throw new Error("vitePluginSitemap: domain must be a non-empty string");
+  }
+  try {
+    new URL(config.domain);
+  } catch {
+    throw new Error(`vitePluginSitemap: domain must be a valid URL origin (received "${config.domain}")`);
+  }
+  if (!config.sitemaps) {
+    throw new Error("vitePluginSitemap: sitemaps is required");
+  }
+  if (typeof config.sitemaps === "object" && !Array.isArray(config.sitemaps)) {
+    const callbacks = Object.values(config.sitemaps).filter((value) => typeof value === "function");
+    if (callbacks.length === 0) {
+      throw new Error("vitePluginSitemap: sitemaps object must include at least one callback");
+    }
+  }
+  return config;
+}
+
 // src/file.ts
 var {writeFileSync} = (() => ({}));
 var createFile = (outputPath, filename, content) => {
@@ -532,28 +547,20 @@ var createFile = (outputPath, filename, content) => {
 };
 
 // src/vite-plugin.ts
-var DEFAULT_CONFIG = {
-  domain: "https://yoursite.com",
-  outDir: "dist",
-  sitemaps: { pages: async () => [] }
-};
 function vitePluginSitemap(config) {
-  const pluginConfig = config || DEFAULT_CONFIG;
-  const domain = pluginConfig?.domain;
-  if (!domain) {
-    throw new Error("⚠️ No domain provided. Sitemap generation requires a domain.");
-  }
-  const outDir = pluginConfig?.outDir || "dist";
+  const pluginConfig = validateConfig(config);
+  const domain = pluginConfig.domain;
+  const outDir = pluginConfig.outDir || "dist";
   const resolvedOutDir = path_default.resolve(process.cwd(), outDir);
-  const locales = pluginConfig?.locales;
-  const localeMode = pluginConfig?.localeMode || "prefix";
-  const prefixDefault = pluginConfig?.prefixDefault ?? false;
-  const createRobots = async (sitemapIndex = "sitemap.xml") => {
-    const content = await generateRobotsTxt(domain, sitemapIndex, pluginConfig.robots);
+  const locales = pluginConfig.locales;
+  const localeMode = pluginConfig.localeMode || "prefix";
+  const prefixDefault = pluginConfig.prefixDefault ?? false;
+  const writeRobots = (sitemapIndex = "sitemap.xml") => {
+    const content = generateRobotsTxt(domain, sitemapIndex, pluginConfig.robots);
     createFile(resolvedOutDir, "robots.txt", content);
   };
-  const createSitemap = async (filename, urls) => {
-    const xml = await generateSitemap({
+  const writeSitemap = (filename, urls) => {
+    const xml = generateSitemap({
       domain,
       entries: urls,
       locales,
@@ -568,29 +575,25 @@ function vitePluginSitemap(config) {
     async closeBundle() {
       fs.mkdirSync(resolvedOutDir, { recursive: true });
       const { sitemaps } = pluginConfig;
-      if (!sitemaps) {
-        console.warn("⚠️ No sitemaps configuration found");
-        return;
-      }
       if (typeof sitemaps === "function") {
         const urls = await sitemaps();
-        await createSitemap("sitemap.xml", urls);
-        await createRobots("sitemap.xml");
+        writeSitemap("sitemap.xml", urls);
+        writeRobots("sitemap.xml");
         console.log("✅ Generated single sitemap");
         return;
       }
-      const allSitemaps = [];
+      const indexFiles = [];
       for (const [name, cb] of Object.entries(sitemaps)) {
         if (typeof cb !== "function")
           continue;
         const urls = await cb();
-        await createSitemap(`sitemap-${name}.xml`, urls);
-        allSitemaps.push(`/sitemap-${name}.xml`);
+        writeSitemap(`sitemap-${name}.xml`, urls);
+        indexFiles.push(`sitemap-${name}.xml`);
       }
-      const indexXml = await generateIndexSitemap(allSitemaps.map((s) => s.slice(1)), domain);
+      const indexXml = generateIndexSitemap(indexFiles, domain);
       createFile(resolvedOutDir, "sitemap.xml", indexXml);
-      await createRobots("sitemap.xml");
-      console.log(`✅ Generated ${allSitemaps.length} sitemaps + index + robots.txt`);
+      writeRobots("sitemap.xml");
+      console.log(`✅ Generated ${indexFiles.length} sitemaps + index + robots.txt`);
     }
   };
 }
@@ -599,9 +602,8 @@ export {
   generateSitemap,
   generateRobotsTxt,
   generateIndexSitemap,
-  createRobotsTxt,
   DEFAULT_ROBOTS_RULES
 };
 
-//# debugId=66A709E20DEBB39164756E2164756E21
+//# debugId=0BBDA2C7D685534564756E2164756E21
 //# sourceMappingURL=index.js.map
