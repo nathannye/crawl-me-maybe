@@ -6,6 +6,7 @@ import type {
 	WithContext,
 } from "schema-dts";
 import { createSchemaId } from "./builders/fragments";
+import { buildImageObject, type ImageInput } from "./utils/image";
 
 type SchemaNode = Record<string, unknown>;
 
@@ -25,7 +26,7 @@ export type PersonIdentity = {
 	type: "person";
 	name: string;
 	description?: string;
-	image?: string;
+	image?: ImageInput;
 	sameAs?: string[];
 };
 
@@ -33,7 +34,7 @@ export type OrganizationIdentity = {
 	type: "organization";
 	name: string;
 	description?: string;
-	logo?: string;
+	logo?: ImageInput;
 	sameAs?: string[];
 };
 
@@ -41,7 +42,7 @@ export type LocalBusinessIdentity = {
 	type: "localBusiness";
 	name: string;
 	description?: string;
-	logo?: string;
+	logo?: ImageInput;
 	phone?: string;
 	email?: string;
 	address?: PostalAddress;
@@ -202,7 +203,7 @@ const buildIdentityNodes = (
 					"@id": id,
 					name: identity.name,
 					description: identity.description,
-					image: identity.image,
+					image: buildImageObject(identity.image),
 					sameAs: identity.sameAs,
 					url: siteUrl,
 				},
@@ -221,7 +222,7 @@ const buildIdentityNodes = (
 					"@id": id,
 					name: identity.name,
 					description: identity.description,
-					logo: identity.logo,
+					logo: buildImageObject(identity.logo),
 					sameAs: identity.sameAs,
 					url: siteUrl,
 				},
@@ -240,7 +241,7 @@ const buildIdentityNodes = (
 					"@id": id,
 					name: identity.name,
 					description: identity.description,
-					logo: identity.logo,
+					logo: buildImageObject(identity.logo),
 					telephone: identity.phone,
 					email: identity.email,
 					address: identity.address,

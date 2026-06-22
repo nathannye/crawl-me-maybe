@@ -1,4 +1,5 @@
 import type { SchemaOrganization, SchemaPerson } from "../types";
+import { buildImageObject } from "../utils/image";
 import {
 	asIdReference,
 	createSchemaId,
@@ -34,7 +35,7 @@ export function buildOrganizationCore(
 		"@id": id,
 		name: org.name,
 		url: org.url,
-		logo: org.logo,
+		logo: buildImageObject(org.logo),
 		sameAs: org.sameAs,
 		department: departments,
 		contactPoint,
@@ -70,7 +71,7 @@ export function buildPersonSchema(
 		url: person.url,
 		sameAs: person.sameAs,
 		jobTitle: person.jobTitle,
-		image: person.image,
+		image: buildImageObject(person.image),
 	};
 }
 
