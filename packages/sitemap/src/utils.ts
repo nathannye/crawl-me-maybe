@@ -68,7 +68,6 @@ type SitemapEntryWithAlternates = SitemapEntry & {
  */
 export async function createSitemapXml(
 	urls: SitemapEntryWithAlternates[],
-	opts?: { minify?: boolean },
 ): Promise<string> {
 	try {
 		const now = new Date().toISOString();
@@ -119,10 +118,8 @@ export async function createSitemapXml(
 		]
 			.filter(Boolean)
 			.join(" ");
-		let xmlString = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset ${ns}>${items}</urlset>`;
-		if (opts?.minify) {
-			xmlString = minifyXml(xmlString);
-		}
+		const xmlString = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset ${ns}>${items}</urlset>`;
+
 		return xmlString;
 	} catch (err) {
 		throw new Error(
@@ -135,26 +132,6 @@ export async function createSitemapXml(
  * Generates a sitemapindex XML string for an array of sitemap file urls.
  * Throws an Error if minify or generation fails.
  */
-export async function createIndexSitemap(
-	files: string[],
-	baseUrl: string,
-	opts?: { minify?: boolean },
-): Promise<string> {
-	try {
-		const items: string = files
-			.map((f) => `<sitemap><loc>${baseUrl}/${f}</loc></sitemap>`)
-			.join("");
-		let xmlString = `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${items}</sitemapindex>`;
-		if (opts?.minify) {
-			xmlString = minifyXml(xmlString);
-		}
-		return xmlString;
-	} catch (err) {
-		throw new Error(
-			`Sitemap index XML creation failed: ${err instanceof Error ? err.message : String(err)}`,
-		);
-	}
-}
 
 /**
  * Writes a file to a directory, creating the full path if needed. Throws on failure.
