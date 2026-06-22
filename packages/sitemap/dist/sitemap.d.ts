@@ -7,4 +7,4 @@ export type SitemapGeneratorConfig = {
     prefixDefault?: boolean;
 };
 export declare function generateSitemap(config: SitemapGeneratorConfig): Promise<string>;
-export declare function createIndexSitemap(files: string[], baseUrl: string): Promise<string>;
+export declare function generateIndexSitemap(files: string[], baseUrl: string): Promise<string>;
