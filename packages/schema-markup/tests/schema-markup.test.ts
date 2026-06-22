@@ -56,36 +56,23 @@ describe("buildBreadcrumbListSchema", () => {
 });
 
 describe("buildSchemaMarkup", () => {
-	test("stringifies nodes and replaces nested entity objects with @id references", () => {
-		const organization = {
-			"@type": "Organization",
-			"@id": "https://example.com#organization-main",
-			name: "Example Org",
-		};
-
+	test("builds identity/site/page graph and replaces nested mainEntity with @id reference", () => {
 		const product = {
 			"@type": "Product",
 			"@id": "https://example.com/products/lemon-pie#product",
 			name: "Lemon Pie",
 		};
 
-		const website = {
-			"@type": "WebSite",
-			"@id": "https://example.com#website",
-			name: "Example",
-			publisher: organization,
-		};
-
-		const webpage = {
-			"@type": "WebPage",
-			"@id": "https://example.com/recipes/lemon-pie#webpage",
-			url: "https://example.com/recipes/lemon-pie",
-			isPartOf: website,
-			mainEntity: product,
-		};
-
 		const output = buildSchemaMarkup({
-			nodes: [webpage],
+			identity: {
+				type: "organization",
+				name: "Example Org",
+			},
+			siteUrl: "https://example.com",
+			siteName: "Example",
+			pageUrl: "https://example.com/recipes/lemon-pie",
+			pageTitle: "Lemon Pie",
+			mainEntity: product,
 		});
 
 		expect(output.length).toBe(4);
@@ -100,15 +87,16 @@ describe("buildSchemaMarkup", () => {
 
 		const webSiteNode = nodes.find((node) => node["@type"] === "WebSite");
 		const webPageNode = nodes.find((node) => node["@type"] === "WebPage");
+		const organizationNode = nodes.find((node) => node["@type"] === "Organization");
 
 		expect(webSiteNode.publisher).toEqual({
-			"@id": organization["@id"],
+			"@id": organizationNode["@id"],
 		});
 		expect(webPageNode.mainEntity).toEqual({
 			"@id": product["@id"],
 		});
 		expect(webPageNode.isPartOf).toEqual({
-			"@id": website["@id"],
+			"@id": webSiteNode["@id"],
 		});
 	});
 });

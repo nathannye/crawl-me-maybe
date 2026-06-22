@@ -3,8 +3,8 @@ import { buildSchemaMarkup } from "@crawl-me-maybe/schema-markup";
 export default function SchemaMarkup() {
 	const schema = buildSchemaMarkup({
 		identity: {
+			type: "organization",
 			name: "Crawl Me Maybe",
-			url: "https://crawlmemaybe.test",
 		},
 		siteUrl: "https://crawlmemaybe.test",
 		siteName: "Crawl Me Maybe",
@@ -13,10 +13,8 @@ export default function SchemaMarkup() {
 		pageDescription: "Playground page for schema markup output.",
 	});
 
-	console.log(schema);
-
-	return schema.map((s, i) => (
-		<script key={`schema-${i}`} type="application/ld+json">
+	return schema.map((s) => (
+		<script key={s} type="application/ld+json">
 			{s}
 		</script>
 	));

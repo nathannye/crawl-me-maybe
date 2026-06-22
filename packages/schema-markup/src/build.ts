@@ -1,11 +1,16 @@
-import type { BreadcrumbList, Thing, WithContext } from "schema-dts";
-import type { SchemaOrganization, SchemaPerson } from "./types";
-import { buildPersonOrOrg } from "./builders/utils";
+import type {
+	BreadcrumbList,
+	OpeningHoursSpecification,
+	PostalAddress,
+	Thing,
+	WithContext,
+} from "schema-dts";
+import { createSchemaId } from "./builders/fragments";
 
 type SchemaNode = Record<string, unknown>;
 
 export type BuildSchemaMarkupInput = {
-	identity: SchemaOrganization | SchemaPerson;
+	identity: Identity;
 	siteUrl: string;
 	siteName: string;
 	siteDescription?: string;
@@ -15,6 +20,39 @@ export type BuildSchemaMarkupInput = {
 	breadcrumb?: WithContext<BreadcrumbList>;
 	mainEntity?: Thing | SchemaNode;
 };
+
+export type PersonIdentity = {
+	type: "person";
+	name: string;
+	description?: string;
+	image?: string;
+	sameAs?: string[];
+};
+
+export type OrganizationIdentity = {
+	type: "organization";
+	name: string;
+	description?: string;
+	logo?: string;
+	sameAs?: string[];
+};
+
+export type LocalBusinessIdentity = {
+	type: "localBusiness";
+	name: string;
+	description?: string;
+	logo?: string;
+	phone?: string;
+	email?: string;
+	address?: PostalAddress;
+	openingHours?: OpeningHoursSpecification[];
+	sameAs?: string[];
+};
+
+export type Identity =
+	| PersonIdentity
+	| OrganizationIdentity
+	| LocalBusinessIdentity;
 
 const TYPE_PRIORITY = [
 	"Organization",
@@ -147,9 +185,80 @@ const assembleNodes = (nodes: Array<Thing | SchemaNode | undefined>): string[] =
 	return ranked.map(({ node }) => JSON.stringify(node));
 };
 
+const buildIdentityNodes = (
+	identity: Identity,
+	siteUrl: string,
+): { node: SchemaNode; ref: { "@id": string } } => {
+	switch (identity.type) {
+		case "person": {
+			const id = createSchemaId({
+				kind: "person",
+				name: identity.name,
+				baseUrl: siteUrl,
+			});
+			return {
+				node: {
+					"@type": "Person",
+					"@id": id,
+					name: identity.name,
+					description: identity.description,
+					image: identity.image,
+					sameAs: identity.sameAs,
+					url: siteUrl,
+				},
+				ref: { "@id": id },
+			};
+		}
+		case "organization": {
+			const id = createSchemaId({
+				kind: "organization",
+				name: identity.name,
+				baseUrl: siteUrl,
+			});
+			return {
+				node: {
+					"@type": "Organization",
+					"@id": id,
+					name: identity.name,
+					description: identity.description,
+					logo: identity.logo,
+					sameAs: identity.sameAs,
+					url: siteUrl,
+				},
+				ref: { "@id": id },
+			};
+		}
+		case "localBusiness": {
+			const id = createSchemaId({
+				kind: "local-business",
+				name: identity.name,
+				baseUrl: siteUrl,
+			});
+			return {
+				node: {
+					"@type": "LocalBusiness",
+					"@id": id,
+					name: identity.name,
+					description: identity.description,
+					logo: identity.logo,
+					telephone: identity.phone,
+					email: identity.email,
+					address: identity.address,
+					openingHoursSpecification: identity.openingHours,
+					sameAs: identity.sameAs,
+					url: siteUrl,
+				},
+				ref: { "@id": id },
+			};
+		}
+	}
+};
+
 export const buildSchemaMarkup = (input: BuildSchemaMarkupInput): string[] => {
-	const identityNode = buildPersonOrOrg(input.identity, false, input.siteUrl);
-	const identityRef = buildPersonOrOrg(input.identity, true, input.siteUrl);
+	const { node: identityNode, ref: identityRef } = buildIdentityNodes(
+		input.identity,
+		input.siteUrl,
+	);
 	const websiteId = `${input.siteUrl}#website`;
 
 	const websiteNode: SchemaNode = {

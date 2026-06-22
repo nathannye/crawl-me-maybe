@@ -43,83 +43,6 @@ function mapEntityReferences(entities, mapToReference, baseUrl) {
   return entities.map((entity) => mapToReference(entity, baseUrl)).filter(Boolean);
 }
 
-// src/builders/utils.ts
-function buildOrganizationCore(org, baseUrl) {
-  const base = baseUrl || org.url || "";
-  const id = createSchemaId({
-    kind: "organization",
-    name: org.name,
-    baseUrl: base,
-    explicitId: org["@id"]
-  });
-  const departments = org.department ? org.department.map((dept) => buildOrgSchema(dept, true, baseUrl)).filter(Boolean) : undefined;
-  const contactPoint = mapContactPoints(org.contactPoint);
-  return {
-    "@type": "Organization",
-    "@id": id,
-    name: org.name,
-    url: org.url,
-    logo: org.logo,
-    sameAs: org.sameAs,
-    department: departments,
-    contactPoint
-  };
-}
-function buildPersonSchema(person, asReference = false, baseUrl) {
-  if (!person)
-    return;
-  const base = baseUrl || "";
-  const id = createSchemaId({
-    kind: "person",
-    name: person.name,
-    baseUrl: base,
-    explicitId: person["@id"]
-  });
-  if (asReference) {
-    return asIdReference(id);
-  }
-  return {
-    "@type": "Person",
-    "@id": id,
-    name: person.name,
-    url: person.url,
-    sameAs: person.sameAs,
-    jobTitle: person.jobTitle,
-    image: person.image
-  };
-}
-function buildOrgSchema(org, asReference = false, baseUrl) {
-  if (!org)
-    return;
-  const base = baseUrl || org.url || "";
-  const id = createSchemaId({
-    kind: "organization",
-    name: org.name,
-    baseUrl: base,
-    explicitId: org["@id"]
-  });
-  if (asReference) {
-    return asIdReference(id);
-  }
-  return buildOrganizationCore(org, baseUrl);
-}
-function buildPersonOrOrg(entity, asReference = false, baseUrl) {
-  if (!entity)
-    return;
-  if ("jobTitle" in entity || !("logo" in entity)) {
-    return buildPersonSchema(entity, asReference, baseUrl);
-  }
-  return buildOrgSchema(entity, asReference, baseUrl);
-}
-function formatSchemaDate(date) {
-  if (!date)
-    return;
-  if (typeof date === "string") {
-    return date;
-  }
-  return date.toISOString();
-}
-
 // src/build.ts
 var TYPE_PRIORITY = [
   "Organization",
@@ -231,9 +154,73 @@ var assembleNodes = (nodes) => {
   });
   return ranked.map(({ node }) => JSON.stringify(node));
 };
+var buildIdentityNodes = (identity, siteUrl) => {
+  switch (identity.type) {
+    case "person": {
+      const id = createSchemaId({
+        kind: "person",
+        name: identity.name,
+        baseUrl: siteUrl
+      });
+      return {
+        node: {
+          "@type": "Person",
+          "@id": id,
+          name: identity.name,
+          description: identity.description,
+          image: identity.image,
+          sameAs: identity.sameAs,
+          url: siteUrl
+        },
+        ref: { "@id": id }
+      };
+    }
+    case "organization": {
+      const id = createSchemaId({
+        kind: "organization",
+        name: identity.name,
+        baseUrl: siteUrl
+      });
+      return {
+        node: {
+          "@type": "Organization",
+          "@id": id,
+          name: identity.name,
+          description: identity.description,
+          logo: identity.logo,
+          sameAs: identity.sameAs,
+          url: siteUrl
+        },
+        ref: { "@id": id }
+      };
+    }
+    case "localBusiness": {
+      const id = createSchemaId({
+        kind: "local-business",
+        name: identity.name,
+        baseUrl: siteUrl
+      });
+      return {
+        node: {
+          "@type": "LocalBusiness",
+          "@id": id,
+          name: identity.name,
+          description: identity.description,
+          logo: identity.logo,
+          telephone: identity.phone,
+          email: identity.email,
+          address: identity.address,
+          openingHoursSpecification: identity.openingHours,
+          sameAs: identity.sameAs,
+          url: siteUrl
+        },
+        ref: { "@id": id }
+      };
+    }
+  }
+};
 var buildSchemaMarkup = (input) => {
-  const identityNode = buildPersonOrOrg(input.identity, false, input.siteUrl);
-  const identityRef = buildPersonOrOrg(input.identity, true, input.siteUrl);
+  const { node: identityNode, ref: identityRef } = buildIdentityNodes(input.identity, input.siteUrl);
   const websiteId = `${input.siteUrl}#website`;
   const websiteNode = {
     "@type": "WebSite",
@@ -349,6 +336,83 @@ var buildJobPosting = defineBuilder("JobPosting");
 var buildLocalBusiness = defineBuilder("LocalBusiness");
 // src/builders/movie.ts
 var buildMovie = defineBuilder("Movie");
+// src/builders/utils.ts
+function buildOrganizationCore(org, baseUrl) {
+  const base = baseUrl || org.url || "";
+  const id = createSchemaId({
+    kind: "organization",
+    name: org.name,
+    baseUrl: base,
+    explicitId: org["@id"]
+  });
+  const departments = org.department ? org.department.map((dept) => buildOrgSchema(dept, true, baseUrl)).filter(Boolean) : undefined;
+  const contactPoint = mapContactPoints(org.contactPoint);
+  return {
+    "@type": "Organization",
+    "@id": id,
+    name: org.name,
+    url: org.url,
+    logo: org.logo,
+    sameAs: org.sameAs,
+    department: departments,
+    contactPoint
+  };
+}
+function buildPersonSchema(person, asReference = false, baseUrl) {
+  if (!person)
+    return;
+  const base = baseUrl || "";
+  const id = createSchemaId({
+    kind: "person",
+    name: person.name,
+    baseUrl: base,
+    explicitId: person["@id"]
+  });
+  if (asReference) {
+    return asIdReference(id);
+  }
+  return {
+    "@type": "Person",
+    "@id": id,
+    name: person.name,
+    url: person.url,
+    sameAs: person.sameAs,
+    jobTitle: person.jobTitle,
+    image: person.image
+  };
+}
+function buildOrgSchema(org, asReference = false, baseUrl) {
+  if (!org)
+    return;
+  const base = baseUrl || org.url || "";
+  const id = createSchemaId({
+    kind: "organization",
+    name: org.name,
+    baseUrl: base,
+    explicitId: org["@id"]
+  });
+  if (asReference) {
+    return asIdReference(id);
+  }
+  return buildOrganizationCore(org, baseUrl);
+}
+function buildPersonOrOrg(entity, asReference = false, baseUrl) {
+  if (!entity)
+    return;
+  if ("jobTitle" in entity || !("logo" in entity)) {
+    return buildPersonSchema(entity, asReference, baseUrl);
+  }
+  return buildOrgSchema(entity, asReference, baseUrl);
+}
+function formatSchemaDate(date) {
+  if (!date)
+    return;
+  if (typeof date === "string") {
+    return date;
+  }
+  return date.toISOString();
+}
+
 // src/builders/organization.ts
 function buildOrganization(organization, baseUrl, asReference = false) {
   const base = baseUrl || organization.url || "";
@@ -431,5 +495,5 @@ export {
   asIdReference
 };
 
-//# debugId=47418FC35EFA428F64756E2164756E21
+//# debugId=8B5E021735BBDB0164756E2164756E21
 //# sourceMappingURL=index.js.map
