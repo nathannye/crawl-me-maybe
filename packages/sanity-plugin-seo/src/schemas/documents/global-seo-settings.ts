@@ -1,8 +1,7 @@
 import { MdSearch, MdShare } from "react-icons/md";
-import { defineField, defineType, type Rule, type StringRule } from "sanity";
-import FaviconPreview from "../../components/core/Favicon/FaviconPreview";
+import { defineField, defineType, type StringRule } from "sanity";
 
-export const seoDefaults = defineType({
+export default defineType({
 	name: "globalSeoSettings",
 	title: "Global SEO Settings",
 	type: "document",
@@ -27,7 +26,6 @@ export const seoDefaults = defineType({
 			description:
 				"The title of the site injected into the Page Title Template field below.",
 			validation: (Rule) => Rule.required(),
-			group: "metadata",
 		}),
 		defineField({
 			name: "pageTitleTemplate",
@@ -37,12 +35,11 @@ export const seoDefaults = defineType({
 				"Template for page titles. Use {siteTitle} and {pageTitle} for the page title. Example: {pageTitle} - {siteTitle}",
 			validation: (Rule) => Rule.required(),
 			initialValue: "{pageTitle} - {siteTitle}",
-			group: "metadata",
 		}),
 		defineField({
 			name: "metaDescription",
 			type: "metaDescription",
-			group: "metadata",
+
 			description: "The default meta description for all pages.",
 		}),
 		defineField({
@@ -52,12 +49,10 @@ export const seoDefaults = defineType({
 			description:
 				"Root URL of the website (e.g. https://your-domain.com). Used for canonical and Open Graph tags.",
 			validation: (Rule) => Rule.required(),
-			group: "metadata",
 		}),
 		defineField({
 			name: "favicon",
 			type: "favicon",
-			group: "metadata",
 		}),
 		defineField({
 			name: "twitterHandle",
@@ -76,7 +71,6 @@ export const seoDefaults = defineType({
 		defineField({
 			name: "logo",
 			title: "Global Logo",
-			group: "global",
 			type: "image",
 			description:
 				"Logo used behind the scenes to populate Organization and WebSite schema markup.",

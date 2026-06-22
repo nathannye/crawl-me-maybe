@@ -1,49 +1,15 @@
 declare const _default: (({
-    type: "object";
-    name: "schemaMarkupAddress";
-} & Omit<import("sanity").ObjectDefinition, "preview"> & {
-    preview?: import("sanity").PreviewConfig<{
-        street: string;
-        city: string;
-        region: string;
-        country: string;
-    }, Record<"street" | "city" | "region" | "country", any>> | undefined;
-}) | ({
-    type: "object";
-    name: "schemaMarkupAggregateRating";
-} & Omit<import("sanity").ObjectDefinition, "preview"> & {
-    preview?: import("sanity").PreviewConfig<{
-        value: string;
-        count: string;
-    }, Record<"value" | "count", any>> | undefined;
-}) | ({
-    type: "object";
-    name: "schemaMarkupGeo";
-} & Omit<import("sanity").ObjectDefinition, "preview"> & {
-    preview?: import("sanity").PreviewConfig<{
-        lat: string;
-        lon: string;
-    }, Record<"lat" | "lon", any>> | undefined;
-}) | ({
+    type: "image";
+    name: "favicon";
+} & Omit<import("sanity").ImageDefinition, "preview"> & {
+    preview?: import("sanity").PreviewConfig<Record<string, string>, Record<never, any>> | undefined;
+} & import("sanity").FieldDefinitionBase & import("sanity").WidenValidation & import("sanity").WidenInitialValue) | ({
     type: "text";
     name: "metaDescription";
 } & Omit<import("sanity").TextDefinition, "preview"> & import("sanity").FieldDefinitionBase & import("sanity").WidenValidation & import("sanity").WidenInitialValue) | ({
     type: "object";
-    name: "schemaMarkup";
-} & Omit<import("sanity").ObjectDefinition, "preview"> & {
-    preview?: import("sanity").PreviewConfig<{
-        title: string;
-        subtitle: string;
-    }, Record<"title" | "subtitle", any>> | undefined;
-}) | ({
-    type: "object";
     name: "searchIndexing";
 } & Omit<import("sanity").ObjectDefinition, "preview"> & {
-    preview?: import("sanity").PreviewConfig<Record<string, string>, Record<never, any>> | undefined;
-} & import("sanity").FieldDefinitionBase & import("sanity").WidenValidation & import("sanity").WidenInitialValue) | ({
-    type: "image";
-    name: "favicon";
-} & Omit<import("sanity").ImageDefinition, "preview"> & {
     preview?: import("sanity").PreviewConfig<Record<string, string>, Record<never, any>> | undefined;
 } & import("sanity").FieldDefinitionBase & import("sanity").WidenValidation & import("sanity").WidenInitialValue) | {
     name: string;

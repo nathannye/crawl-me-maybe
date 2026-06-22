@@ -1,5 +1,5 @@
 import { defineField } from "sanity";
-import { IndexingControls } from "../../../components/core";
+import { IndexingControls } from "../../components/core";
 
 export default defineField({
 	name: "searchIndexing",

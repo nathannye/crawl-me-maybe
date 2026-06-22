@@ -1,15 +1,13 @@
 import { definePlugin } from "sanity";
 import SeoLayoutWrapper from "./components/core/SeoLayoutWrapper";
-
+import documents from "./schemas/documents";
 import fieldGroups from "./schemas/fields";
-import global from "./schemas/global";
-import singleton from "./schemas/documents";
 
 export default definePlugin({
 	name: "crawl-me-maybe",
 
 	schema: {
-		types: [...fieldGroups, ...global, ...singleton],
+		types: [...fieldGroups, ...documents],
 	},
 	studio: {
 		components: {

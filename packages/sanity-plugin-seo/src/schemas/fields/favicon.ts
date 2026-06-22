@@ -1,5 +1,5 @@
 import { defineField } from "sanity";
-import FaviconPreview from "../../../components/core/Favicon/FaviconPreview";
+import FaviconPreview from "../../components/core/Favicon/FaviconPreview";
 
 export default defineField({
 	name: "favicon",

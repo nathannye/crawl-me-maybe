@@ -1,5 +1,5 @@
-import InputWithGlobalDefault from "../../../components/core/InputWithGlobalDefault";
-import PageSeoInput from "../../../components/core/PageSeoInput/PageSeoInput";
+import InputWithGlobalDefault from "../../components/core/InputWithGlobalDefault";
+import PageSeoInput from "../../components/core/PageSeoInput/PageSeoInput";
 declare const _default: {
     name: string;
     title: string;

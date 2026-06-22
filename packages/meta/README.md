@@ -22,9 +22,9 @@ npm install @crawl-me-maybe/meta
 ## Quick Start
 
 ```typescript
-import { mergeSeoData } from "@crawl-me-maybe/meta";
+import { buildMetadata } from "@crawl-me-maybe/meta";
 
-const meta = mergeSeoData(
+const meta = buildMetadata(
   {
     title: "About Us",
     slug: { slug: { current: "about" } },
@@ -43,7 +43,7 @@ const meta = mergeSeoData(
 
 ## Core Exports
 
-- `mergeSeoData` — merge page metadata with global SEO defaults
+- `buildMetadata` — merge page metadata with global SEO defaults
 - `createMetaTitle` — generate titles from a template
 - `createFavicons` — build favicon set from a Sanity asset
 - `urlFor` — Sanity image URL builder (requires `setConfig` first)

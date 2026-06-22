@@ -1,3 +1,3 @@
-import { seoDefaults } from "./global-seo-settings";
+import globalSeoSettings from "./global-seo-settings";
 
-export default [seoDefaults];
+export default [globalSeoSettings];

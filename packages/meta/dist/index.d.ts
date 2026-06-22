@@ -1,4 +1,4 @@
-export type { Favicon, MergedMetadata, PageMetadata, SeoDefaults, } from "~/utils";
-export { createFavicons, createMetaTitle, mergeSeoData, setConfig, urlFor, } from "~/utils";
 export type { SanityWebConfig } from "./config";
-export { getConfig } from "./config";
+export { getConfig, setConfig } from "./config";
+export type { Favicon, GlobalSeoSettings, MergedMetadata, RawPageMetadata, } from "./utils";
+export { buildMetadata, createFavicons, createMetaTitle } from "./utils";

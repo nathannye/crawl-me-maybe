@@ -1,12 +1,13 @@
 import type { SanityImageAssetDocument } from "@sanity/client";
 import { createFavicons, type Favicon } from "./favicon";
 import { createMetaTitle } from "./meta-title";
+import { normalizeUrl } from "./url";
 
 /**
  * Type for SEO defaults from seoDefaults singleton
  * Based on apps/cms/plugins/schema-markup/src/schemas/singleton/seo-defaults.ts
  */
-export type SeoDefaults = {
+export type GlobalSeoSettings = {
 	siteTitle: string;
 	pageTitleTemplate: string;
 	metaDescription?: string;
@@ -15,31 +16,20 @@ export type SeoDefaults = {
 	twitterHandle?: string;
 };
 
-/**
- * Type for page-level metadata
- * Based on apps/cms/plugins/schema-markup/src/schemas/fields/metadata/page-metadata.ts
- */
-
-type SanitySlug = { slug: { current?: string; fullUrl?: string } } | string;
-
-// This allows you to dynamically change the metadata field name on the page object
-export type PageMetadata<MetaKey extends string = "meta"> = {
-	schemaMarkup?: { type: string };
-	title: string;
-} & {
-	[metaKey in MetaKey]: {
-		description?: string;
-		canonicalUrl?: string;
-		metaImage?: SanityImageAssetDocument;
-		searchIndexing?: {
-			noIndex?: boolean;
-			noFollow?: boolean;
-		};
+export type RawPageMetadata = {
+	slug: {
+		current?: string;
 	};
-} & {
-	slug: SanitySlug;
+	title: string;
 	_createdAt?: string;
 	_updatedAt?: string;
+	description?: string;
+	canonicalUrl?: string;
+	metaImage?: SanityImageAssetDocument;
+	searchIndexing?: {
+		noIndex?: boolean;
+		noFollow?: boolean;
+	};
 };
 
 export type MergedMetadata = {
@@ -52,6 +42,10 @@ export type MergedMetadata = {
 	robots?: string;
 	schemaMarkup?: string;
 	siteTitle?: string;
+};
+
+type MergeSeoDataOptions = {
+	disableSelfCanonical?: boolean;
 };
 
 const buildRobotsString = ({
@@ -71,34 +65,49 @@ const buildRobotsString = ({
 	return parts.join(",");
 };
 
-/**
- * Merges page-level metadata with SEO defaults,
- * Page metadata takes precedence over defaults
- *
- * The `seoObjectName` parameter tells us which key to look for on the page object.
- * Typescript cannot statically verify the key, so types are a little looser at this access.
- */
-export const mergeSeoData = <MetaKey extends string = "meta">(
-	page?: PageMetadata<MetaKey>,
-	seoDefaults?: SeoDefaults,
-	seoObjectName: MetaKey = "meta" as MetaKey,
+const createCanonicalUrl = ({
+	slug = "/",
+	siteUrl,
+	disableSelfCanonical,
+	canonicalUrl,
+}: {
+	slug?: string;
+	siteUrl: string;
+	disableSelfCanonical?: boolean;
+	canonicalUrl?: string;
+}) => {
+	if (disableSelfCanonical) return canonicalUrl || undefined;
+	return normalizeUrl(siteUrl, slug);
+};
+
+export const buildMetadata = (
+	page?: RawPageMetadata,
+	seoDefaults?: GlobalSeoSettings,
+	options?: MergeSeoDataOptions,
 ): MergedMetadata => {
+	const { disableSelfCanonical = false } = options || {};
+
 	// If no data available, return minimal metadata
 	if (!page && !seoDefaults) {
-		console.warn("mergeSeoData: No page or seoDefaults provided");
+		console.warn("buildMetadata: No page or seoDefaults provided");
 		return {
 			title: undefined,
 			description: undefined,
+			canonicalUrl: undefined,
+			favicons: undefined,
+			twitterHandle: undefined,
+			robots: undefined,
+			schemaMarkup: undefined,
+			siteTitle: undefined,
 		};
 	}
 
 	// -------- Dynamic meta key extraction --------
-	const pageMeta = page?.[seoObjectName as keyof PageMetadata<MetaKey>];
-	const schemaMarkupType = page?.schemaMarkup?.type;
+	const pageMeta = page;
 
 	// If only defaults available
 	if (!page) {
-		console.warn("mergeSeoData: No page data provided");
+		console.warn("buildMetadata: No page data provided");
 		return {
 			title: seoDefaults?.siteTitle,
 			description: seoDefaults?.metaDescription,
@@ -110,33 +119,40 @@ export const mergeSeoData = <MetaKey extends string = "meta">(
 
 	// If only page data available (no defaults)
 	if (!seoDefaults) {
-		console.warn("mergeSeoData: No seoDefaults provided");
+		console.warn("buildMetadata: No seoDefaults provided");
 		return {
 			title: page.title,
 			description: pageMeta?.description,
 			canonicalUrl: pageMeta?.canonicalUrl,
-			schemaMarkup: schemaMarkupType,
 		};
 	}
+
+	const canonicalUrl = createCanonicalUrl({
+		slug: page?.slug?.current,
+		siteUrl: seoDefaults?.siteUrl,
+		disableSelfCanonical,
+		canonicalUrl: page?.canonicalUrl,
+	});
+	const robots = buildRobotsString(
+		pageMeta?.searchIndexing || { noIndex: false, noFollow: false },
+	);
+	const metaTitle = createMetaTitle(
+		page.title,
+		seoDefaults.siteTitle,
+		seoDefaults.pageTitleTemplate,
+	);
+	const description = pageMeta?.description || seoDefaults.metaDescription;
+	const favicons = createFavicons(seoDefaults.favicon);
 
 	// Both page and defaults available - merge them
 	return {
 		// Generate title using template
-		title: createMetaTitle(
-			page.title,
-			seoDefaults.siteTitle,
-			seoDefaults.pageTitleTemplate,
-		),
-		siteTitle: seoDefaults.siteTitle,
-		// Page metadata overrides defaults
-		description: pageMeta?.description || seoDefaults.metaDescription,
-		canonicalUrl: pageMeta?.canonicalUrl || seoDefaults.siteUrl,
+		title: metaTitle,
+		description: description,
+		canonicalUrl: canonicalUrl,
 		metaImage: pageMeta?.metaImage,
-		favicons: createFavicons(seoDefaults.favicon),
+		favicons: favicons,
 		twitterHandle: seoDefaults.twitterHandle,
-		robots: buildRobotsString(
-			pageMeta?.searchIndexing || { noIndex: false, noFollow: false },
-		),
-		schemaMarkup: schemaMarkupType,
+		robots: robots,
 	};
 };
