@@ -1,9 +1,5 @@
 import type { SanityImageAssetDocument } from "@sanity/client";
 import { type Favicon } from "./favicon";
-/**
- * Type for SEO defaults from seoDefaults singleton
- * Based on apps/cms/plugins/schema-markup/src/schemas/singleton/seo-defaults.ts
- */
 type OpenGraphType = "website" | "article" | "product";
 type TwitterCardStyle = "summary_large_image" | "summary" | "app" | "player";
 type TwitterMetadata = {

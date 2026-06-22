@@ -13,3 +13,6 @@ npm install @crawl-me-maybe/schema-markup
 pnpm add @crawl-me-maybe/schema-markup
 bun add @crawl-me-maybe/schema-markup
 ```
+
+## Supported Schemas
+[Complete list of Google-supported rich result schemas](https://developers.google.com/search/docs/appearance/structured-data/search-gallery)
