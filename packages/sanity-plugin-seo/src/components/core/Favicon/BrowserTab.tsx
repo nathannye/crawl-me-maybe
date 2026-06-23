@@ -4,8 +4,12 @@ import styles from "./favicon-preview.module.css";
 export default function BrowserTab({
 	url = "https://example.com",
 	favicon = "https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg",
-	title = "Facebook",
-}: { url?: string | null; favicon?: string | null; title?: string | null }) {
+	title = "Your Site",
+}: {
+	url?: string | null;
+	favicon?: string | null;
+	title?: string | null;
+}) {
 	const theme = useRootTheme();
 
 	return (

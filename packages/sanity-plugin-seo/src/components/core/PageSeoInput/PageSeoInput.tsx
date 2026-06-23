@@ -1,7 +1,14 @@
+import { buildSrc } from "@sanity-image/url-builder";
 import { Box, Flex } from "@sanity/ui";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { MdEdit, MdPreview } from "react-icons/md";
-import { type ObjectInputProps, useClient, useFormValue } from "sanity";
+import {
+	type ObjectInputProps,
+	useClient,
+	useDataset,
+	useFormValue,
+	useProjectId,
+} from "sanity";
 import { concatenatePageTitle } from "../../../utils/string";
 import ButtonWithIcon from "../../partials/ButtonWithIcon";
 import FacebookCard from "../../socials/facebook/FacebookCard";
@@ -29,6 +36,8 @@ const PREVIEW_GROUPS = [
 
 export default function PageSeoInput(props: ObjectInputProps) {
 	const client = useClient({ apiVersion: "2025-01-11" });
+	const dataset = useDataset();
+	const projectId = useProjectId();
 	const MODES = [
 		{ name: "fields", title: "Fields", icon: MdEdit },
 		{ name: "preview", title: "Preview", icon: MdPreview },
@@ -39,21 +48,43 @@ export default function PageSeoInput(props: ObjectInputProps) {
 	const [currentMode, setCurrentMode] = useState<SeoInputMode["name"]>(
 		MODES[0]?.name,
 	);
-	const [seoDefaults, setSeoDefaults] = useState<any>(null);
+	const [seoDefaults, setSeoDefaults] = useState<Record<string, unknown> | null>(
+		null,
+	);
 
 	useEffect(() => {
 		client.fetch(`*[_type == "globalSeoSettings"][0]`).then(setSeoDefaults);
 	}, [client]);
 
 	const document = useFormValue([]) || {};
+	const pageValue = (props.value || {}) as {
+		metaImage?: { asset?: { _ref?: string } };
+	};
+	const defaults = (seoDefaults || {}) as {
+		defaultMetaImage?: { asset?: { _ref?: string } };
+		siteTitle?: string;
+		pageTitleTemplate?: string;
+	};
+
+	const previewImageUrl = useMemo(() => {
+		const effectiveMetaImage = pageValue.metaImage ?? defaults.defaultMetaImage;
+		const assetRef = effectiveMetaImage?.asset?._ref;
+		if (!assetRef) return undefined;
+
+		return buildSrc({
+			id: assetRef,
+			baseUrl: `https://cdn.sanity.io/images/${projectId}/${dataset}/`,
+		})?.src;
+	}, [dataset, defaults.defaultMetaImage, pageValue.metaImage, projectId]);
 
 	const seoData = {
-		...(seoDefaults || {}),
-		...(props.value || {}),
+		...defaults,
+		...pageValue,
+		image: previewImageUrl,
 		title: concatenatePageTitle(
 			document?.title,
-			seoDefaults?.siteTitle,
-			seoDefaults?.pageTitleTemplate,
+			defaults.siteTitle,
+			defaults.pageTitleTemplate,
 		),
 		// merge description or other fields as needed
 	};
