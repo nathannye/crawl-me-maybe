@@ -12,6 +12,7 @@ For Schema.org JSON-LD, use [`@crawl-me-maybe/schema-markup`](../schema-markup).
 - [Features](#features)
 - [Quick start](#quick-start)
 - [Sanity queries](#sanity-queries)
+- [Build options](#build-options)
 - [Core exports](#core-exports)
 - [Output adapters](#output-adapters)
   - [toHtmlTags](#tohtmltags)
@@ -119,11 +120,37 @@ For Open Graph, consider appending Sanity image params (`?w=1200&h=630&fit=crop&
 - **Path** (e.g. `/about`) — joined with `siteUrl` internally
 - **Full URL** (e.g. `https://example.com/about`) — used as-is
 
+Path values require `seoDefaults.siteUrl` so they can be resolved into an absolute URL. If you call `buildMetadata(page)` without global defaults, only a full canonical URL can be returned safely.
+
 Pass paths from Studio as-is in your GROQ projection:
 
 ```groq
 "canonicalUrl": seo.canonicalUrl
 ```
+
+---
+
+## Build options
+
+`buildMetadata` accepts an optional third argument:
+
+```ts
+buildMetadata(page, globalSeoDefaults, {
+  disableSelfCanonical: false,
+  twitterCardStyle: "summary_large_image",
+  ogType: "website",
+  metadata: {},
+});
+```
+
+| Option | Type | Description |
+|---|---|---|
+| `disableSelfCanonical` | `boolean` | When `true`, no self-referential canonical is generated from `siteUrl` + slug. Explicit `canonicalUrl` values are still honored. |
+| `twitterCardStyle` | `"summary_large_image" \| "summary" \| "app" \| "player"` | Controls the generated Twitter card type. |
+| `ogType` | `"website" \| "article" \| "product"` | Controls `openGraph.type`. |
+| `metadata` | `Record<string, unknown>` | Extra values to merge into the returned metadata object. |
+
+`openGraph.url` currently comes from `globalSeoDefaults.siteUrl`. The canonical URL is exposed separately as `canonicalUrl` and is what the HTML, Next.js, and Nuxt adapters use for canonical links.
 
 ---
 

@@ -34,11 +34,11 @@ yarn add @crawl-me-maybe/sanity-plugin-seo
 
 ## Features
 
-- **Global defaults** — a `globalSeoSettings` singleton document that feeds fallback values to all page-level fields; editors always see what's being inherited
+- **Global defaults** — a `globalSeoSettings` singleton document that feeds fallback values to all page-level fields; editors always see what fallback is being displayed
 - **Page metadata** — a `pageMetadata` object type with meta description, meta image, and search indexing controls that each show and override the global default
 - **Social preview cards** — live editable previews for Facebook, Twitter/X, LinkedIn, and Google Search, built from page data
 - **Favicon browser-tab preview** — renders your favicon and site title in a mock browser tab with light/dark toggle
-- **robots.txt rules editor** — structured rule builder with a read-only `robots.txt` preview tab
+- **Robots.txt rules editor** — structured rule builder with a read-only `robots.txt` preview tab
 
 ## Getting started
 
@@ -101,7 +101,7 @@ Resolve the referenced document to a URL in your frontend query and pass it to `
 
 ### Adding SEO fields to a page document
 
-Include the `pageMetadata` object type on any document schema. Global defaults are displayed automatically but not inherited by the frontend, this must be wired manually.
+Include the `pageMetadata` object type on any document schema. Global defaults are displayed automatically in Studio, but frontend fallback merging must be wired manually.
 
 ```ts
 // schemas/page.ts
@@ -209,15 +209,15 @@ You are responsible for reading these fields and generating:
 
 ### `globalSeoSettings` document
 
-A singleton document that provides site-wide defaults. Page-level fields inherit from these values when empty.
+A singleton document that provides site-wide defaults. Page-level fields display these values in Studio when empty; frontend fallback merging is handled by your app.
 
 | Field | Sanity type | Required | Validation | Notes |
 |---|---|---|---|---|
 | `siteTitle` | `string` | ✅ | Required | Injected into `pageTitleTemplate` via `{siteTitle}` |
 | `pageTitleTemplate` | `string` | ✅ | Required | Custom token input; initial value `{pageTitle} - {siteTitle}` |
 | `siteUrl` | `url` | ✅ | Must start with `https://` | Used when generating canonical URLs, Open Graph URLs, and sitemap entries. |
-| `metaDescription` | `metaDescription` | — | Warn < 120 or > 160 chars | Default description inherited by all pages |
-| `defaultMetaImage` | `metaImage` | — | — | Default OG image inherited by all pages |
+| `metaDescription` | `metaDescription` | — | Warn < 120 or > 160 chars | Default description displayed by page metadata fields |
+| `defaultMetaImage` | `metaImage` | — | — | Default OG image displayed by page metadata fields |
 | `favicon` | `image` | — | — | Browser-tab preview in Studio. Controlled by `global.favicon` option |
 | `twitterHandle` | `string` | — | Must start with `@` | Social group |
 | `logo` | `image` | — | — | Used for Organization / WebSite schema markup |
@@ -245,6 +245,7 @@ These named types are registered by the plugin and can be reused in your own sch
 | Type name | Base type | Description |
 |---|---|---|
 | `metaDescription` | `text` | 3-row textarea with 120–160 char warnings |
+| `metaTitle` | `string` | Single-line title field with 50–60 char warnings |
 | `metaImage` | `image` | Standard image field for OG/social use |
 | `favicon` | `image` | Image with browser-tab preview component |
 | `searchIndexing` | `object` | noIndex + noFollow boolean controls |

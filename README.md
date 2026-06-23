@@ -2,7 +2,7 @@
 
 A suite of framework-agnostic tools for CMS-driven SEO.
 
-Other plugins place most of the work on editors, schema markup and metadata that users must fill in by hand, usually duplicating content that already exists. These libaries flip this and advocate for passing that content once in your template and saving editors the effort.
+Other plugins place most of the work on editors, schema markup and metadata that users must fill in by hand, usually duplicating content that already exists. These libraries flip this and advocate for passing that content once in your template and saving editors the effort.
 
 ---
 
@@ -76,7 +76,7 @@ yarn add @crawl-me-maybe/sitemap
 
 Builds Schema.org JSON-LD from Sanity content. Derive structured data from your existing content model — no extra editor fields required.
 
-Supports all non-deprecated Google rich result types including `Article`, `Product`, `Event`, `FAQPage`, `LocalBusiness`, `Organization`, `WebPage`, `WebSite`, and more.
+Includes typed builders for many Google-supported rich result schemas, including `Article`, `Product`, `Event`, `FAQPage`, `LocalBusiness`, `Organization`, `WebPage`, `WebSite`, and more.
 
 [See docs](./packages/schema-markup)
 
