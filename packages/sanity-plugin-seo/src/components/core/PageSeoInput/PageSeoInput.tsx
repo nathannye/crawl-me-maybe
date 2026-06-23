@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Text } from "@sanity/ui";
+import { Box, Flex } from "@sanity/ui";
 import { useEffect, useState } from "react";
 import { MdEdit, MdPreview } from "react-icons/md";
 import { type ObjectInputProps, useClient, useFormValue } from "sanity";

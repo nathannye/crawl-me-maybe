@@ -1,13 +1,14 @@
 .facebookCard {
 	border: 1px solid #1877f2;
 	background: #fff;
-	max-width: 500px;
+	width: 100%;
 	margin: 0 auto;
 	box-sizing: border-box;
 	font-family: Arial, sans-serif;
 	padding: 0;
-	gap: 0;
+	overflow: hidden;
 }
+
 .header {
 	display: flex;
 	gap: 1.2rem;
@@ -16,25 +17,27 @@
 	padding-bottom: 8px;
 	margin-bottom: 8px;
 }
+
+.imageWrapper {
+	width: 100%;
+	max-width: 100%;
+	overflow: hidden;
+}
+
 .image {
 	width: 100%;
-	height: 220px;
+	max-width: 100%;
+	aspect-ratio: 1.91 / 1;
 	object-fit: cover;
 	display: block;
 	border-bottom: 1px solid #f0f2f5;
-	margin: 8px 0 12px 0;
-}
-.cardSection {
-	margin: 16px 0;
 }
 
 @media (max-width: 600px) {
 	.facebookCard {
-		max-width: 99vw;
+		max-width: 100%;
 	}
-	.image {
-		height: 160px;
-	}
+
 	.header {
 		gap: 0.6rem;
 	}

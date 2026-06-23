@@ -2,11 +2,14 @@
 	border: 1px solid #1da1f2;
 	background: #fff;
 	max-width: 500px;
+	width: 100%;
 	margin: 0 auto;
 	box-sizing: border-box;
 	font-family: Arial, sans-serif;
 	padding: 0;
+	overflow: hidden;
 }
+
 .userRow {
 	display: flex;
 	gap: 1.2rem;
@@ -15,25 +18,29 @@
 	margin-bottom: 8px;
 	border-bottom: 1px solid #eaf5fe;
 }
+
+.imageWrapper {
+	width: 100%;
+	max-width: 100%;
+	padding: 0 12px;
+	box-sizing: border-box;
+}
+
 .imageLarge {
 	width: 100%;
-	height: 260px;
+	max-width: 100%;
+	aspect-ratio: 1.91 / 1;
 	object-fit: cover;
 	border-radius: 12px;
-	margin: 12px 0 18px 0;
+	margin: 12px 0 18px;
 	display: block;
-}
-.cardSection {
-	margin: 16px 0;
 }
 
 @media (max-width: 600px) {
 	.twitterCard {
-		max-width: 99vw;
+		max-width: 100%;
 	}
-	.imageLarge {
-		height: 160px;
-	}
+
 	.userRow {
 		gap: 0.6rem;
 	}

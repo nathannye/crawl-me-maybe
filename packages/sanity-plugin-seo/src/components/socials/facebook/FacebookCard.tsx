@@ -1,8 +1,8 @@
-import { Card, Stack, Text, Box, Avatar, Flex } from "@sanity/ui";
-import styles from "./FacebookCard.module.css";
-import { truncate } from "../../../utils/string";
+import { Avatar, Box, Flex, Stack, Text } from "@sanity/ui";
 import type { PreviewCardProps } from "../../../types";
+import { truncate } from "../../../utils/string";
 import SocialCardWrapper from "../../partials/SocialCardWrapper";
+import styles from "./FacebookCard.module.css";
 
 export function FacebookCard(props: PreviewCardProps) {
 	const fallback = {
@@ -17,10 +17,10 @@ export function FacebookCard(props: PreviewCardProps) {
 	const data = { ...fallback, ...props };
 
 	return (
-		<SocialCardWrapper>
+		<SocialCardWrapper className={styles.facebookCard}>
 			<Flex gap={2} padding={3} className={styles.header}>
 				<Avatar src={data.avatar} size={3} />
-				<Stack space={2}>
+				<Stack gap={2}>
 					<Text weight="semibold" size={2}>
 						{data.siteTitle}
 					</Text>
@@ -29,8 +29,12 @@ export function FacebookCard(props: PreviewCardProps) {
 					</Text>
 				</Stack>
 			</Flex>
-			<Box>
-				<img className={styles.image} src={data.image} alt="Facebook preview" />
+			<Box className={styles.imageWrapper}>
+				<img
+					className={styles.image}
+					src={data.image}
+					alt="Facebook preview"
+				/>
 			</Box>
 			<Box padding={3}>
 				<Stack space={3}>

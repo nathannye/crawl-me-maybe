@@ -1,3 +1,12 @@
+
+(function() {
+  var id = "__crawl-me-maybe-seo-styles__";
+  if (typeof document === "undefined" || document.getElementById(id)) return;
+  var style = document.createElement("style");
+  style.id = id;
+  style.textContent = "/* src/components/core/Favicon/favicon-preview.module.css */\n.card_znijeg[data-theme=\"dark\"] {\n  --card-bg: #22242a;\n  --tab-bg: #22242a;\n  --tab-shadow: 0px 1.5px 3px 0px #181a1f, 0px .5px .5px .2px #23272b;\n  --tab-border: 1.5px solid #32353b;\n  --tab-favicon-bg: #22242a;\n  --tab-favicon-border: 1px solid #44464a;\n  --tab-url-text-color: #e1e6f0;\n}\n\n.card_znijeg[data-theme=\"light\"] {\n  --card-bg: #fff;\n  --tab-bg: #fff;\n  --tab-shadow: 0px 1.5px 3px 0px #ececec, 0px .5px .5px .2px #d4d9db;\n  --tab-border: 1.5px solid #e7ebed;\n  --tab-favicon-bg: #fff;\n  --tab-favicon-border: 1px solid #e5e5e5;\n  --tab-url-text-color: #242629;\n}\n\n.card_znijeg [data-tab-display] {\n  background: var(--tab-bg);\n  font-family: \"system-ui\", -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;\n}\n\n.image-preview_znijeg img {\n  background: #ececec !important;\n}\n\n/* src/components/socials/facebook/FacebookCard.module.css */\n.facebookCard_iq-4hA {\n  box-sizing: border-box;\n  overflow: hidden;\n  background: #fff;\n  border: 1px solid #1877f2;\n  width: 100%;\n  margin: 0 auto;\n  padding: 0;\n  font-family: Arial, sans-serif;\n}\n\n.header_iq-4hA {\n  display: flex;\n  border-bottom: 1px solid #f0f2f5;\n  align-items:  center;\n  gap: 1.2rem;\n  margin-bottom: 8px;\n  padding-bottom: 8px;\n}\n\n.imageWrapper_iq-4hA {\n  overflow: hidden;\n  width: 100%;\n  max-width: 100%;\n}\n\n.image_iq-4hA {\n  aspect-ratio: 1.91;\n  object-fit: cover;\n  display: block;\n  border-bottom: 1px solid #f0f2f5;\n  width: 100%;\n  max-width: 100%;\n}\n\n@media (max-width: 600px) {\n  .facebookCard_iq-4hA {\n    max-width: 100%;\n  }\n\n  .header_iq-4hA {\n    gap: .6rem;\n  }\n}\n\n/* src/components/socials/google/GoogleEntry.module.css */\n.googleCard_yJDEgw {\n  box-sizing: border-box;\n  background: #fff;\n  border: 1px solid #e1e4e8;\n  max-width: 550px;\n  margin: 0 auto 24px;\n  padding: 0;\n  font-family: Arial, sans-serif;\n}\n\n.title_yJDEgw {\n  color: #1a0dab;\n  margin-bottom: .25em;\n}\n\n.site_yJDEgw {\n  color: #202124;\n  margin-bottom: .2em;\n  font-size: .97em;\n}\n\n.desc_yJDEgw {\n  color: #4d5156;\n}\n\n.cardSection_yJDEgw {\n  margin: 16px 0;\n}\n\n@media (max-width: 600px) {\n  .googleCard_yJDEgw {\n    max-width: 99vw;\n  }\n}\n\n/* src/components/socials/twitter/TwitterCard.module.css */\n.twitterCard_1NtJNQ {\n  box-sizing: border-box;\n  overflow: hidden;\n  background: #fff;\n  border: 1px solid #1da1f2;\n  width: 100%;\n  max-width: 500px;\n  margin: 0 auto;\n  padding: 0;\n  font-family: Arial, sans-serif;\n}\n\n.userRow_1NtJNQ {\n  display: flex;\n  border-bottom: 1px solid #eaf5fe;\n  align-items:  center;\n  gap: 1.2rem;\n  margin-bottom: 8px;\n  padding-bottom: 8px;\n}\n\n.imageWrapper_1NtJNQ {\n  box-sizing: border-box;\n  width: 100%;\n  max-width: 100%;\n  padding: 0 12px;\n}\n\n.imageLarge_1NtJNQ {\n  aspect-ratio: 1.91;\n  object-fit: cover;\n  display: block;\n  border-radius: 12px;\n  width: 100%;\n  max-width: 100%;\n  margin: 12px 0 18px;\n}\n\n@media (max-width: 600px) {\n  .twitterCard_1NtJNQ {\n    max-width: 100%;\n  }\n\n  .userRow_1NtJNQ {\n    gap: .6rem;\n  }\n}\n";
+  document.head.appendChild(style);
+})();
 // src/index.ts
 import { definePlugin } from "sanity";
 
@@ -156,41 +165,12 @@ import { defineField as defineField2 } from "sanity";
 
 // src/components/core/Favicon/FaviconPreview.tsx
 import { Box as Box2, Card, Flex as Flex3, useRootTheme as useRootTheme2 } from "@sanity/ui";
+import { buildSrc } from "@sanity-image/url-builder";
 import { useMemo } from "react";
-
-// src/components/core/Favicon/WindowControls.tsx
-import { Flex } from "@sanity/ui";
-import { jsxDEV as jsxDEV3 } from "react/jsx-dev-runtime";
-function WindowControls() {
-  const CONTROLS = [
-    { bg: "#ff5f57", title: "Close" },
-    { bg: "#ffbd2e", title: "Minimize" },
-    { bg: "#28c940", title: "Maximize" }
-  ];
-  return /* @__PURE__ */ jsxDEV3(Flex, {
-    align: "center",
-    style: {
-      gap: 6,
-      paddingRight: 16
-    },
-    children: CONTROLS.map((c, i) => /* @__PURE__ */ jsxDEV3("span", {
-      title: c.title,
-      style: {
-        display: "inline-block",
-        width: 11,
-        height: 11,
-        borderRadius: "50%",
-        background: c.bg,
-        border: "0.5px solid #bfbfbf",
-        boxSizing: "border-box",
-        boxShadow: i === 0 ? "0 0.5px 0.5px #c14545" : i === 2 ? "0 0.5px 0.5px #30993d" : "0 0.5px 0.5px #bfa350"
-      }
-    }, i, false, undefined, this))
-  }, undefined, false, undefined, this);
-}
+import { useDataset, useProjectId } from "sanity";
 
 // src/components/core/Favicon/BrowserTab.tsx
-import { Flex as Flex2, Text, useRootTheme } from "@sanity/ui";
+import { Flex, Text, useRootTheme } from "@sanity/ui";
 
 // src/components/core/Favicon/favicon-preview.module.css
 var favicon_preview_module_default = {
@@ -199,14 +179,14 @@ var favicon_preview_module_default = {
 };
 
 // src/components/core/Favicon/BrowserTab.tsx
-import { jsxDEV as jsxDEV4 } from "react/jsx-dev-runtime";
+import { jsxDEV as jsxDEV3 } from "react/jsx-dev-runtime";
 function BrowserTab({
   url = "https://example.com",
   favicon = "https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg",
   title = "Facebook"
 }) {
   const theme = useRootTheme();
-  return /* @__PURE__ */ jsxDEV4(Flex2, {
+  return /* @__PURE__ */ jsxDEV3(Flex, {
     gap: 2,
     "data-theme": theme.scheme,
     className: favicon_preview_module_default.card,
@@ -224,7 +204,7 @@ function BrowserTab({
       borderBottom: "none"
     },
     children: [
-      /* @__PURE__ */ jsxDEV4("img", {
+      /* @__PURE__ */ jsxDEV3("img", {
         src: favicon,
         width: 16,
         height: 16,
@@ -235,11 +215,11 @@ function BrowserTab({
           display: "block"
         }
       }, undefined, false, undefined, this),
-      /* @__PURE__ */ jsxDEV4(Flex2, {
+      /* @__PURE__ */ jsxDEV3(Flex, {
         direction: "column",
         justify: "center",
         align: "center",
-        children: /* @__PURE__ */ jsxDEV4(Text, {
+        children: /* @__PURE__ */ jsxDEV3(Text, {
           size: 1,
           style: {
             fontWeight: 500,
@@ -258,9 +238,38 @@ function BrowserTab({
   }, undefined, true, undefined, this);
 }
 
+// src/components/core/Favicon/WindowControls.tsx
+import { Flex as Flex2 } from "@sanity/ui";
+import { jsxDEV as jsxDEV4 } from "react/jsx-dev-runtime";
+function WindowControls() {
+  const CONTROLS = [
+    { bg: "#ff5f57", title: "Close" },
+    { bg: "#ffbd2e", title: "Minimize" },
+    { bg: "#28c940", title: "Maximize" }
+  ];
+  return /* @__PURE__ */ jsxDEV4(Flex2, {
+    align: "center",
+    style: {
+      gap: 6,
+      paddingRight: 16
+    },
+    children: CONTROLS.map((c, i) => /* @__PURE__ */ jsxDEV4("span", {
+      title: c.title,
+      style: {
+        display: "inline-block",
+        width: 11,
+        height: 11,
+        borderRadius: "50%",
+        background: c.bg,
+        border: "0.5px solid #bfbfbf",
+        boxSizing: "border-box",
+        boxShadow: i === 0 ? "0 0.5px 0.5px #c14545" : i === 2 ? "0 0.5px 0.5px #30993d" : "0 0.5px 0.5px #bfa350"
+      }
+    }, i, false, undefined, this))
+  }, undefined, false, undefined, this);
+}
+
 // src/components/core/Favicon/FaviconPreview.tsx
-import { buildSrc } from "@sanity-image/url-builder";
-import { useDataset, useProjectId } from "sanity";
 import { jsxDEV as jsxDEV5 } from "react/jsx-dev-runtime";
 function FaviconPreview(props) {
   const defaults = useSeoDefaults();
@@ -455,15 +464,7 @@ function ButtonWithIcon({
 }
 
 // src/components/socials/facebook/FacebookCard.tsx
-import { Stack, Text as Text6, Box as Box4, Avatar, Flex as Flex7 } from "@sanity/ui";
-
-// src/components/socials/facebook/FacebookCard.module.css
-var FacebookCard_module_default = {
-  facebookCard: "facebookCard_iq-4hA",
-  header: "header_iq-4hA",
-  image: "image_iq-4hA",
-  cardSection: "cardSection_iq-4hA"
-};
+import { Avatar, Box as Box4, Flex as Flex7, Stack, Text as Text6 } from "@sanity/ui";
 
 // src/components/partials/SocialCardWrapper.tsx
 import { Card as Card4 } from "@sanity/ui";
@@ -474,9 +475,18 @@ function SocialCardWrapper(props) {
     border: false,
     radius: 2,
     tone: "neutral",
+    className: props.className,
     children: props.children
   }, undefined, false, undefined, this);
 }
+
+// src/components/socials/facebook/FacebookCard.module.css
+var FacebookCard_module_default = {
+  facebookCard: "facebookCard_iq-4hA",
+  header: "header_iq-4hA",
+  imageWrapper: "imageWrapper_iq-4hA",
+  image: "image_iq-4hA"
+};
 
 // src/components/socials/facebook/FacebookCard.tsx
 import { jsxDEV as jsxDEV10 } from "react/jsx-dev-runtime";
@@ -491,6 +501,7 @@ function FacebookCard(props) {
   };
   const data = { ...fallback, ...props };
   return /* @__PURE__ */ jsxDEV10(SocialCardWrapper, {
+    className: FacebookCard_module_default.facebookCard,
     children: [
       /* @__PURE__ */ jsxDEV10(Flex7, {
         gap: 2,
@@ -502,7 +513,7 @@ function FacebookCard(props) {
             size: 3
           }, undefined, false, undefined, this),
           /* @__PURE__ */ jsxDEV10(Stack, {
-            space: 2,
+            gap: 2,
             children: [
               /* @__PURE__ */ jsxDEV10(Text6, {
                 weight: "semibold",
@@ -519,6 +530,7 @@ function FacebookCard(props) {
         ]
       }, undefined, true, undefined, this),
       /* @__PURE__ */ jsxDEV10(Box4, {
+        className: FacebookCard_module_default.imageWrapper,
         children: /* @__PURE__ */ jsxDEV10("img", {
           className: FacebookCard_module_default.image,
           src: data.image,
@@ -642,8 +654,8 @@ import { Avatar as Avatar3, Box as Box6, Flex as Flex9, Stack as Stack3, Text as
 var TwitterCard_module_default = {
   twitterCard: "twitterCard_1NtJNQ",
   userRow: "userRow_1NtJNQ",
-  imageLarge: "imageLarge_1NtJNQ",
-  cardSection: "cardSection_1NtJNQ"
+  imageWrapper: "imageWrapper_1NtJNQ",
+  imageLarge: "imageLarge_1NtJNQ"
 };
 
 // src/components/socials/twitter/TwitterCard.tsx
@@ -662,6 +674,7 @@ function TwitterCard(props) {
     ...props
   };
   return /* @__PURE__ */ jsxDEV12(SocialCardWrapper, {
+    className: TwitterCard_module_default.twitterCard,
     children: [
       /* @__PURE__ */ jsxDEV12(Flex9, {
         gap: 2,
@@ -690,6 +703,7 @@ function TwitterCard(props) {
         ]
       }, undefined, true, undefined, this),
       /* @__PURE__ */ jsxDEV12(Box6, {
+        className: TwitterCard_module_default.imageWrapper,
         children: /* @__PURE__ */ jsxDEV12("img", {
           className: TwitterCard_module_default.imageLarge,
           src: data.image,
@@ -865,7 +879,7 @@ import { defineField as defineField4 } from "sanity";
 
 // src/components/core/IndexingControls.tsx
 import { set } from "sanity";
-import { Button as Button3, Flex as Flex11, Stack as Stack4 } from "@sanity/ui";
+import { Button as Button2, Flex as Flex11, Stack as Stack4 } from "@sanity/ui";
 import { useCallback as useCallback2 } from "react";
 import { MdInfo, MdPlaylistRemove } from "react-icons/md";
 import { IoArrowRedo } from "react-icons/io5";
@@ -901,7 +915,7 @@ function IndexingControls(props) {
       /* @__PURE__ */ jsxDEV15(Flex11, {
         gap: 3,
         children: [
-          /* @__PURE__ */ jsxDEV15(Button3, {
+          /* @__PURE__ */ jsxDEV15(Button2, {
             width: "fill",
             icon: IoArrowRedo,
             mode: noFollow ? "default" : "ghost",
@@ -910,7 +924,7 @@ function IndexingControls(props) {
             tone: noFollow ? "critical" : "default",
             onClick: () => setValue("noFollow", !noFollow)
           }, undefined, false, undefined, this),
-          /* @__PURE__ */ jsxDEV15(Button3, {
+          /* @__PURE__ */ jsxDEV15(Button2, {
             width: "fill",
             icon: MdPlaylistRemove,
             mode: noIndex ? "default" : "ghost",
@@ -969,4 +983,4 @@ export {
   src_default as default
 };
 
-//# debugId=EE0B708D0319139E64756E2164756E21
+//# debugId=45C91FA1707C758E64756E2164756E21

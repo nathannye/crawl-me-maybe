@@ -1,4 +1,4 @@
-import { existsSync, mkdirSync, renameSync, rmSync } from "node:fs";
+import { existsSync, mkdirSync, readFileSync, renameSync, rmSync, writeFileSync } from "node:fs";
 
 const externals = [
 	"react",
@@ -31,8 +31,22 @@ mkdirSync("dist", { recursive: true });
 renameSync(".dist/index.js", "dist/index.js");
 if (existsSync(".dist/index.js.map"))
 	renameSync(".dist/index.js.map", "dist/index.js.map");
-if (existsSync(".dist/index.css"))
-	renameSync(".dist/index.css", "dist/index.css");
+
+if (existsSync(".dist/index.css")) {
+	const css = readFileSync(".dist/index.css", "utf-8");
+	const injection = `
+(function() {
+  var id = "__crawl-me-maybe-seo-styles__";
+  if (typeof document === "undefined" || document.getElementById(id)) return;
+  var style = document.createElement("style");
+  style.id = id;
+  style.textContent = ${JSON.stringify(css)};
+  document.head.appendChild(style);
+})();
+`;
+	const js = readFileSync("dist/index.js", "utf-8");
+	writeFileSync("dist/index.js", injection + js);
+}
 
 rmSync(".dist", { recursive: true });
 

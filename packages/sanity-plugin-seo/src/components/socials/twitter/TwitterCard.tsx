@@ -1,4 +1,4 @@
-import { Avatar, Box, Card, Flex, Stack, Text } from "@sanity/ui";
+import { Avatar, Box, Flex, Stack, Text } from "@sanity/ui";
 import type { PreviewCardProps } from "../../../types";
 import { truncate } from "../../../utils/string";
 import SocialCardWrapper from "../../partials/SocialCardWrapper";
@@ -19,7 +19,7 @@ export function TwitterCard(props: PreviewCardProps) {
 		...props,
 	};
 	return (
-		<SocialCardWrapper>
+		<SocialCardWrapper className={styles.twitterCard}>
 			<Flex gap={2} padding={3} className={styles.userRow}>
 				<Avatar src={data.avatar} size={3} />
 				<Stack space={2}>
@@ -31,7 +31,7 @@ export function TwitterCard(props: PreviewCardProps) {
 					</Text>
 				</Stack>
 			</Flex>
-			<Box>
+			<Box className={styles.imageWrapper}>
 				<img
 					className={styles.imageLarge}
 					src={data.image}
