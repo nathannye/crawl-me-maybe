@@ -7,7 +7,7 @@ export type BreadcrumbItemInput = {
 };
 
 export type BuildBreadcrumbListSchemaInput = {
-	pageUrl: string;
+	pagePath: string;
 	pageTitle: string;
 	items?: BreadcrumbItemInput[];
 };
@@ -20,8 +20,8 @@ function normalizePath(path: string): string {
 	return prefixed.replace(/\/+$/, "") || "/";
 }
 
-function createDerivedParentItems(pageUrl: string): BreadcrumbItemInput[] {
-	const normalized = normalizePath(pageUrl);
+function createDerivedParentItems(pagePath: string): BreadcrumbItemInput[] {
+	const normalized = normalizePath(pagePath);
 	const segments = normalized.split("/").filter(Boolean);
 
 	if (segments.length <= 1) return [];
@@ -42,16 +42,16 @@ function toListItems(items: BreadcrumbItemInput[]): ListItem[] {
 }
 
 export function buildBreadcrumbListSchema({
-	pageUrl,
+	pagePath,
 	pageTitle,
 	items,
 }: BuildBreadcrumbListSchemaInput): WithContext<BreadcrumbList> {
-	const parentItems = items?.length ? items : createDerivedParentItems(pageUrl);
+	const parentItems = items?.length ? items : createDerivedParentItems(pagePath);
 	const finalItems = [
 		...parentItems,
 		{
 			title: pageTitle,
-			url: normalizePath(pageUrl),
+			url: normalizePath(pagePath),
 		},
 	];
 

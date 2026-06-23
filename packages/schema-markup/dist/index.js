@@ -296,8 +296,8 @@ function normalizePath(path) {
   const prefixed = withoutQuery.startsWith("/") ? withoutQuery : `/${withoutQuery}`;
   return prefixed.replace(/\/+$/, "") || "/";
 }
-function createDerivedParentItems(pageUrl) {
-  const normalized = normalizePath(pageUrl);
+function createDerivedParentItems(pagePath) {
+  const normalized = normalizePath(pagePath);
   const segments = normalized.split("/").filter(Boolean);
   if (segments.length <= 1)
     return [];
@@ -315,16 +315,16 @@ function toListItems(items) {
   }));
 }
 function buildBreadcrumbListSchema({
-  pageUrl,
+  pagePath,
   pageTitle,
   items
 }) {
-  const parentItems = items?.length ? items : createDerivedParentItems(pageUrl);
+  const parentItems = items?.length ? items : createDerivedParentItems(pagePath);
   const finalItems = [
     ...parentItems,
     {
       title: pageTitle,
-      url: normalizePath(pageUrl)
+      url: normalizePath(pagePath)
     }
   ];
   return {
@@ -514,5 +514,5 @@ export {
   asIdReference
 };
 
-//# debugId=76AE2B40C167835964756E2164756E21
+//# debugId=353BAB7279BFA2D564756E2164756E21
 //# sourceMappingURL=index.js.map

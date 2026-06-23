@@ -1,14 +1,17 @@
 # @crawl-me-maybe/schema-markup
 
-Schema markup should be generated from your content model, not rebuilt beside it. At all costs, avoid breaking the guarantee that schema markup reflects the content model.
+Schema markup should be generated from your content model, not rebuilt beside it. If editors update the content, the schema should update with it.
 
 ## Table of contents
 
 - [Install](#install)
 - [Features](#features)
 - [Why this exists](#why-this-exists)
+- [What `buildSchemaMarkup` generates](#what-buildschemamerkup-generates)
 - [Quick start](#quick-start)
-- [Rendering JSON-LD](#rendering-json-ld)
+- [`mainEntity`](#mainentity)
+- [`@id` and de-duplication](#id-and-de-duplication)
+- [Rendering the graph](#rendering-the-graph)
 - [Supported schemas](#supported-schemas)
 - [Core exports](#core-exports)
 - [License](#license)
@@ -38,6 +41,34 @@ Schema markup from CMS → frontend is usually handled with a bulk of fields tha
 
 ---
 
+## What `buildSchemaMarkup` generates
+
+`buildSchemaMarkup` creates the page-level schema graph for a single URL. It always generates:
+
+- a site identity node (`Organization`, `Person`, or `LocalBusiness`)
+- a `WebSite` node
+- a `WebPage` node
+
+You can optionally attach additional entities such as:
+
+- `Article`
+- `Product`
+- `FAQPage`
+- `Event`
+- `BreadcrumbList`
+
+These are linked into the same graph as the page's main entity, breadcrumb trail, or supporting nodes.
+
+A typical article page graph looks like:
+
+- `Organization` — who owns the site
+- `WebSite` — the site itself
+- `WebPage` — the current page
+- `BreadcrumbList` — optional page hierarchy
+- `Article` — the page's main content entity
+
+---
+
 ## Quick start
 
 ```ts
@@ -60,7 +91,7 @@ const schemas = buildSchemaMarkup({
   pageTitle: "Hello world",
   pageDescription: "An intro post from Acme.",
   breadcrumb: buildBreadcrumbListSchema({
-    pageUrl: "/blog/hello-world",
+    pagePath: "/blog/hello-world",
     pageTitle: "Hello world",
   }),
   mainEntity: buildArticle({
@@ -72,11 +103,36 @@ const schemas = buildSchemaMarkup({
 });
 ```
 
+In this example, `buildSchemaMarkup` creates the site identity, `WebSite`, and `WebPage` nodes automatically, then attaches the breadcrumb and article as part of the same graph.
+
 `buildSchemaMarkup` returns `string[]`, with each string ready to render in a `<script type="application/ld+json">`.
 
 ---
 
-## Rendering JSON-LD
+## `mainEntity`
+
+Use `mainEntity` for the primary entity the page is about.
+
+Common examples:
+
+- blog post → `buildArticle(...)`
+- product page → `buildProduct(...)`
+- event page → `buildEvent(...)`
+- FAQ page → `buildFAQPage(...)`
+
+If a page has no clear primary entity, you can omit `mainEntity` and render just the page-level graph.
+
+---
+
+## `@id` and de-duplication
+
+If multiple nodes reference the same entity, give them the same `@id`. The library will collapse duplicates into a single graph node where possible.
+
+In most cases, `buildSchemaMarkup` handles page-level identity, `WebSite`, and `WebPage` IDs for you. You'll mainly care about `@id` when composing custom or nested entities manually.
+
+---
+
+## Rendering the graph
 
 ```tsx
 {schemas.map((schema) => (
@@ -92,38 +148,50 @@ const schemas = buildSchemaMarkup({
 
 ## Supported schemas
 
-Builders are exported from the package root:
+Builders are exported from the package root.
+
+### Common page entities
 
 | Builder | Schema.org type |
 |---|---|
-| `buildAboutPage` | `AboutPage` |
-| `buildAggregateRating` | `AggregateRating` |
-| `buildAnswer` | `Answer` |
 | `buildArticle` | `Article` |
-| `buildComment` | `Comment` |
-| `buildContactPage` | `ContactPage` |
-| `buildCourse` | `Course` |
-| `buildDataset` | `Dataset` |
-| `buildDiscussionForumPosting` | `DiscussionForumPosting` |
+| `buildProduct` | `Product` |
 | `buildEvent` | `Event` |
 | `buildFAQPage` | `FAQPage` |
-| `buildItemList` | `ItemList` |
-| `buildJobPosting` | `JobPosting` |
-| `buildLocalBusiness` | `LocalBusiness` |
-| `buildMovie` | `Movie` |
-| `buildOrganization` | `Organization` |
-| `buildProduct` | `Product` |
-| `buildProfilePage` | `ProfilePage` |
-| `buildQAPage` | `QAPage` |
-| `buildQuestion` | `Question` |
 | `buildRecipe` | `Recipe` |
-| `buildReview` | `Review` |
 | `buildSoftwareApplication` | `SoftwareApplication` |
+| `buildCourse` | `Course` |
+| `buildDataset` | `Dataset` |
+| `buildMovie` | `Movie` |
 | `buildVacationRental` | `VacationRental` |
 | `buildVideoObject` | `VideoObject` |
-| `buildWebPage` | `WebPage` |
+| `buildJobPosting` | `JobPosting` |
+
+### Site / structural entities
+
+| Builder | Schema.org type |
+|---|---|
+| `buildOrganization` | `Organization` |
+| `buildLocalBusiness` | `LocalBusiness` |
 | `buildWebSite` | `WebSite` |
+| `buildWebPage` | `WebPage` |
 | `buildBreadcrumbListSchema` | `BreadcrumbList` |
+| `buildAboutPage` | `AboutPage` |
+| `buildContactPage` | `ContactPage` |
+| `buildProfilePage` | `ProfilePage` |
+
+### Supporting / nested entities
+
+| Builder | Schema.org type |
+|---|---|
+| `buildAggregateRating` | `AggregateRating` |
+| `buildReview` | `Review` |
+| `buildComment` | `Comment` |
+| `buildQuestion` | `Question` |
+| `buildAnswer` | `Answer` |
+| `buildQAPage` | `QAPage` |
+| `buildDiscussionForumPosting` | `DiscussionForumPosting` |
+| `buildItemList` | `ItemList` |
 
 See Google's [structured data gallery](https://developers.google.com/search/docs/appearance/structured-data/search-gallery) for which schema types are eligible for rich results.
 

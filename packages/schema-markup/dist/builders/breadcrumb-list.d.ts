@@ -4,8 +4,8 @@ export type BreadcrumbItemInput = {
     url: string;
 };
 export type BuildBreadcrumbListSchemaInput = {
-    pageUrl: string;
+    pagePath: string;
     pageTitle: string;
     items?: BreadcrumbItemInput[];
 };
-export declare function buildBreadcrumbListSchema({ pageUrl, pageTitle, items, }: BuildBreadcrumbListSchemaInput): WithContext<BreadcrumbList>;
+export declare function buildBreadcrumbListSchema({ pagePath, pageTitle, items, }: BuildBreadcrumbListSchemaInput): WithContext<BreadcrumbList>;
