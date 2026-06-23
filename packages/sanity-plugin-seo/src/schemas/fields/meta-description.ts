@@ -8,22 +8,27 @@ export default defineField({
 	title: "Meta Description",
 	type: "text",
 	rows: 3,
-	description:
-		`The description of the page used in meta tags. ${MIN_CHARACTERS}-${MAX_CHARACTERS} characters is recommended to avoid truncation.`,
-	validation: (Rule) =>
+	description: `The description of the page used in meta tags. ${MIN_CHARACTERS}-${MAX_CHARACTERS} characters is recommended to avoid truncation.`,
+	validation: (Rule) => [
 		Rule.custom((value) => {
+			const currentLength = value?.length || 0;
+
 			if (
 				typeof value === "string" &&
-				value.length > 0 &&
-				value.length < MIN_CHARACTERS
+				currentLength > 0 &&
+				currentLength < MIN_CHARACTERS
 			) {
-				return `Short descriptions (under ${MIN_CHARACTERS} characters) could be more descriptive.`;
+				return `Short descriptions (under ${MIN_CHARACTERS} characters) could be more descriptive. Current length: ${currentLength}`;
 			}
-
-			if (typeof value === "string" && value.length > MAX_CHARACTERS) {
-				return `Long descriptions (over ${MAX_CHARACTERS} characters) will be truncated in search results.`;
-			}
-
 			return true;
 		}).warning(),
+		Rule.custom((value) => {
+			const currentLength = value?.length || 0;
+
+			if (typeof value === "string" && currentLength > MAX_CHARACTERS) {
+				return `Long descriptions (over ${MAX_CHARACTERS} characters) will be truncated in search results. Current length: ${currentLength}`;
+			}
+			return true;
+		}).warning(),
+	],
 });

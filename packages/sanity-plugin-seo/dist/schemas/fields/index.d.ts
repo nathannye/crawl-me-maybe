@@ -1,4 +1,5 @@
-declare const _default: (({
+import type { PluginOptions } from "../../types";
+export default function buildFieldTypes(options?: PluginOptions): (({
     type: "image";
     name: "favicon";
 } & Omit<import("sanity").ImageDefinition, "preview"> & {
@@ -14,15 +15,7 @@ declare const _default: (({
 } & import("sanity").FieldDefinitionBase & import("sanity").WidenValidation & import("sanity").WidenInitialValue) | ({
     type: "string";
     name: "metaTitle";
-} & Omit<import("sanity").StringDefinition, "preview"> & import("sanity").FieldDefinitionBase & import("sanity").WidenValidation & import("sanity").WidenInitialValue) | ({
-    type: "array";
-    name: "robots";
-} & Omit<import("sanity").ArrayDefinition, "preview"> & import("sanity").FieldDefinitionBase & import("sanity").WidenValidation & import("sanity").WidenInitialValue) | ({
-    type: "object";
-    name: "searchIndexing";
-} & Omit<import("sanity").ObjectDefinition, "preview"> & {
-    preview?: import("sanity").PreviewConfig<Record<string, string>, Record<never, any>> | undefined;
-} & import("sanity").FieldDefinitionBase & import("sanity").WidenValidation & import("sanity").WidenInitialValue) | {
+} & Omit<import("sanity").StringDefinition, "preview"> & import("sanity").FieldDefinitionBase & import("sanity").WidenValidation & import("sanity").WidenInitialValue) | {
     name: string;
     title: string;
     components: {
@@ -59,5 +52,12 @@ declare const _default: (({
         type: string;
         title?: undefined;
     })[];
-})[];
-export default _default;
+} | ({
+    type: "array";
+    name: "robots";
+} & Omit<import("sanity").ArrayDefinition, "preview"> & import("sanity").FieldDefinitionBase & import("sanity").WidenValidation & import("sanity").WidenInitialValue) | ({
+    type: "object";
+    name: "searchIndexing";
+} & Omit<import("sanity").ObjectDefinition, "preview"> & {
+    preview?: import("sanity").PreviewConfig<Record<string, string>, Record<never, any>> | undefined;
+} & import("sanity").FieldDefinitionBase & import("sanity").WidenValidation & import("sanity").WidenInitialValue))[];

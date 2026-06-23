@@ -1,3 +1,6 @@
-import globalSeoSettings from "./global-seo-settings";
+import type { PluginOptions } from "../../types";
+import buildGlobalSeoSettings from "./global-seo-settings";
 
-export default [globalSeoSettings];
+export default function buildDocuments(options?: PluginOptions) {
+	return [buildGlobalSeoSettings(options)];
+}

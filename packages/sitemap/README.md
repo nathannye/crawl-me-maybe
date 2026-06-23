@@ -288,6 +288,36 @@ export async function GET() {
 }
 ```
 
+### c. With @crawl-me-maybe/sanity-plugin-seo
+
+If you use [`@crawl-me-maybe/sanity-plugin-seo`](../sanity-plugin-seo), the robots rules stored in `globalSeoSettings.advanced.robots` share the same shape as `RobotsRule`. Fetch them from Sanity and pass them directly — no mapping needed.
+
+```ts
+// app/robots.txt/route.ts
+import { generateRobotsTxt, type RobotsRule } from "@crawl-me-maybe/sitemap";
+import { client } from "@/lib/sanityClient";
+
+export const dynamic = "force-dynamic";
+
+export async function GET() {
+  const settings = await client.fetch<{
+    siteUrl?: string;
+    advanced?: { robots?: RobotsRule[] };
+  }>(`*[_type == "globalSeoSettings"][0]{ siteUrl, advanced }`);
+
+  const domain = settings?.siteUrl ?? "https://example.com";
+  const rules = settings?.advanced?.robots;
+
+  const robots = generateRobotsTxt(domain, "sitemap.xml", rules);
+
+  return new Response(robots, {
+    headers: { "Content-Type": "text/plain" },
+  });
+}
+```
+
+If `rules` is `undefined` (not configured in Studio), `generateRobotsTxt` falls back to `DEFAULT_ROBOTS_RULES` automatically.
+
 ---
 
 ## Config reference

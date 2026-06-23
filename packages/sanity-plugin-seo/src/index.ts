@@ -1,17 +1,23 @@
 import { definePlugin } from "sanity";
 import SeoLayoutWrapper from "./components/core/SeoLayoutWrapper";
-import documents from "./schemas/documents";
-import fieldGroups from "./schemas/fields";
+import buildDocuments from "./schemas/documents";
+import buildFieldTypes from "./schemas/fields";
+import type { PluginOptions } from "./types";
 
-export default definePlugin({
+export type { PluginOptions };
+
+export default definePlugin<PluginOptions | undefined>((options) => ({
 	name: "crawl-me-maybe",
 
 	schema: {
-		types: [...fieldGroups, ...documents],
+		types: [
+			...buildFieldTypes(options ?? undefined),
+			...buildDocuments(options ?? undefined),
+		],
 	},
 	studio: {
 		components: {
 			layout: SeoLayoutWrapper,
 		},
 	},
-});
+}));

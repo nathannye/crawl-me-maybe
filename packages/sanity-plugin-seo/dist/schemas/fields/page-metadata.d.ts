@@ -1,6 +1,7 @@
 import InputWithGlobalDefault from "../../components/core/InputWithGlobalDefault";
 import PageSeoInput from "../../components/core/PageSeoInput/PageSeoInput";
-declare const _default: {
+import type { PluginOptions } from "../../types";
+export default function buildPageMetadata(options?: PluginOptions): {
     name: string;
     title: string;
     components: {
@@ -38,4 +39,3 @@ declare const _default: {
         title?: undefined;
     })[];
 };
-export default _default;

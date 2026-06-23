@@ -204,113 +204,123 @@ function PageTitleTemplateInput(props) {
 }
 
 // src/schemas/documents/global-seo-settings.ts
-var global_seo_settings_default = defineType({
-  name: "globalSeoSettings",
-  title: "Global SEO Settings",
-  type: "document",
-  groups: [
-    {
-      name: "metadata",
-      title: "Metadata",
-      default: true,
-      icon: MdSearch
-    },
-    {
-      name: "social",
-      title: "Social",
-      icon: MdShare
-    }
-  ],
-  fields: [
-    defineField({
-      name: "siteTitle",
-      title: "Site Title",
-      type: "string",
-      description: "The title of the site injected into the Page Title Template field below.",
-      validation: (Rule) => Rule.required()
-    }),
-    defineField({
-      name: "pageTitleTemplate",
-      title: "Page Title Template",
-      type: "string",
-      components: {
-        input: PageTitleTemplateInput
+function buildGlobalSeoSettings(options) {
+  const includeFavicon = options?.global?.favicon !== false;
+  const includeRobots = options?.global?.robots !== false;
+  return defineType({
+    name: "globalSeoSettings",
+    title: "Global SEO Settings",
+    type: "document",
+    groups: [
+      {
+        name: "metadata",
+        title: "Metadata",
+        default: true,
+        icon: MdSearch
       },
-      description: "Template for page titles. Use {siteTitle} and {pageTitle} for the page title. Example: {pageTitle} - {siteTitle}",
-      validation: (Rule) => Rule.required(),
-      initialValue: "{pageTitle} - {siteTitle}"
-    }),
-    defineField({
-      name: "siteUrl",
-      title: "Site URL",
-      type: "url",
-      description: "Root URL of the website (e.g. https://your-domain.com). Used for canonical and Open Graph tags.",
-      validation: (Rule) => Rule.custom((value) => {
-        if (!value)
-          return "Site URL is required";
-        if (typeof value !== "string")
-          return "Site URL must be a string";
-        if (!value.startsWith("https://"))
-          return "Site URL must start with https://";
-        return true;
-      })
-    }),
-    defineField({
-      name: "metaDescription",
-      type: "metaDescription",
-      description: "The default meta description for all pages."
-    }),
-    defineField({
-      name: "defaultMetaImage",
-      type: "metaImage",
-      description: "The default meta image for all pages if not overridden on the page."
-    }),
-    defineField({
-      name: "favicon",
-      type: "favicon"
-    }),
-    defineField({
-      name: "twitterHandle",
-      title: "Twitter Handle",
-      type: "string",
-      description: "Example: @yourbrand",
-      validation: (rule) => rule.custom((val) => {
-        if (!val)
-          return true;
-        if (typeof val !== "string")
-          return "Twitter handle must be a string";
-        if (!val.startsWith("@"))
-          return "Twitter handle must start with @";
-        return true;
+      {
+        name: "social",
+        title: "Social",
+        icon: MdShare
+      }
+    ],
+    fields: [
+      defineField({
+        name: "siteTitle",
+        title: "Site Title",
+        type: "string",
+        description: "The title of the site injected into the Page Title Template field below.",
+        validation: (Rule) => Rule.required()
       }),
-      group: "social"
-    }),
-    defineField({
-      name: "logo",
-      title: "Global Logo",
-      type: "image",
-      description: "Logo used behind the scenes to populate Organization and WebSite schema markup."
-    }),
-    defineField({
-      name: "advanced",
-      type: "object",
-      fields: [
-        {
-          name: "robots",
-          type: "robots"
-        }
-      ]
-    })
-  ],
-  preview: {
-    prepare() {
-      return { title: "Global SEO Settings" };
+      defineField({
+        name: "pageTitleTemplate",
+        title: "Page Title Template",
+        type: "string",
+        components: {
+          input: PageTitleTemplateInput
+        },
+        description: "Template for page titles. Use {siteTitle} and {pageTitle} for the page title. Example: {pageTitle} - {siteTitle}",
+        validation: (Rule) => Rule.required(),
+        initialValue: "{pageTitle} - {siteTitle}"
+      }),
+      defineField({
+        name: "siteUrl",
+        title: "Site URL",
+        type: "url",
+        description: "Root URL of the website (e.g. https://your-domain.com). Used for canonical and Open Graph tags.",
+        validation: (Rule) => Rule.custom((value) => {
+          if (!value)
+            return "Site URL is required";
+          if (typeof value !== "string")
+            return "Site URL must be a string";
+          if (!value.startsWith("https://"))
+            return "Site URL must start with https://";
+          return true;
+        })
+      }),
+      defineField({
+        name: "metaDescription",
+        type: "metaDescription",
+        description: "The default meta description for all pages."
+      }),
+      defineField({
+        name: "defaultMetaImage",
+        type: "metaImage",
+        description: "The default meta image for all pages if not overridden on the page."
+      }),
+      ...includeFavicon ? [
+        defineField({
+          name: "favicon",
+          type: "favicon"
+        })
+      ] : [],
+      defineField({
+        name: "twitterHandle",
+        title: "Twitter Handle",
+        type: "string",
+        description: "Example: @yourbrand",
+        validation: (rule) => rule.custom((val) => {
+          if (!val)
+            return true;
+          if (typeof val !== "string")
+            return "Twitter handle must be a string";
+          if (!val.startsWith("@"))
+            return "Twitter handle must start with @";
+          return true;
+        }),
+        group: "social"
+      }),
+      defineField({
+        name: "logo",
+        title: "Global Logo",
+        type: "image",
+        description: "Logo used behind the scenes to populate Organization and WebSite schema markup."
+      }),
+      ...includeRobots ? [
+        defineField({
+          name: "advanced",
+          type: "object",
+          fields: [
+            {
+              name: "robots",
+              type: "robots"
+            }
+          ]
+        })
+      ] : []
+    ],
+    preview: {
+      prepare() {
+        return { title: "Global SEO Settings" };
+      }
     }
-  }
-});
+  });
+}
 
 // src/schemas/documents/index.ts
-var documents_default = [global_seo_settings_default];
+function buildDocuments(options) {
+  return [buildGlobalSeoSettings(options)];
+}
 
 // src/schemas/fields/favicon.ts
 import { defineField as defineField2 } from "sanity";
@@ -530,15 +540,20 @@ var meta_description_default = defineField3({
   type: "text",
   rows: 3,
   description: `The description of the page used in meta tags. ${MIN_CHARACTERS}-${MAX_CHARACTERS} characters is recommended to avoid truncation.`,
-  validation: (Rule) => Rule.custom((value) => {
-    if (typeof value === "string" && value.length > 0 && value.length < MIN_CHARACTERS) {
-      return `Short descriptions (under ${MIN_CHARACTERS} characters) could be more descriptive.`;
-    }
-    if (typeof value === "string" && value.length > MAX_CHARACTERS) {
-      return `Long descriptions (over ${MAX_CHARACTERS} characters) will be truncated in search results.`;
-    }
-    return true;
-  }).warning()
+  validation: (Rule) => [
+    Rule.custom((value) => {
+      if (typeof value === "string" && value.length > 0 && value.length < MIN_CHARACTERS) {
+        return `Short descriptions (under ${MIN_CHARACTERS} characters) could be more descriptive.`;
+      }
+      return true;
+    }).warning(),
+    Rule.custom((value) => {
+      if (typeof value === "string" && value.length > MAX_CHARACTERS) {
+        return `Long descriptions (over ${MAX_CHARACTERS} characters) will be truncated in search results.`;
+      }
+      return true;
+    }).warning()
+  ]
 });
 
 // src/schemas/fields/meta-image.ts
@@ -1285,43 +1300,48 @@ function PageSeoInput(props) {
   }, undefined, true, undefined, this);
 }
 
-// src/schemas/fields/metadata.ts
-var metadata_default = {
-  name: "pageMetadata",
-  title: "Metadata",
-  components: {
-    input: PageSeoInput
-  },
-  type: "object",
-  fields: [
-    {
-      name: "description",
-      title: "Meta Description",
-      components: {
-        input: InputWithGlobalDefault
-      },
-      options: {
-        matchingDefaultField: "metaDescription"
-      },
-      type: "metaDescription"
+// src/schemas/fields/page-metadata.ts
+function buildPageMetadata(options) {
+  const includeSearchIndexing = options?.page?.searchIndexing !== false;
+  return {
+    name: "pageMetadata",
+    title: "Metadata",
+    components: {
+      input: PageSeoInput
     },
-    {
-      name: "searchIndexing",
-      type: "searchIndexing"
-    },
-    {
-      name: "metaImage",
-      components: {
-        input: InputWithGlobalDefault
+    type: "object",
+    fields: [
+      {
+        name: "description",
+        title: "Meta Description",
+        components: {
+          input: InputWithGlobalDefault
+        },
+        options: {
+          matchingDefaultField: "metaDescription"
+        },
+        type: "metaDescription"
       },
-      options: {
-        matchingDefaultField: "defaultMetaImage"
-      },
-      description: "Displayed when the site link is posted on social media, defaults to a screenshot of the homepage.",
-      type: "metaImage"
-    }
-  ]
-};
+      ...includeSearchIndexing ? [
+        {
+          name: "searchIndexing",
+          type: "searchIndexing"
+        }
+      ] : [],
+      {
+        name: "metaImage",
+        components: {
+          input: InputWithGlobalDefault
+        },
+        options: {
+          matchingDefaultField: "defaultMetaImage"
+        },
+        description: "Displayed when the site link is posted on social media, defaults to a screenshot of the homepage.",
+        type: "metaImage"
+      }
+    ]
+  };
+}
 
 // src/schemas/fields/robots.ts
 import { FaRobot } from "react-icons/fa";
@@ -1462,7 +1482,8 @@ var robots_default = defineField6({
         {
           name: "userAgent",
           title: "User Agent",
-          type: "string"
+          type: "string",
+          validation: (Rule) => Rule.required()
         },
         {
           name: "allow",
@@ -1572,30 +1593,37 @@ var search_indexing_default = defineField7({
 });
 
 // src/schemas/fields/index.ts
-var fields_default = [
-  search_indexing_default,
-  favicon_default,
-  metadata_default,
-  meta_description_default,
-  meta_title_default,
-  meta_image_default,
-  robots_default
-];
+function buildFieldTypes(options) {
+  const includeFavicon = options?.global?.favicon !== false;
+  const includeRobots = options?.global?.robots !== false;
+  return [
+    search_indexing_default,
+    buildPageMetadata(options),
+    meta_description_default,
+    meta_title_default,
+    meta_image_default,
+    ...includeFavicon ? [favicon_default] : [],
+    ...includeRobots ? [robots_default] : []
+  ];
+}
 
 // src/index.ts
-var src_default = definePlugin({
+var src_default = definePlugin((options) => ({
   name: "crawl-me-maybe",
   schema: {
-    types: [...fields_default, ...documents_default]
+    types: [
+      ...buildFieldTypes(options ?? undefined),
+      ...buildDocuments(options ?? undefined)
+    ]
   },
   studio: {
     components: {
       layout: SeoLayoutWrapper
     }
   }
-});
+}));
 export {
   src_default as default
 };
 
-//# debugId=7F8F110B61E911A464756E2164756E21
+//# debugId=249E2AEF569E58F064756E2164756E21
