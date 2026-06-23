@@ -25,6 +25,7 @@ export type GlobalSeoSettings = {
 	metaDescription?: string;
 	siteUrl: string;
 	favicon?: SanityImageAssetDocument;
+	defaultMetaImage?: string;
 	twitterHandle?: string;
 };
 
@@ -37,7 +38,7 @@ export type RawPageMetadata = {
 	_updatedAt?: string;
 	description?: string;
 	canonicalUrl?: string;
-	metaImage?: SanityImageAssetDocument;
+	metaImage?: string;
 	searchIndexing?: {
 		noIndex?: boolean;
 		noFollow?: boolean;
@@ -48,7 +49,7 @@ export type MergedMetadata = {
 	title?: string;
 	description?: string;
 	canonicalUrl?: string;
-	metaImage?: SanityImageAssetDocument;
+	metaImage?: string;
 	twitterHandle?: string;
 	robots?: string;
 	schemaMarkup?: string;
@@ -167,6 +168,7 @@ export const buildMetadata = (
 			description: seoDefaults?.metaDescription,
 			canonicalUrl: seoDefaults?.siteUrl,
 			twitterHandle: seoDefaults?.twitterHandle,
+			metaImage: seoDefaults?.defaultMetaImage,
 		};
 	}
 
@@ -177,6 +179,7 @@ export const buildMetadata = (
 			title: page.title,
 			description: pageMeta?.description,
 			canonicalUrl: pageMeta?.canonicalUrl,
+			metaImage: pageMeta?.metaImage,
 		};
 	}
 
@@ -214,7 +217,7 @@ export const buildMetadata = (
 		title: metaTitle,
 		description: description,
 		canonicalUrl: canonicalUrl,
-		metaImage: pageMeta?.metaImage,
+		metaImage: pageMeta?.metaImage ?? seoDefaults.defaultMetaImage,
 		twitter: twitter,
 		openGraph: openGraph,
 		robots: robots,

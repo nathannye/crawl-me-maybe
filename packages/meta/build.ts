@@ -1,15 +1,18 @@
-import { existsSync, mkdirSync, renameSync, rmSync } from "node:fs";
+import { mkdirSync, readdirSync, renameSync, rmSync } from "node:fs";
+import { join } from "node:path";
 
 const externals = [
 	"@sanity/client",
 	"@sanity-image/url-builder",
 	"@sanity/image-url",
+	"next",
+	"zhead",
 ];
 
 rmSync("dist", { recursive: true, force: true });
 
 const result = await Bun.build({
-	entrypoints: ["src/index.ts"],
+	entrypoints: ["src/index.ts", "src/next.ts", "src/nuxt.ts"],
 	outdir: ".dist",
 	format: "esm",
 	sourcemap: "external",
@@ -24,10 +27,10 @@ if (!result.success) {
 
 mkdirSync("dist", { recursive: true });
 
-renameSync(".dist/index.js", "dist/index.js");
-if (existsSync(".dist/index.js.map"))
-	renameSync(".dist/index.js.map", "dist/index.js.map");
+for (const file of readdirSync(".dist")) {
+	renameSync(join(".dist", file), join("dist", file));
+}
 
 rmSync(".dist", { recursive: true });
 
-console.log("Built dist/index.js (ESM)");
+console.log("Built dist/index.js, dist/next.js, dist/nuxt.js (ESM)");

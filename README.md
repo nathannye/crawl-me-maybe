@@ -8,7 +8,9 @@ Other plugins place most of the work on editors, schema markup and metadata that
 
 ## Packages
 
-### [`@crawl-me-maybe/sanity-plugin-seo`](./packages/sanity-plugin-seo)
+### Sanity Plugin
+
+[See docs](./packages/sanity-plugin-seo)
 
 Sanity Studio plugin with SEO fields, global defaults, and social/search preview cards.
 
@@ -27,14 +29,15 @@ yarn add @crawl-me-maybe/sanity-plugin-seo
 
 ---
 
-### [`@crawl-me-maybe/meta`](./packages/meta)
+### Frontend Metadata Transformer
 
-Framework-agnostic runtime helpers to merge page and global SEO metadata, generate meta titles, and build Sanity image URLs.
+Runtime helpers to merge page and global SEO metadata, generate meta titles, and build Sanity image URLs.
 
 - Merge page-level and global SEO defaults
 - Meta title templates (`{pageTitle} - {siteTitle}`)
 - Multi-format favicon generation from Sanity assets
 - Sanity image URL helpers
+- Explicit Nuxt and Next helpers, with generic HTML tag helper for other frameworks
 
 ```bash
 npm install @crawl-me-maybe/meta
@@ -45,14 +48,11 @@ yarn add @crawl-me-maybe/meta
 
 ---
 
-### [`@crawl-me-maybe/sitemap`](./packages/sitemap)
+### Sitemap
 
-Minimal sitemap generator. Query your CMS, pass the result, done.
+Minimal sitemap generator. Query your CMS, pass the result, done. Supports localization and multiple sitemaps.
 
-- `generateSitemap` — standard XML sitemap
-- `generateIndexSitemap` — sitemap index pointing to child sitemaps
-- `generateRobotsTxt` — robots.txt string from structured rules
-- Vite plugin available at `@crawl-me-maybe/sitemap/vite`
+[See docs](./packages/sitemap)
 
 ```bash
 npm install @crawl-me-maybe/sitemap
@@ -63,11 +63,13 @@ yarn add @crawl-me-maybe/sitemap
 
 ---
 
-### [`@crawl-me-maybe/schema-markup`](./packages/schema-markup)
+## Schema Markup (JSON-LD)
 
 Builds Schema.org JSON-LD from Sanity content. Derive structured data from your existing content model — no extra editor fields required.
 
 Supports all non-deprecated Google rich result types including `Article`, `Product`, `Event`, `FAQPage`, `LocalBusiness`, `Organization`, `WebPage`, `WebSite`, and more.
+
+[See docs](./packages/schema-markup)
 
 ```bash
 npm install @crawl-me-maybe/schema-markup

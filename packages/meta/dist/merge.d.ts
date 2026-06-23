@@ -19,6 +19,7 @@ export type GlobalSeoSettings = {
     metaDescription?: string;
     siteUrl: string;
     favicon?: SanityImageAssetDocument;
+    defaultMetaImage?: string;
     twitterHandle?: string;
 };
 export type RawPageMetadata = {
@@ -30,7 +31,7 @@ export type RawPageMetadata = {
     _updatedAt?: string;
     description?: string;
     canonicalUrl?: string;
-    metaImage?: SanityImageAssetDocument;
+    metaImage?: string;
     searchIndexing?: {
         noIndex?: boolean;
         noFollow?: boolean;
@@ -40,7 +41,7 @@ export type MergedMetadata = {
     title?: string;
     description?: string;
     canonicalUrl?: string;
-    metaImage?: SanityImageAssetDocument;
+    metaImage?: string;
     twitterHandle?: string;
     robots?: string;
     schemaMarkup?: string;

@@ -1,7 +1,8 @@
 import { buildMetadata } from "@crawl-me-maybe/meta";
-import { buildSchemaMarkup } from "@crawl-me-maybe/schema-markup";
+import { toNextMeta } from "@crawl-me-maybe/meta/next";
 import SchemaMarkup from "@/components/SchemaMarkup";
-import { getDocumentBySlug, getDocumentByType } from "@/lib/sanityClient";
+import { getGlobalSeoSettings, getPageForMetadata } from "@/lib/seo";
+import { getDocumentBySlug } from "@/lib/sanityClient";
 
 export async function generateMetadata({
 	params,
@@ -9,11 +10,14 @@ export async function generateMetadata({
 	params: { slug: string };
 }) {
 	const { slug } = await params;
-	const defaults = await getDocumentByType("globalSeoSettings");
-	const page = await getDocumentBySlug("page", slug);
-	const metadata = buildMetadata(page, defaults);
+	const [defaults, page] = await Promise.all([
+		getGlobalSeoSettings(),
+		getPageForMetadata(slug),
+	]);
 
-	return metadata;
+	if (!page || !defaults) return {};
+
+	return toNextMeta(buildMetadata(page, defaults));
 }
 
 export default async function DynamicPage({
