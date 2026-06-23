@@ -41,11 +41,6 @@ export default defineType({
 			initialValue: "{pageTitle} - {siteTitle}",
 		}),
 		defineField({
-			name: "metaDescription",
-			type: "metaDescription",
-			description: "The default meta description for all pages.",
-		}),
-		defineField({
 			name: "siteUrl",
 			title: "Site URL",
 			type: "url",
@@ -60,6 +55,12 @@ export default defineType({
 					return true;
 				}),
 		}),
+		defineField({
+			name: "metaDescription",
+			type: "metaDescription",
+			description: "The default meta description for all pages.",
+		}),
+
 		defineField({
 			name: "defaultMetaImage",
 			type: "metaImage",
@@ -90,6 +91,16 @@ export default defineType({
 			type: "image",
 			description:
 				"Logo used behind the scenes to populate Organization and WebSite schema markup.",
+		}),
+		defineField({
+			name: "advanced",
+			type: "object",
+			fields: [
+				{
+					name: "robots",
+					type: "robots",
+				},
+			],
 		}),
 	],
 	preview: {

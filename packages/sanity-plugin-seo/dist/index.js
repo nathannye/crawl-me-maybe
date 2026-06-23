@@ -241,11 +241,6 @@ var global_seo_settings_default = defineType({
       initialValue: "{pageTitle} - {siteTitle}"
     }),
     defineField({
-      name: "metaDescription",
-      type: "metaDescription",
-      description: "The default meta description for all pages."
-    }),
-    defineField({
       name: "siteUrl",
       title: "Site URL",
       type: "url",
@@ -259,6 +254,11 @@ var global_seo_settings_default = defineType({
           return "Site URL must start with https://";
         return true;
       })
+    }),
+    defineField({
+      name: "metaDescription",
+      type: "metaDescription",
+      description: "The default meta description for all pages."
     }),
     defineField({
       name: "defaultMetaImage",
@@ -290,6 +290,16 @@ var global_seo_settings_default = defineType({
       title: "Global Logo",
       type: "image",
       description: "Logo used behind the scenes to populate Organization and WebSite schema markup."
+    }),
+    defineField({
+      name: "advanced",
+      type: "object",
+      fields: [
+        {
+          name: "robots",
+          type: "robots"
+        }
+      ]
     })
   ],
   preview: {
@@ -1313,8 +1323,104 @@ var metadata_default = {
   ]
 };
 
-// src/schemas/fields/search-indexing.ts
+// src/schemas/fields/robots.ts
+import { FaRobot } from "react-icons/fa";
 import { defineField as defineField6 } from "sanity";
+var validateRobotsDirectivePath = (value) => {
+  if (value === undefined || value === null || value === "")
+    return true;
+  if (typeof value !== "string")
+    return "Must be a string path";
+  const trimmed = value.trim();
+  if (!trimmed)
+    return "Path cannot be empty";
+  if (!trimmed.startsWith("/")) {
+    return "Path must start with '/' (e.g. /, /private, /api/)";
+  }
+  return true;
+};
+var robots_default = defineField6({
+  name: "robots",
+  title: "Robots",
+  description: "Define robots.txt rules",
+  type: "object",
+  fields: [
+    {
+      name: "aiRules",
+      type: "object",
+      fields: [
+        {
+          name: "blockAiCrawlers",
+          title: "User Agent",
+          type: "string"
+        },
+        {
+          name: "blockAiTraining",
+          title: "Block AI Training",
+          type: "boolean"
+        }
+      ]
+    },
+    {
+      name: "rules",
+      title: "Rules",
+      type: "array",
+      of: [
+        {
+          type: "object",
+          title: "Rule",
+          icon: FaRobot,
+          options: {
+            columns: 3
+          },
+          preview: {
+            select: {
+              userAgent: "userAgent",
+              allow: "allow",
+              disallow: "disallow"
+            },
+            prepare({ userAgent, allow, disallow }) {
+              const parts = [];
+              if (allow)
+                parts.push(`Allow: ${allow}`);
+              if (disallow)
+                parts.push(`Disallow: ${disallow}`);
+              if (parts.length === 0)
+                parts.push("No rules");
+              return {
+                title: userAgent,
+                subtitle: parts.join(`, 
+`)
+              };
+            }
+          },
+          fields: [
+            {
+              name: "userAgent",
+              title: "User Agent",
+              type: "string"
+            },
+            {
+              name: "allow",
+              title: "Allow",
+              type: "string",
+              validation: (Rule) => Rule.custom(validateRobotsDirectivePath)
+            },
+            {
+              name: "disallow",
+              title: "Disallow",
+              type: "string",
+              validation: (Rule) => Rule.custom(validateRobotsDirectivePath)
+            }
+          ]
+        }
+      ]
+    }
+  ]
+});
+
+// src/schemas/fields/search-indexing.ts
+import { defineField as defineField7 } from "sanity";
 
 // src/components/core/IndexingControls.tsx
 import { set as set2 } from "sanity";
@@ -1382,7 +1488,7 @@ import { Box as Box10 } from "@sanity/ui";
 import { MdCheck as MdCheck2, MdWarning as MdWarning2 } from "react-icons/md";
 import { jsxDEV as jsxDEV18 } from "react/jsx-dev-runtime";
 // src/schemas/fields/search-indexing.ts
-var search_indexing_default = defineField6({
+var search_indexing_default = defineField7({
   name: "searchIndexing",
   title: "Search Indexing",
   type: "object",
@@ -1410,7 +1516,8 @@ var fields_default = [
   metadata_default,
   meta_description_default,
   meta_title_default,
-  meta_image_default
+  meta_image_default,
+  robots_default
 ];
 
 // src/index.ts
@@ -1429,4 +1536,4 @@ export {
   src_default as default
 };
 
-//# debugId=22583FBBD72810F364756E2164756E21
+//# debugId=8C5E5760972C58A664756E2164756E21

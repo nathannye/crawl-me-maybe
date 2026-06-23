@@ -1,5 +1,7 @@
 declare const _default: {
-    type: "array";
+    type: "object";
     name: "robots";
-} & Omit<import("sanity").ArrayDefinition, "preview"> & import("sanity").FieldDefinitionBase & import("sanity").WidenValidation & import("sanity").WidenInitialValue;
+} & Omit<import("sanity").ObjectDefinition, "preview"> & {
+    preview?: import("sanity").PreviewConfig<Record<string, string>, Record<never, any>> | undefined;
+} & import("sanity").FieldDefinitionBase & import("sanity").WidenValidation & import("sanity").WidenInitialValue;
 export default _default;

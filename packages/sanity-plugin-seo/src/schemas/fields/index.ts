@@ -3,6 +3,7 @@ import metaDescription from "./meta-description";
 import metaImage from "./meta-image";
 import metaTitle from "./meta-title";
 import metadata from "./metadata";
+import robots from "./robots";
 import indexing from "./search-indexing";
 
 export default [
@@ -12,4 +13,5 @@ export default [
 	metaDescription,
 	metaTitle,
 	metaImage,
+	robots,
 ];
