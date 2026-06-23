@@ -120,6 +120,8 @@ Browser-tab preview for dynamic favicons with theme-switching button. Can be dis
 ## Robots.txt
 Preview-enabled array field for robots.txt entries. Disabled by setting `global.robots` to `false`.
 
+> 🧠 Note: This plugin only generates a preview, you are still responsible for exposing and formatting this to your frontend.
+
 <img width="697" height="318" alt="Screenshot 2026-06-23 at 1 18 44 PM" src="https://github.com/user-attachments/assets/7592bdbc-a39c-44d9-b801-4e566e499919" />
 <img width="682" height="333" alt="Screenshot 2026-06-23 at 1 18 50 PM" src="https://github.com/user-attachments/assets/f8d7444c-cb8a-4571-80a8-352699dd36fc" />
 <br/>
