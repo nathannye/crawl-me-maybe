@@ -4,6 +4,33 @@ SEO fields, global defaults, and social preview cards for Sanity Studio.
 
 > Built for Sanity v5 and v6
 
+## Table of contents
+
+- [Install](#install)
+- [Features](#features)
+- [Getting started](#getting-started)
+  - [Plugin configuration](#plugin-configuration)
+  - [Adding SEO fields to a page document](#adding-seo-fields-to-a-page-document)
+  - [Studio structure — surfacing Global SEO Settings](#studio-structure--surfacing-global-seo-settings)
+- [Favicons](#favicons)
+- [Robots.txt](#robotstxt)
+- [Frontend integration](#frontend-integration)
+- [Schemas](#schemas)
+  - [`globalSeoSettings` document](#globalseoSettings-document)
+  - [`pageMetadata` object](#pagemetadata-object)
+  - [Shared field types](#shared-field-types)
+
+## Install
+
+```bash
+npm install @crawl-me-maybe/sanity-plugin-seo
+pnpm add @crawl-me-maybe/sanity-plugin-seo
+bun add @crawl-me-maybe/sanity-plugin-seo
+yarn add @crawl-me-maybe/sanity-plugin-seo
+```
+
+---
+
 ## Features
 
 - **Global defaults** — a `globalSeoSettings` singleton document that feeds fallback values to all page-level fields; editors always see what's being inherited
@@ -12,7 +39,9 @@ SEO fields, global defaults, and social preview cards for Sanity Studio.
 - **Favicon browser-tab preview** — renders your favicon and site title in a mock browser tab with light/dark toggle
 - **robots.txt rules editor** — structured rule builder with a read-only `robots.txt` preview tab
 
-## Getting Started
+## Getting started
+
+### Plugin configuration
 
 Pass options to the plugin to enable or disable individual features. All options default to `true`.
 

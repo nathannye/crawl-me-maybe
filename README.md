@@ -1,62 +1,91 @@
-> 🚨 These libraries are still under heavy active development, they are not ready for primetime usage.
-
 # Crawl me maybe
+
 A suite of framework-agnostic tools for CMS-driven SEO.
 
-Other plugins place most of the work on editors, schema markup and bunches of metadata that the user must duplicate. Your users are busy, pass this dupliated content once in your template and save them the time.
+Other plugins place most of the work on editors, schema markup and metadata that users must fill in by hand, usually duplicating content that already exists. These libaries flip this and advocate for passing that content once in your template and saving editors the effort.
 
-## Features
-- Schema Markup handlers for every non-deprecated type (full list here)
-- Global schema markup defaults
-- Global schema markup dataset that can be re-used
-- Sanity Plugin 
-- Global defaults with visual indications of completeness
-- Social previews
-- Search result previews
-- Dynamic favicons
+---
 
+## Packages
 
-## Schema Markup (JSON-LD)
+### [`@crawl-me-maybe/sanity-plugin-seo`](./packages/sanity-plugin-seo)
 
+Sanity Studio plugin with SEO fields, global defaults, and social/search preview cards.
 
+- `globalSeoSettings` singleton document with site title, page title template, default OG image, favicon, and robots rules
+- `pageMetadata` object type — add to any document; each field shows the active global default when empty
+- Social preview cards for Facebook, Twitter/X, LinkedIn, and Google Search
+- Favicon browser-tab preview with light/dark toggle
+- `robots.txt` rule builder with live preview tab
 
-## Web (SEO runtime)
-`@crawl-me-maybe/meta`
+```bash
+npm install @crawl-me-maybe/sanity-plugin-seo
+pnpm add @crawl-me-maybe/sanity-plugin-seo
+bun add @crawl-me-maybe/sanity-plugin-seo
+yarn add @crawl-me-maybe/sanity-plugin-seo
+```
 
-Framework-agnostic helpers to merge SEO metadata, generate meta titles, favicons, and Sanity image URLs.
+---
 
-## Schema Markup (JSON-LD)
-`@crawl-me-maybe/schema-markup`
+### [`@crawl-me-maybe/meta`](./packages/meta)
 
-Builds Schema.org JSON-LD from Sanity content. Depends on `@crawl-me-maybe/meta` for merged metadata. Pairs with `@crawl-me-maybe/sanity` for CMS field definitions.
+Framework-agnostic runtime helpers to merge page and global SEO metadata, generate meta titles, and build Sanity image URLs.
 
-### buildSeoPayload
-Builds a complete SEO payload for a page by merging global defaults, page metadata, and optional schema config. Field names align with `@crawl-me-maybe/sanity`.
+- Merge page-level and global SEO defaults
+- Meta title templates (`{pageTitle} - {siteTitle}`)
+- Multi-format favicon generation from Sanity assets
+- Sanity image URL helpers
 
-Returns:
-- `meta`: merged title/description/canonical, favicons, robots string, twitter handle, etc.
-- `schemas`: an array of JSON‑LD objects (`schema-dts` `Thing[]`) ready to render.
+```bash
+npm install @crawl-me-maybe/meta
+pnpm add @crawl-me-maybe/meta
+bun add @crawl-me-maybe/meta
+yarn add @crawl-me-maybe/meta
+```
 
-Typical usage flow:
-1) Provide `projectId` and `dataset` so images/favicons resolve.
-2) Pass `globalSeoDefaults` and the page's `pageMetadata`.
-3) Optionally pass `schemaDefaults` and `pageSchemaType` to emit JSON‑LD.
-4) Render `schemas` as `<script type="application/ld+json">` and apply `meta` to the page head.
+---
 
+### [`@crawl-me-maybe/sitemap`](./packages/sitemap)
 
-## Sitemap
-`@crawl-me-maybe/sitemap`
+Minimal sitemap generator. Query your CMS, pass the result, done.
 
-A stupid-simple sitemap generator, query your CMS and pass the result, done. Supports minification.
+- `generateSitemap` — standard XML sitemap
+- `generateIndexSitemap` — sitemap index pointing to child sitemaps
+- `generateRobotsTxt` — robots.txt string from structured rules
+- Vite plugin available at `@crawl-me-maybe/sitemap/vite`
 
-**Supported properties**
-- url
-- changefreq
-- priority
-- images
-- videos
+```bash
+npm install @crawl-me-maybe/sitemap
+pnpm add @crawl-me-maybe/sitemap
+bun add @crawl-me-maybe/sitemap
+yarn add @crawl-me-maybe/sitemap
+```
 
-## Sanity SEO
-`@crawl-me-maybe/sanity`
+---
 
-Sanity Studio plugin with SEO and Schema Markup fields, defaults, and custom components. Does not generate JSON-LD by itself — use `@crawl-me-maybe/schema-markup` on the frontend.
+### [`@crawl-me-maybe/schema-markup`](./packages/schema-markup)
+
+Builds Schema.org JSON-LD from Sanity content. Derive structured data from your existing content model — no extra editor fields required.
+
+Supports all non-deprecated Google rich result types including `Article`, `Product`, `Event`, `FAQPage`, `LocalBusiness`, `Organization`, `WebPage`, `WebSite`, and more.
+
+```bash
+npm install @crawl-me-maybe/schema-markup
+pnpm add @crawl-me-maybe/schema-markup
+bun add @crawl-me-maybe/schema-markup
+yarn add @crawl-me-maybe/schema-markup
+```
+
+---
+
+## How the packages fit together
+
+```
+Sanity Studio
+  └── @crawl-me-maybe/sanity-plugin-seo   ← editors fill in SEO fields
+
+Your app / site
+  ├── @crawl-me-maybe/meta                ← merge page + global metadata
+  ├── @crawl-me-maybe/schema-markup       ← derive JSON-LD from Sanity content
+  └── @crawl-me-maybe/sitemap             ← generate sitemap.xml and robots.txt
+```

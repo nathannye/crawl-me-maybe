@@ -26,9 +26,9 @@ This package takes a simpler approach. You provide routes, it generates sitemap.
 ## Install
 
 ```bash
-bun add @crawl-me-maybe/sitemap
 npm install @crawl-me-maybe/sitemap
 pnpm add @crawl-me-maybe/sitemap
+bun add @crawl-me-maybe/sitemap
 yarn add @crawl-me-maybe/sitemap
 ```
 

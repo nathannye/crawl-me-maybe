@@ -6,11 +6,24 @@ SEO utilities for Sanity-driven sites: merge page and global metadata, generate 
 
 For Schema.org JSON-LD, use [`@crawl-me-maybe/schema-markup`](../schema-markup).
 
-## Installation
+## Table of contents
+
+- [Install](#install)
+- [Features](#features)
+- [Quick start](#quick-start)
+- [Core exports](#core-exports)
+- [License](#license)
+
+## Install
 
 ```bash
 npm install @crawl-me-maybe/meta
+pnpm add @crawl-me-maybe/meta
+bun add @crawl-me-maybe/meta
+yarn add @crawl-me-maybe/meta
 ```
+
+---
 
 ## Features
 
@@ -19,7 +32,9 @@ npm install @crawl-me-maybe/meta
 - Multi-format favicon generation from Sanity assets
 - Sanity image URL helpers
 
-## Quick Start
+---
+
+## Quick start
 
 ```typescript
 import { buildMetadata } from "@crawl-me-maybe/meta";
@@ -41,7 +56,9 @@ const meta = buildMetadata(
 );
 ```
 
-## Core Exports
+---
+
+## Core exports
 
 - `buildMetadata` — merge page metadata with global SEO defaults
 - `createMetaTitle` — generate titles from a template
@@ -49,13 +66,7 @@ const meta = buildMetadata(
 - `urlFor` — Sanity image URL builder (requires `setConfig` first)
 - `setConfig` / `getConfig` — project ID and dataset for image URLs
 
-## Scripts
-
-```bash
-bun run lint
-bun run fix
-bun run build
-```
+---
 
 ## License
 
