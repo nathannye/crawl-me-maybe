@@ -6,19 +6,28 @@ Other plugins place most of the work on editors, schema markup and metadata that
 
 ---
 
+
+## How the packages fit together
+
+```
+Sanity Studio
+  └── @crawl-me-maybe/sanity-plugin-seo   ← editors fill in SEO fields
+
+Your app / site
+  ├── @crawl-me-maybe/meta                ← merge page + global metadata
+  ├── @crawl-me-maybe/schema-markup       ← derive JSON-LD from Sanity content
+  └── @crawl-me-maybe/sitemap             ← generate sitemap.xml and robots.txt
+```
+
+
 ## Packages
 
 ### Sanity Plugin
 
-[See docs](./packages/sanity-plugin-seo)
 
 Sanity Studio plugin with SEO fields, global defaults, and social/search preview cards.
 
-- `globalSeoSettings` singleton document with site title, page title template, default OG image, favicon, and robots rules
-- `pageMetadata` object type — add to any document; each field shows the active global default when empty
-- Social preview cards for Facebook, Twitter/X, LinkedIn, and Google Search
-- Favicon browser-tab preview with light/dark toggle
-- `robots.txt` rule builder with live preview tab
+[See docs](./packages/sanity-plugin-seo)
 
 ```bash
 npm install @crawl-me-maybe/sanity-plugin-seo
@@ -32,6 +41,8 @@ yarn add @crawl-me-maybe/sanity-plugin-seo
 ### Frontend Metadata Transformer
 
 Runtime helpers to merge page and global SEO metadata, generate meta titles, and build Sanity image URLs.
+
+[See docs](./packages/meta)
 
 - Merge page-level and global SEO defaults
 - Meta title templates (`{pageTitle} - {siteTitle}`)
@@ -63,7 +74,7 @@ yarn add @crawl-me-maybe/sitemap
 
 ---
 
-## Schema Markup (JSON-LD)
+## Schema.org Markup (JSON-LD)
 
 Builds Schema.org JSON-LD from Sanity content. Derive structured data from your existing content model — no extra editor fields required.
 
@@ -80,14 +91,3 @@ yarn add @crawl-me-maybe/schema-markup
 
 ---
 
-## How the packages fit together
-
-```
-Sanity Studio
-  └── @crawl-me-maybe/sanity-plugin-seo   ← editors fill in SEO fields
-
-Your app / site
-  ├── @crawl-me-maybe/meta                ← merge page + global metadata
-  ├── @crawl-me-maybe/schema-markup       ← derive JSON-LD from Sanity content
-  └── @crawl-me-maybe/sitemap             ← generate sitemap.xml and robots.txt
-```
