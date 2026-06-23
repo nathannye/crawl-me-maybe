@@ -1425,63 +1425,56 @@ var robots_default = defineField6({
   name: "robots",
   title: "Robots",
   description: "Define robots.txt rules",
-  type: "object",
-  fields: [
+  type: "array",
+  components: {
+    input: RobotsRulesInput
+  },
+  of: [
     {
-      name: "rules",
-      title: "Rules",
-      type: "array",
-      components: {
-        input: RobotsRulesInput
+      type: "object",
+      title: "Rule",
+      icon: FaRobot,
+      options: {
+        columns: 3
       },
-      of: [
-        {
-          type: "object",
-          title: "Rule",
-          icon: FaRobot,
-          options: {
-            columns: 3
-          },
-          preview: {
-            select: {
-              userAgent: "userAgent",
-              allow: "allow",
-              disallow: "disallow"
-            },
-            prepare({ userAgent, allow, disallow }) {
-              const parts = [];
-              if (allow)
-                parts.push(`Allow: ${allow}`);
-              if (disallow)
-                parts.push(`Disallow: ${disallow}`);
-              if (parts.length === 0)
-                parts.push("No rules");
-              return {
-                title: userAgent,
-                subtitle: parts.join(`, 
+      preview: {
+        select: {
+          userAgent: "userAgent",
+          allow: "allow",
+          disallow: "disallow"
+        },
+        prepare({ userAgent, allow, disallow }) {
+          const parts = [];
+          if (allow)
+            parts.push(`Allow: ${allow}`);
+          if (disallow)
+            parts.push(`Disallow: ${disallow}`);
+          if (parts.length === 0)
+            parts.push("No rules");
+          return {
+            title: userAgent,
+            subtitle: parts.join(`, 
 `)
-              };
-            }
-          },
-          fields: [
-            {
-              name: "userAgent",
-              title: "User Agent",
-              type: "string"
-            },
-            {
-              name: "allow",
-              title: "Allow",
-              type: "string",
-              validation: (Rule) => Rule.custom(validateRobotsDirectivePath)
-            },
-            {
-              name: "disallow",
-              title: "Disallow",
-              type: "string",
-              validation: (Rule) => Rule.custom(validateRobotsDirectivePath)
-            }
-          ]
+          };
+        }
+      },
+      fields: [
+        {
+          name: "userAgent",
+          title: "User Agent",
+          type: "string"
+        },
+        {
+          name: "allow",
+          title: "Allow",
+          type: "string",
+          validation: (Rule) => Rule.custom(validateRobotsDirectivePath)
+        },
+        {
+          name: "disallow",
+          title: "Disallow",
+          type: "string",
+          validation: (Rule) => Rule.custom(validateRobotsDirectivePath)
         }
       ]
     }
@@ -1605,4 +1598,4 @@ export {
   src_default as default
 };
 
-//# debugId=DAE09323285F00BD64756E2164756E21
+//# debugId=7F8F110B61E911A464756E2164756E21
