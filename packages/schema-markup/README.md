@@ -7,7 +7,7 @@ Schema markup should be generated from your content model, not rebuilt beside it
 - [Install](#install)
 - [Features](#features)
 - [Why this exists](#why-this-exists)
-- [What `buildSchemaMarkup` generates](#what-buildschemamerkup-generates)
+- [What `buildSchemaMarkup` generates](#what-buildschemamarkup-generates)
 - [Quick start](#quick-start)
 - [`mainEntity`](#mainentity)
 - [`@id` and de-duplication](#id-and-de-duplication)
@@ -37,7 +37,7 @@ yarn add @crawl-me-maybe/schema-markup
 
 ## Why this exists
 
-Schema markup from CMS → frontend is usually handled with a bulk of fields that editors are forced to fill in, often duplicating content that's already present. This library takes advantage of a bit more developer work up front to reduce the load on editors.
+Schema markup from CMS → frontend is usually handled with a bulk of fields that editors are forced to fill in. This library pushes a bit more work onto developers up front so editors don't have to duplicate content just to satisfy schema markup.
 
 ---
 
@@ -105,7 +105,9 @@ const schemas = buildSchemaMarkup({
 
 In this example, `buildSchemaMarkup` creates the site identity, `WebSite`, and `WebPage` nodes automatically, then attaches the breadcrumb and article as part of the same graph.
 
-`buildSchemaMarkup` returns `string[]`, with each string ready to render in a `<script type="application/ld+json">`.
+`buildSchemaMarkup` returns a `string[]` of serialized JSON-LD script payloads, ready to render into `<script type="application/ld+json">` tags. No `JSON.stringify` needed.
+
+> 🧠 Note: Use `buildSchemaMarkup` to assemble the full page-level graph for a URL. Use the individual `build*` helpers to create entities that are passed into that graph as `mainEntity`, breadcrumbs, or nested supporting nodes.
 
 ---
 
