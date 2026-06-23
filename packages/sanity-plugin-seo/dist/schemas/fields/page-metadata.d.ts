@@ -8,7 +8,10 @@ export default function buildPageMetadata(options?: PluginOptions): {
         input: typeof PageSeoInput;
     };
     type: string;
-    fields: ({
+    fields: (({
+        type: "string";
+        name: "canonicalUrl";
+    } & Omit<import("sanity").StringDefinition, "preview"> & import("sanity").FieldDefinitionBase & import("sanity").WidenValidation & import("sanity").WidenInitialValue) | {
         name: string;
         title: string;
         components: {

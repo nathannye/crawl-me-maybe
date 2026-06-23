@@ -592,6 +592,9 @@ var meta_title_default = defineField5({
   ]
 });
 
+// src/schemas/fields/page-metadata.ts
+import { defineField as defineField6 } from "sanity";
+
 // src/components/core/InputWithGlobalDefault.tsx
 import { Box as Box2, Card as Card4, Flex as Flex6, Stack as Stack2, Text as Text4 } from "@sanity/ui";
 import { buildSrc as buildSrc2 } from "@sanity-image/url-builder";
@@ -1307,9 +1310,38 @@ function PageSeoInput(props) {
   }, undefined, true, undefined, this);
 }
 
+// src/utils/canonical.ts
+var validateCanonicalPathOrUrl = (value) => {
+  if (value === undefined || value === null || value === "")
+    return true;
+  if (typeof value !== "string")
+    return "Must be a string";
+  const trimmed = value.trim();
+  if (!trimmed)
+    return true;
+  if (trimmed.startsWith("/") && !trimmed.startsWith("//")) {
+    if (/\s/.test(trimmed))
+      return "Path cannot contain spaces";
+    return true;
+  }
+  try {
+    const parsed = new URL(trimmed);
+    if (parsed.protocol !== "http:" && parsed.protocol !== "https:") {
+      return "Must be a path starting with '/' or a full https:// URL";
+    }
+  } catch {
+    return "Must be a path starting with '/' (e.g. /about) or a full https:// URL";
+  }
+  if (!trimmed.startsWith("https://")) {
+    return "URL must start with https://";
+  }
+  return true;
+};
+
 // src/schemas/fields/page-metadata.ts
 function buildPageMetadata(options) {
   const includeSearchIndexing = options?.page?.searchIndexing !== false;
+  const includeCanonicalUrl = options?.page?.canonicalUrl !== false;
   return {
     name: "pageMetadata",
     title: "Metadata",
@@ -1329,6 +1361,15 @@ function buildPageMetadata(options) {
         },
         type: "metaDescription"
       },
+      ...includeCanonicalUrl ? [
+        defineField6({
+          name: "canonicalUrl",
+          title: "Canonical URL",
+          type: "string",
+          description: "Optional canonical override: a path (e.g. /about) or full URL (https://…). Leave empty to use the auto-generated self-referential URL on the frontend.",
+          validation: (Rule) => Rule.custom(validateCanonicalPathOrUrl)
+        })
+      ] : [],
       ...includeSearchIndexing ? [
         {
           name: "searchIndexing",
@@ -1352,7 +1393,7 @@ function buildPageMetadata(options) {
 
 // src/schemas/fields/robots.ts
 import { FaRobot } from "react-icons/fa";
-import { defineField as defineField6 } from "sanity";
+import { defineField as defineField7 } from "sanity";
 
 // src/components/core/RobotsRulesInput.tsx
 import { Box as Box9, Card as Card6, Flex as Flex13, Text as Text11 } from "@sanity/ui";
@@ -1448,7 +1489,7 @@ var validateRobotsDirectivePath = (value) => {
   }
   return true;
 };
-var robots_default = defineField6({
+var robots_default = defineField7({
   name: "robots",
   title: "Robots",
   description: "Define robots.txt rules",
@@ -1510,7 +1551,7 @@ var robots_default = defineField6({
 });
 
 // src/schemas/fields/search-indexing.ts
-import { defineField as defineField7 } from "sanity";
+import { defineField as defineField8 } from "sanity";
 
 // src/components/core/IndexingControls.tsx
 import { set as set2 } from "sanity";
@@ -1578,7 +1619,7 @@ import { Box as Box11 } from "@sanity/ui";
 import { MdCheck as MdCheck2, MdWarning as MdWarning2 } from "react-icons/md";
 import { jsxDEV as jsxDEV19 } from "react/jsx-dev-runtime";
 // src/schemas/fields/search-indexing.ts
-var search_indexing_default = defineField7({
+var search_indexing_default = defineField8({
   name: "searchIndexing",
   title: "Search Indexing",
   type: "object",
@@ -1633,4 +1674,4 @@ export {
   src_default as default
 };
 
-//# debugId=51FF8D3521AF635564756E2164756E21
+//# debugId=44DFE7A65758E54764756E2164756E21
