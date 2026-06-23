@@ -2,23 +2,41 @@
 
 Most sitemap generators either crawl your built site, scan your filesystem, or expect you to be using a specific framework.
 
-That's fine until your routes come from a CMS, database, API, or an ISR/SSR application where new pages can appear long after the last build finishes.
-
 This package takes a simpler approach. You provide routes, it generates sitemap.xml and robots.txt. Build-time with Vite, runtime from an API route, or both. No crawling, no filesystem scanning, and no strong opinions about where your content lives.
 
 ## Features
+
 - Framework agnostic sitemap generation
 - Build-time generation with Vite
 - Runtime generation for ISR and SSR applications
 - Localized sitemaps with hreflang alternates
 - robots.txt generation with sitemap link
 
+## How this package is meant to be used
+
+`@crawl-me-maybe/sitemap` supports two output modes:
+
+- **Build-time generation** with the Vite plugin, which writes `sitemap.xml` and `robots.txt` to disk during your build
+- **Runtime generation** with `generateSitemap`, `generateIndexSitemap`, and `generateRobotsTxt`, which lets you return XML from a route handler or API endpoint for ISR, SSR, or CMS-backed routes
+
+Both modes use the same sitemap entry shape, so route generation logic can be shared between them.
+
+Use a **single sitemap** when all routes can live in one file. Use **multiple sitemaps** when you want to split by content type or expect to exceed sitemap size limits.
+
+| Situation | Use |
+|---|---|
+| Static site or known routes at build time | `vitePluginSitemap` |
+| ISR / SSR / CMS-backed routes that can change after build | `generateSitemap` in a route handler |
+| More than ~50k URLs or separate route families | multiple sitemaps + sitemap index |
+| Need `robots.txt` output | `generateRobotsTxt` or Vite plugin `robots` config |
+
 ## Table of contents
 
 - [Install](#install)
+- [Sitemap entry shape](#sitemap-entry-shape)
 - [Locale modes](#locale-modes)
-- [Sitemap Vite plugin](#vite-plugin)
-- [Sitemap with API route](#api-route)
+- [Vite plugin](#vite-plugin)
+- [Runtime generation](#runtime-generation)
 - [Robots](#robots)
 - [Config reference](#config-reference)
 - [License](#license)
@@ -31,6 +49,39 @@ pnpm add @crawl-me-maybe/sitemap
 bun add @crawl-me-maybe/sitemap
 yarn add @crawl-me-maybe/sitemap
 ```
+
+---
+
+## Sitemap entry shape
+
+Sitemap entries are always defined as site-relative paths. The domain is supplied separately via the `domain` option.
+
+```ts
+type SitemapEntry = {
+  path: string
+  lastmod?: string
+  changefreq?: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never"
+  priority?: number
+  imageUrls?: string[]
+  videoUrls?: string[]
+  skipLocalization?: boolean
+}
+```
+
+Example:
+
+```ts
+{
+  path: "/blog/hello-world",
+  lastmod: "2025-06-01",
+  changefreq: "weekly",
+  imageUrls: ["https://example.com/images/hello-world.jpg"],
+}
+```
+
+- `path` should be relative, e.g. `/about`
+- the domain is always configured separately via `domain`
+- `skipLocalization: true` prevents locale variants from being generated for that entry
 
 ---
 
@@ -136,7 +187,23 @@ vitePluginSitemap({
 });
 ```
 
-### c. Localized
+### c. With robots
+
+When using the Vite plugin, `robots.txt` is written alongside your sitemap files during the build.
+
+```ts
+vitePluginSitemap({
+  domain: "https://example.com",
+  robots: {
+    userAgent: "*",
+    allow: "/",
+    disallow: ["/admin", "/api/"],
+  },
+  sitemaps: async () => [{ path: "/" }],
+});
+```
+
+### d. Localized
 
 See [Locale modes](#locale-modes). Works with single or multiple sitemap configs.
 
@@ -157,9 +224,9 @@ vitePluginSitemap({
 
 ---
 
-## API route
+## Runtime generation
 
-Return XML from a route handler. Same entry shape as the Vite plugin — no file writes.
+Return XML from a route handler or API endpoint. This uses the same entry shape as the Vite plugin, but does not write files to disk.
 
 ### a. Single sitemap
 
@@ -181,16 +248,24 @@ export async function GET() {
 
 ### b. Multiple sitemaps
 
+When generating multiple sitemaps at runtime, the sitemap index needs to know the filenames of the child sitemap routes. In most apps this is a small shared list such as `pages`, `blog`, or `products`.
+
 Serve a sitemap index at `/sitemap.xml` and child sitemaps at `/sitemap-{name}.xml`.
+
+```ts
+// lib/sitemap-names.ts
+export const SITEMAP_NAMES = ["pages", "blog"] as const;
+```
 
 ```ts
 // app/sitemap.xml/route.ts
 import { generateIndexSitemap } from "@crawl-me-maybe/sitemap";
+import { SITEMAP_NAMES } from "@/lib/sitemap-names";
 
 export async function GET() {
   const xml = generateIndexSitemap(
     "https://example.com",
-    ["sitemap-pages.xml", "sitemap-blog.xml"],
+    SITEMAP_NAMES.map((name) => `sitemap-${name}.xml`),
   );
 
   return new Response(xml, {
@@ -244,6 +319,8 @@ export async function GET() {
 ## Robots
 
 Build `robots.txt` as a string. Pass the sitemap **filename only** (no domain) — e.g. `"sitemap.xml"`.
+
+If you're generating multiple sitemaps, pass the sitemap index filename (usually `sitemap.xml`) rather than a child sitemap filename.
 
 ### a. Array of rules
 
@@ -322,15 +399,16 @@ If `rules` is `undefined` (not configured in Studio), `generateRobotsTxt` falls 
 
 ## Config reference
 
-| Option | Type | Description |
-|--------|------|-------------|
-| `domain` | `string` | Site origin, e.g. `https://example.com` |
-| `outDir` | `string` | Output directory (default: `dist`) |
-| `sitemaps` | fn or object | Entry callback(s) |
-| `robots` | `RobotsRule` or array | Crawler rules (Vite plugin only) |
-| `locales` | `LocaleConfig[]` | Locale list for hreflang |
-| `localeMode` | `"prefix"` \| `"subdomain"` | URL strategy (default: `prefix`) |
-| `prefixDefault` | `boolean` | Prefix the default locale too (default: `false`) |
+| Option | Type | Applies to | Description |
+|--------|------|------------|-------------|
+| `domain` | `string` | Vite + runtime | Site origin, e.g. `https://example.com` |
+| `outDir` | `string` | Vite | Output directory (default: `dist`) |
+| `sitemaps` | fn or object | Vite | Entry callback(s) for one or more sitemap files |
+| `entries` | `SitemapEntry[]` | Runtime | Entries for a single generated sitemap |
+| `robots` | `RobotsRule` or array | Vite | Crawler rules used when writing `robots.txt` |
+| `locales` | `LocaleConfig[]` | Vite + runtime | Locale list for hreflang generation |
+| `localeMode` | `"prefix"` \| `"subdomain"` | Vite + runtime | URL strategy (default: `prefix`) |
+| `prefixDefault` | `boolean` | Vite + runtime | Prefix the default locale too (default: `false`) |
 
 ## License
 
