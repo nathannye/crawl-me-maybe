@@ -1,13 +1,7 @@
 import { mkdirSync, readdirSync, renameSync, rmSync } from "node:fs";
 import { join } from "node:path";
 
-const externals = [
-	"@sanity/client",
-	"@sanity-image/url-builder",
-	"@sanity/image-url",
-	"next",
-	"zhead",
-];
+const externals = ["@sanity/client", "next", "zhead"];
 
 rmSync("dist", { recursive: true, force: true });
 

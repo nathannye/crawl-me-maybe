@@ -40,14 +40,12 @@ yarn add @crawl-me-maybe/sanity-plugin-seo
 
 ### Frontend Metadata Transformer
 
-Runtime helpers to merge page and global SEO metadata, generate meta titles, and build Sanity image URLs.
+Runtime helpers to merge page and global SEO metadata and generate meta titles.
 
 [See docs](./packages/meta)
 
 - Merge page-level and global SEO defaults
 - Meta title templates (`{pageTitle} - {siteTitle}`)
-- Multi-format favicon generation from Sanity assets
-- Sanity image URL helpers
 - Explicit Nuxt and Next helpers, with generic HTML tag helper for other frameworks
 
 ```bash

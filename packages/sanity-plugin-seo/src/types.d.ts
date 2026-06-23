@@ -29,5 +29,7 @@ export type PluginOptions = {
 	page?: {
 		/** Include search indexing (noIndex/noFollow) controls on page metadata (default: true) */
 		searchIndexing?: boolean;
+		/** Include canonicalUrl on page metadata (default: true). Disable if you use a custom reference field for canonical URLs. */
+		canonicalUrl?: boolean;
 	};
 };

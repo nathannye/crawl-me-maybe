@@ -10,6 +10,7 @@ SEO fields, global defaults, and social preview cards for Sanity Studio.
 - [Features](#features)
 - [Getting started](#getting-started)
   - [Plugin configuration](#plugin-configuration)
+  - [Custom canonical URLs](#custom-canonical-urls)
   - [Adding SEO fields to a page document](#adding-seo-fields-to-a-page-document)
   - [Studio structure — surfacing Global SEO Settings](#studio-structure--surfacing-global-seo-settings)
 - [Favicons](#favicons)
@@ -58,6 +59,7 @@ export default defineConfig({
       },
       page: {
         searchIndexing: true, // noIndex / noFollow controls on page metadata
+        canonicalUrl: true,   // canonical URL override on page metadata
       },
     }),
   ],
@@ -69,6 +71,32 @@ export default defineConfig({
 | `global.favicon` | `boolean` | `true` | Includes the favicon field (with browser-tab preview) in Global SEO Settings |
 | `global.robots` | `boolean` | `true` | Includes the robots rules builder in Global SEO Settings |
 | `page.searchIndexing` | `boolean` | `true` | Includes noIndex / noFollow controls on the `pageMetadata` field |
+| `page.canonicalUrl` | `boolean` | `true` | Includes the canonical URL field on `pageMetadata`. Disable if you manage canonical via a custom reference field on the document |
+
+### Custom canonical URLs
+
+By default, `pageMetadata` includes a `canonicalUrl` field for explicit URL overrides. Disable it when you prefer a reference to another document:
+
+```ts
+// sanity.config.ts
+crawlMeMaybeSeo({
+  page: {
+    canonicalUrl: false,
+  },
+});
+```
+
+Then add your own field on the page document:
+
+```ts
+defineField({
+  name: "canonical",
+  type: "reference",
+  to: [{ type: "page" }, { type: "post" }],
+})
+```
+
+Resolve the referenced document to a URL in your frontend query and pass it to `@crawl-me-maybe/meta` with `disableSelfCanonical: true`. When the built-in field is enabled, leave it empty and `@crawl-me-maybe/meta` generates a self-referential canonical from `siteUrl` + slug automatically.
 
 
 ### Adding SEO fields to a page document
@@ -204,6 +232,7 @@ Add this type to any document that needs per-page SEO. Fields display the active
 | Field | Sanity type | Required | Validation | Notes |
 |---|---|---|---|---|
 | `description` | `metaDescription` | — | Warn < 120 or > 160 chars | Overrides `globalSeoSettings.metaDescription` |
+| `canonicalUrl` | `string` | — | Path (`/about`) or `https://` URL | Optional override; leave empty for auto self-canonical on the frontend. Controlled by `page.canonicalUrl` option |
 | `searchIndexing` | `searchIndexing` | — | — | noIndex / noFollow controls. Controlled by `page.searchIndexing` option |
 | `metaImage` | `metaImage` | — | — | Overrides `globalSeoSettings.defaultMetaImage`; shows thumbnail of active default when empty |
 

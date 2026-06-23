@@ -18,9 +18,10 @@ const pageForMetadataQuery = defineQuery(`
     title,
     "slug": { "current": slug.current },
     "description": seo.description,
-    "searchIndexing": seo.searchIndexing,
-    "metaImage": seo.metaImage.asset->url
-  }
+  "searchIndexing": seo.searchIndexing,
+  "metaImage": seo.metaImage.asset->url,
+  "canonicalUrl": seo.canonicalUrl
+}
 `);
 
 export async function getGlobalSeoSettings(): Promise<GlobalSeoSettings | null> {

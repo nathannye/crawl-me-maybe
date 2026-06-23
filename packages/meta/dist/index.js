@@ -1,11 +1,3 @@
-// src/config.ts
-var config = {};
-function setConfig(newConfig) {
-  config = { ...config, ...newConfig };
-}
-function getConfig() {
-  return config;
-}
 // src/meta-title.ts
 var createMetaTitle = (pageTitle = "", siteTitle = "", template = "{pageTitle} | {siteTitle}") => {
   let metaTitle = template.replace("{pageTitle}", pageTitle).replace("{siteTitle}", siteTitle);
@@ -19,6 +11,28 @@ var createMetaTitle = (pageTitle = "", siteTitle = "", template = "{pageTitle} |
 // src/url.ts
 var normalizeUrl = (baseUrl, path) => {
   return new URL(path, baseUrl).toString();
+};
+var isAbsoluteUrl = (value) => {
+  try {
+    const parsed = new URL(value);
+    return parsed.protocol === "http:" || parsed.protocol === "https:";
+  } catch {
+    return false;
+  }
+};
+var isCanonicalPath = (value) => {
+  const trimmed = value.trim();
+  return trimmed.startsWith("/") && !trimmed.startsWith("//");
+};
+var resolveCanonicalUrl = (siteUrl, canonicalOrPath) => {
+  const trimmed = canonicalOrPath.trim();
+  if (isAbsoluteUrl(trimmed)) {
+    return trimmed;
+  }
+  if (isCanonicalPath(trimmed)) {
+    return normalizeUrl(siteUrl, trimmed);
+  }
+  return normalizeUrl(siteUrl, trimmed);
 };
 
 // src/merge.ts
@@ -41,8 +55,11 @@ var createCanonicalUrl = ({
   disableSelfCanonical,
   canonicalUrl
 }) => {
+  if (canonicalUrl?.trim()) {
+    return resolveCanonicalUrl(siteUrl, canonicalUrl);
+  }
   if (disableSelfCanonical)
-    return canonicalUrl || undefined;
+    return;
   return normalizeUrl(siteUrl, slug);
 };
 var buildOpenGraphMetadata = ({
@@ -102,7 +119,7 @@ var buildMetadata = (page, seoDefaults, options) => {
     return {
       title: page.title,
       description: pageMeta?.description,
-      canonicalUrl: pageMeta?.canonicalUrl,
+      canonicalUrl: pageMeta?.canonicalUrl && isAbsoluteUrl(pageMeta.canonicalUrl.trim()) ? pageMeta.canonicalUrl.trim() : undefined,
       metaImage: pageMeta?.metaImage
     };
   }
@@ -217,10 +234,8 @@ function toHtmlTags(meta) {
 }
 export {
   toHtmlTags,
-  setConfig,
-  getConfig,
   createMetaTitle,
   buildMetadata
 };
 
-//# debugId=98BB7B86216F16D964756E2164756E21
+//# debugId=ABA4796923024B4E64756E2164756E21

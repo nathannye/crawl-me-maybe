@@ -1,6 +1,6 @@
 import type { SanityImageAssetDocument } from "@sanity/client";
 import { createMetaTitle } from "./meta-title";
-import { normalizeUrl } from "./url";
+import { isAbsoluteUrl, normalizeUrl, resolveCanonicalUrl } from "./url";
 
 type OpenGraphType = "website" | "article" | "product";
 type TwitterCardStyle = "summary_large_image" | "summary" | "app" | "player";
@@ -93,7 +93,12 @@ const createCanonicalUrl = ({
 	disableSelfCanonical?: boolean;
 	canonicalUrl?: string;
 }) => {
-	if (disableSelfCanonical) return canonicalUrl || undefined;
+	if (canonicalUrl?.trim()) {
+		return resolveCanonicalUrl(siteUrl, canonicalUrl);
+	}
+
+	if (disableSelfCanonical) return undefined;
+
 	return normalizeUrl(siteUrl, slug);
 };
 
@@ -178,7 +183,10 @@ export const buildMetadata = (
 		return {
 			title: page.title,
 			description: pageMeta?.description,
-			canonicalUrl: pageMeta?.canonicalUrl,
+			canonicalUrl:
+				pageMeta?.canonicalUrl && isAbsoluteUrl(pageMeta.canonicalUrl.trim())
+					? pageMeta.canonicalUrl.trim()
+					: undefined,
 			metaImage: pageMeta?.metaImage,
 		};
 	}

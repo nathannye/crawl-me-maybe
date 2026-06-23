@@ -2,7 +2,7 @@
 
 > This library is under active development. APIs and data shapes may change.
 
-SEO utilities for Sanity-driven sites: merge page and global metadata, generate meta titles, favicons, and Sanity image URLs.
+SEO utilities for Sanity-driven sites: merge page and global metadata, generate meta titles, and output framework-specific meta tags.
 
 For Schema.org JSON-LD, use [`@crawl-me-maybe/schema-markup`](../schema-markup).
 
@@ -44,8 +44,6 @@ npm install next
 - Merge page-level and global SEO metadata
 - Meta title templates
 - Framework output adapters for raw HTML, Next.js, and Nuxt
-- Multi-format favicon generation from Sanity assets
-- Sanity image URL helpers
 
 ---
 
@@ -113,6 +111,20 @@ const meta = buildMetadata(
 
 For Open Graph, consider appending Sanity image params (`?w=1200&h=630&fit=crop&auto=format`) when building the URL.
 
+### Canonical URLs
+
+`buildMetadata` resolves `canonicalUrl` automatically when both page data and `globalSeoSettings.siteUrl` are provided:
+
+- **Empty** — generates a self-referential canonical from `siteUrl` + slug (unless `disableSelfCanonical: true`)
+- **Path** (e.g. `/about`) — joined with `siteUrl` internally
+- **Full URL** (e.g. `https://example.com/about`) — used as-is
+
+Pass paths from Studio as-is in your GROQ projection:
+
+```groq
+"canonicalUrl": seo.canonicalUrl
+```
+
 ---
 
 ## Core exports
@@ -120,7 +132,6 @@ For Open Graph, consider appending Sanity image params (`?w=1200&h=630&fit=crop&
 - `buildMetadata` — merge page metadata with global SEO defaults
 - `createMetaTitle` — generate titles from a template
 - `toHtmlTags` — convert merged metadata into spreadable `<meta>` / `<link>` tag objects
-- `setConfig` / `getConfig` — project ID and dataset for image URLs
 
 Framework-specific adapters are available via subpath imports:
 
