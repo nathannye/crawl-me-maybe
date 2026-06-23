@@ -1,4 +1,3 @@
-<img width="682" height="333" alt="Screenshot 2026-06-23 at 1 18 50 PM" src="https://github.com/user-attachments/assets/9c5d13fa-1c6b-4529-bb0d-ec636112b965" />
 # @crawl-me-maybe/sanity-plugin-seo
 
 SEO fields, global defaults, and social preview cards for Sanity Studio.
