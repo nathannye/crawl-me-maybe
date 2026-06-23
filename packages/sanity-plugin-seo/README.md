@@ -1,3 +1,4 @@
+<img width="682" height="333" alt="Screenshot 2026-06-23 at 1 18 50 PM" src="https://github.com/user-attachments/assets/9c5d13fa-1c6b-4529-bb0d-ec636112b965" />
 # @crawl-me-maybe/sanity-plugin-seo
 
 SEO fields, global defaults, and social preview cards for Sanity Studio.
@@ -44,12 +45,15 @@ export default defineConfig({
 ## Favicons
 Browser-tab preview for dynamic favicons with theme-switching button. Can be disabled by setting `global.favicon` to `false`.
 
-
+<img width="661" height="355" alt="Screenshot 2026-06-23 at 1 22 48 PM" src="https://github.com/user-attachments/assets/69600f60-2e93-4df4-88f6-ec50fcd3adb5" />
+<br/>
 
 ## Robots.txt
 Preview-enabled array field for robots.txt entries. Disabled by setting `global.robots` to `false`.
 
-
+<img width="697" height="318" alt="Screenshot 2026-06-23 at 1 18 44 PM" src="https://github.com/user-attachments/assets/7592bdbc-a39c-44d9-b801-4e566e499919" />
+<img width="682" height="333" alt="Screenshot 2026-06-23 at 1 18 50 PM" src="https://github.com/user-attachments/assets/f8d7444c-cb8a-4571-80a8-352699dd36fc" />
+<br/>
 
 ## Schemas
 
