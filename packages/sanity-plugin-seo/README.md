@@ -77,6 +77,8 @@ export default defineType({
 
 Each `pageMetadata` field shows the live global default as a placeholder when the field is empty, and renders social preview cards (Facebook, Twitter/X, LinkedIn, Google) in a tabbed panel.
 
+<img width="814" height="686" alt="Screenshot 2026-06-23 at 1 48 58 PM" src="https://github.com/user-attachments/assets/542b0804-4036-4d8c-b2ab-d6579f84523c" />
+<br/>
 
 ### Studio structure — surfacing Global SEO Settings
 
