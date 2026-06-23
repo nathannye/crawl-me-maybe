@@ -35,8 +35,7 @@ export default function buildPageMetadata(options?: PluginOptions) {
 							type: "string",
 							description:
 								"Optional canonical override: a path (e.g. /about) or full URL (https://…). Leave empty to use the auto-generated self-referential URL on the frontend.",
-							validation: (Rule) =>
-								Rule.custom(validateCanonicalPathOrUrl),
+							validation: (Rule) => Rule.custom(validateCanonicalPathOrUrl),
 						}),
 					]
 				: []),
