@@ -17,18 +17,14 @@ declare const _default: {
             matchingDefaultField: string;
         };
         type: string;
-        rows: number;
-        description: string;
-        validation: (Rule: any) => any;
+        description?: undefined;
     } | {
         name: string;
         type: string;
         title?: undefined;
         components?: undefined;
         options?: undefined;
-        rows?: undefined;
         description?: undefined;
-        validation?: undefined;
     } | {
         name: string;
         components: {
@@ -37,11 +33,9 @@ declare const _default: {
         options: {
             matchingDefaultField: string;
         };
-        title: string;
         description: string;
         type: string;
-        rows?: undefined;
-        validation?: undefined;
+        title?: undefined;
     })[];
 };
 export default _default;

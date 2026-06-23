@@ -7,6 +7,14 @@ declare const _default: (({
     type: "text";
     name: "metaDescription";
 } & Omit<import("sanity").TextDefinition, "preview"> & import("sanity").FieldDefinitionBase & import("sanity").WidenValidation & import("sanity").WidenInitialValue) | ({
+    type: "image";
+    name: "metaImage";
+} & Omit<import("sanity").ImageDefinition, "preview"> & {
+    preview?: import("sanity").PreviewConfig<Record<string, string>, Record<never, any>> | undefined;
+} & import("sanity").FieldDefinitionBase & import("sanity").WidenValidation & import("sanity").WidenInitialValue) | ({
+    type: "string";
+    name: "metaTitle";
+} & Omit<import("sanity").StringDefinition, "preview"> & import("sanity").FieldDefinitionBase & import("sanity").WidenValidation & import("sanity").WidenInitialValue) | ({
     type: "object";
     name: "searchIndexing";
 } & Omit<import("sanity").ObjectDefinition, "preview"> & {
@@ -28,18 +36,14 @@ declare const _default: (({
             matchingDefaultField: string;
         };
         type: string;
-        rows: number;
-        description: string;
-        validation: (Rule: any) => any;
+        description?: undefined;
     } | {
         name: string;
         type: string;
         title?: undefined;
         components?: undefined;
         options?: undefined;
-        rows?: undefined;
         description?: undefined;
-        validation?: undefined;
     } | {
         name: string;
         components: {
@@ -48,11 +52,9 @@ declare const _default: (({
         options: {
             matchingDefaultField: string;
         };
-        title: string;
         description: string;
         type: string;
-        rows?: undefined;
-        validation?: undefined;
+        title?: undefined;
     })[];
 })[];
 export default _default;

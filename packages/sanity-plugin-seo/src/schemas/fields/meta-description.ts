@@ -9,7 +9,7 @@ export default defineField({
 	type: "text",
 	rows: 3,
 	description:
-		"The description of the page used in meta tags. 50-160 characters is recommended to avoid truncation.",
+		`The description of the page used in meta tags. ${MIN_CHARACTERS}-${MAX_CHARACTERS} characters is recommended to avoid truncation.`,
 	validation: (Rule) =>
 		Rule.custom((value) => {
 			if (

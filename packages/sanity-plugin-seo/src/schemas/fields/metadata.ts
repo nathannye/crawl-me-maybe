@@ -30,7 +30,7 @@ export default {
 				input: InputWithGlobalDefault,
 			},
 			options: {
-				matchingDefaultField: "metaImage",
+				matchingDefaultField: "defaultMetaImage",
 			},
 			description:
 				"Displayed when the site link is posted on social media, defaults to a screenshot of the homepage.",

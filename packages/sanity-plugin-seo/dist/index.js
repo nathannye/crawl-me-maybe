@@ -35,7 +35,7 @@ var SeoDefaultsProvider = ({ children }) => {
       cleanup.schemaSub.unsubscribe();
     }
   }, []);
-  const sub = (query, property) => {
+  const sub = useCallback((query, property) => {
     return client.listen(query).subscribe((update) => {
       if (update.result) {
         setDefaults((prev) => ({
@@ -44,13 +44,13 @@ var SeoDefaultsProvider = ({ children }) => {
         }));
       }
     });
-  };
+  }, [client]);
   useEffect(() => {
-    const seoSub = sub(`*[_type == "seoDefaults"][0]`, "seoDefaults");
+    const seoSub = sub(`*[_type == "globalSeoSettings"][0]`, "seoDefaults");
     const schemaSub = sub(`*[_type == "schemaMarkupDefaults"][0]`, "schemaDefaults");
     cleanup.seoSub = seoSub;
     cleanup.schemaSub = schemaSub;
-    client.fetch(`*[_type == "seoDefaults"][0]`).then((seoDefaults) => setDefaults((prev) => ({
+    client.fetch(`*[_type == "globalSeoSettings"][0]`).then((seoDefaults) => setDefaults((prev) => ({
       ...prev,
       seoDefaults
     })));
@@ -59,7 +59,7 @@ var SeoDefaultsProvider = ({ children }) => {
       schemaDefaults
     })));
     return cleanup;
-  }, [client]);
+  }, [client, cleanup, sub]);
   return /* @__PURE__ */ jsxDEV(SeoDefaultsContext.Provider, {
     value: defaults,
     children
@@ -121,7 +121,20 @@ var global_seo_settings_default = defineType({
       title: "Site URL",
       type: "url",
       description: "Root URL of the website (e.g. https://your-domain.com). Used for canonical and Open Graph tags.",
-      validation: (Rule) => Rule.required()
+      validation: (Rule) => Rule.custom((value) => {
+        if (!value)
+          return "Site URL is required";
+        if (typeof value !== "string")
+          return "Site URL must be a string";
+        if (!value.startsWith("https://"))
+          return "Site URL must start with https://";
+        return true;
+      })
+    }),
+    defineField({
+      name: "defaultMetaImage",
+      type: "metaImage",
+      description: "The default meta image for all pages if not overridden on the page."
     }),
     defineField({
       name: "favicon",
@@ -335,17 +348,59 @@ var favicon_default = defineField2({
 
 // src/schemas/fields/meta-description.ts
 import { defineField as defineField3 } from "sanity";
+var MIN_CHARACTERS = 120;
+var MAX_CHARACTERS = 160;
 var meta_description_default = defineField3({
   name: "metaDescription",
   title: "Meta Description",
   type: "text",
   rows: 3,
-  description: "The description of the page. Used for the meta description.",
-  validation: (Rule) => Rule.max(160).warning("Long descriptions (over 160 characters) will be truncated by Google.")
+  description: "The description of the page used in meta tags. 120-160 characters is recommended to avoid truncation.",
+  validation: (Rule) => Rule.custom((value) => {
+    if (typeof value === "string" && value.length > 0 && value.length < MIN_CHARACTERS) {
+      return `Short descriptions (under ${MIN_CHARACTERS} characters) could be more descriptive.`;
+    }
+    if (typeof value === "string" && value.length > MAX_CHARACTERS) {
+      return `Long descriptions (over ${MAX_CHARACTERS} characters) will be truncated in search results.`;
+    }
+    return true;
+  }).warning()
+});
+
+// src/schemas/fields/meta-image.ts
+import { defineField as defineField4 } from "sanity";
+var meta_image_default = defineField4({
+  name: "metaImage",
+  title: "Meta Image",
+  type: "image",
+  description: "An image displayed on social media platforms when the site is linked"
+});
+
+// src/schemas/fields/meta-title.ts
+import { defineField as defineField5 } from "sanity";
+var MIN_CHARACTERS2 = 50;
+var MAX_CHARACTERS2 = 60;
+var meta_title_default = defineField5({
+  name: "metaTitle",
+  title: "Meta Title",
+  type: "string",
+  description: "The title of the page used in meta tags.",
+  validation: (Rule) => Rule.custom((value) => {
+    if (typeof value === "string" && value.length > 0 && value.length < MIN_CHARACTERS2) {
+      return `Short titles (under ${MIN_CHARACTERS2} characters) could be more descriptive.`;
+    }
+    if (typeof value === "string" && value.length > MAX_CHARACTERS2) {
+      return `Long titles (over ${MAX_CHARACTERS2} characters) will be truncated in search results.`;
+    }
+    return true;
+  }).warning()
 });
 
 // src/components/core/InputWithGlobalDefault.tsx
-import { Box as Box3 } from "@sanity/ui";
+import { buildSrc as buildSrc2 } from "@sanity-image/url-builder";
+import { Box as Box3, Card as Card3, Flex as Flex5, Text as Text4 } from "@sanity/ui";
+import { useMemo as useMemo2 } from "react";
+import { useDataset as useDataset2, useProjectId as useProjectId2 } from "sanity";
 import { MdCheck, MdWarning } from "react-icons/md";
 
 // src/components/partials/CardWithIcon.tsx
@@ -379,29 +434,121 @@ function CardWithIcon({
 
 // src/components/core/InputWithGlobalDefault.tsx
 import { jsxDEV as jsxDEV7 } from "react/jsx-dev-runtime";
+function hasContent(value) {
+  if (typeof value === "string")
+    return value.trim().length > 0;
+  return value !== null && value !== undefined;
+}
 function InputWithGlobalDefault(props) {
   const { seoDefaults } = useSeoDefaults();
+  const dataset = useDataset2();
+  const projectId = useProjectId2();
   const defaultFieldName = props?.schemaType?.options?.matchingDefaultField;
   if (!defaultFieldName) {
     console.warn("No default field name found for input: ", props?.schemaType?.name);
   }
   const value = props?.value;
-  const hasDefault = defaultFieldName ? seoDefaults?.[defaultFieldName] : false;
+  const defaultValue = defaultFieldName ? seoDefaults?.[defaultFieldName] : null;
+  const hasDefault = hasContent(defaultValue);
+  const hasValue = hasContent(value);
+  const isImageField = props?.schemaType?.name === "metaImage";
+  const defaultText = typeof defaultValue === "string" ? defaultValue.trim() : null;
+  const imageFallbackUrl = useMemo2(() => {
+    if (!isImageField || !defaultValue || typeof defaultValue !== "object") {
+      return null;
+    }
+    const assetRef = defaultValue?.asset?._ref ?? null;
+    if (!assetRef)
+      return null;
+    const src = buildSrc2({
+      id: assetRef,
+      baseUrl: `https://cdn.sanity.io/images/${projectId}/${dataset}/`
+    })?.src;
+    if (!src)
+      return null;
+    return `${src}?w=300&h=157&fit=crop&auto=format`;
+  }, [dataset, defaultValue, isImageField, projectId]);
+  const propsWithPlaceholder = !hasValue && defaultText ? {
+    ...props,
+    elementProps: {
+      ...props.elementProps,
+      placeholder: defaultText,
+      title: defaultText
+    }
+  } : props;
   return /* @__PURE__ */ jsxDEV7("div", {
     children: [
-      !value && !hasDefault && /* @__PURE__ */ jsxDEV7(CardWithIcon, {
+      !hasValue && !hasDefault && /* @__PURE__ */ jsxDEV7(CardWithIcon, {
         icon: MdWarning,
         tone: "critical",
         text: "This field does not have a global default set. Make sure to fill it in here."
       }, undefined, false, undefined, this),
-      !value && hasDefault && /* @__PURE__ */ jsxDEV7(CardWithIcon, {
+      !hasValue && hasDefault && !isImageField && /* @__PURE__ */ jsxDEV7(CardWithIcon, {
         icon: MdCheck,
         tone: "suggest",
-        text: "This field is using the global default."
+        text: "This field is using the global default as placeholder."
+      }, undefined, false, undefined, this),
+      !hasValue && hasDefault && isImageField && /* @__PURE__ */ jsxDEV7(Card3, {
+        marginBottom: 3,
+        tone: "positive",
+        padding: 3,
+        children: /* @__PURE__ */ jsxDEV7(Flex5, {
+          gap: 3,
+          align: "center",
+          children: [
+            /* @__PURE__ */ jsxDEV7(MdCheck, {
+              size: 18
+            }, undefined, false, undefined, this),
+            /* @__PURE__ */ jsxDEV7(Box3, {
+              children: [
+                /* @__PURE__ */ jsxDEV7(Text4, {
+                  size: 1,
+                  weight: "semibold",
+                  children: "This field is using the global default image."
+                }, undefined, false, undefined, this),
+                imageFallbackUrl && /* @__PURE__ */ jsxDEV7(Box3, {
+                  marginTop: 3,
+                  children: /* @__PURE__ */ jsxDEV7("img", {
+                    src: imageFallbackUrl,
+                    alt: "Global default preview",
+                    style: {
+                      width: "150px",
+                      maxWidth: "100%",
+                      aspectRatio: "1.91 / 1",
+                      objectFit: "cover",
+                      borderRadius: "4px",
+                      border: "1px solid var(--card-border-color)"
+                    }
+                  }, undefined, false, undefined, this)
+                }, undefined, false, undefined, this)
+              ]
+            }, undefined, true, undefined, this)
+          ]
+        }, undefined, true, undefined, this)
       }, undefined, false, undefined, this),
       /* @__PURE__ */ jsxDEV7(Box3, {
-        children: props.renderDefault(props)
-      }, undefined, false, undefined, this)
+        style: { position: "relative" },
+        children: [
+          props.renderDefault(propsWithPlaceholder),
+          !hasValue && hasDefault && isImageField && /* @__PURE__ */ jsxDEV7(Flex5, {
+            align: "center",
+            justify: "center",
+            style: {
+              position: "absolute",
+              inset: 0,
+              pointerEvents: "none",
+              background: "rgba(255,255,255,0.55)",
+              border: "1px dashed var(--card-border-color)",
+              borderRadius: "4px"
+            },
+            children: /* @__PURE__ */ jsxDEV7(Text4, {
+              size: 1,
+              muted: true,
+              children: "Using global default image"
+            }, undefined, false, undefined, this)
+          }, undefined, false, undefined, this)
+        ]
+      }, undefined, true, undefined, this)
     ]
   }, undefined, true, undefined, this);
 }
@@ -788,7 +935,7 @@ function PageSeoInput(props) {
   const [currentMode, setCurrentMode] = useState2(MODES[0]?.name);
   const [seoDefaults, setSeoDefaults] = useState2(null);
   useEffect2(() => {
-    client.fetch(`*[_type == "seoDefaults"][0]`).then(setSeoDefaults);
+    client.fetch(`*[_type == "globalSeoSettings"][0]`).then(setSeoDefaults);
   }, [client]);
   const document = useFormValue([]) || {};
   const seoData = {
@@ -850,10 +997,7 @@ var metadata_default = {
       options: {
         matchingDefaultField: "metaDescription"
       },
-      type: "text",
-      rows: 3,
-      description: "The description displayed when a user finds the site in search results. Defaults to the description provided in Settings > SEO.",
-      validation: (Rule) => Rule.max(160).warning("Long titles (over 160 characters) will be truncated by Google.")
+      type: "metaDescription"
     },
     {
       name: "searchIndexing",
@@ -865,17 +1009,16 @@ var metadata_default = {
         input: InputWithGlobalDefault
       },
       options: {
-        matchingDefaultField: "metaImage"
+        matchingDefaultField: "defaultMetaImage"
       },
-      title: "Meta Image",
       description: "Displayed when the site link is posted on social media, defaults to a screenshot of the homepage.",
-      type: "image"
+      type: "metaImage"
     }
   ]
 };
 
 // src/schemas/fields/search-indexing.ts
-import { defineField as defineField4 } from "sanity";
+import { defineField as defineField6 } from "sanity";
 
 // src/components/core/IndexingControls.tsx
 import { set } from "sanity";
@@ -943,7 +1086,7 @@ import { Box as Box10 } from "@sanity/ui";
 import { MdCheck as MdCheck2, MdWarning as MdWarning2 } from "react-icons/md";
 import { jsxDEV as jsxDEV16 } from "react/jsx-dev-runtime";
 // src/schemas/fields/search-indexing.ts
-var search_indexing_default = defineField4({
+var search_indexing_default = defineField6({
   name: "searchIndexing",
   title: "Search Indexing",
   type: "object",
@@ -965,7 +1108,14 @@ var search_indexing_default = defineField4({
 });
 
 // src/schemas/fields/index.ts
-var fields_default = [search_indexing_default, favicon_default, metadata_default, meta_description_default];
+var fields_default = [
+  search_indexing_default,
+  favicon_default,
+  metadata_default,
+  meta_description_default,
+  meta_title_default,
+  meta_image_default
+];
 
 // src/index.ts
 var src_default = definePlugin({
@@ -983,4 +1133,4 @@ export {
   src_default as default
 };
 
-//# debugId=45C91FA1707C758E64756E2164756E21
+//# debugId=41D1A02B3394957F64756E2164756E21

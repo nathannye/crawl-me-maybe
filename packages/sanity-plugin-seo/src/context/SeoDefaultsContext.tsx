@@ -26,7 +26,7 @@ export const SeoDefaultsProvider = ({ children }) => {
 		}
 	}, []);
 
-	const sub = (query: string, property: string) => {
+	const sub = useCallback((query: string, property: string) => {
 		return client.listen(query).subscribe((update) => {
 			if (update.result) {
 				setDefaults((prev) => ({
@@ -35,10 +35,10 @@ export const SeoDefaultsProvider = ({ children }) => {
 				}));
 			}
 		});
-	};
+	}, [client]);
 
 	useEffect(() => {
-		const seoSub = sub(`*[_type == "seoDefaults"][0]`, "seoDefaults");
+		const seoSub = sub(`*[_type == "globalSeoSettings"][0]`, "seoDefaults");
 		const schemaSub = sub(
 			`*[_type == "schemaMarkupDefaults"][0]`,
 			"schemaDefaults",
@@ -47,7 +47,7 @@ export const SeoDefaultsProvider = ({ children }) => {
 		cleanup.seoSub = seoSub;
 		cleanup.schemaSub = schemaSub;
 
-		client.fetch(`*[_type == "seoDefaults"][0]`).then((seoDefaults) =>
+		client.fetch(`*[_type == "globalSeoSettings"][0]`).then((seoDefaults) =>
 			setDefaults((prev) => ({
 				...prev,
 				seoDefaults,
@@ -64,8 +64,7 @@ export const SeoDefaultsProvider = ({ children }) => {
 			);
 
 		return cleanup;
-		// eslint-disable-next-line react-hooks/exhaustive-deps
-	}, [client]);
+	}, [client, cleanup, sub]);
 
 	return (
 		<SeoDefaultsContext.Provider value={defaults}>

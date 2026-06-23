@@ -42,7 +42,7 @@ export default function PageSeoInput(props: ObjectInputProps) {
 	const [seoDefaults, setSeoDefaults] = useState<any>(null);
 
 	useEffect(() => {
-		client.fetch(`*[_type == "seoDefaults"][0]`).then(setSeoDefaults);
+		client.fetch(`*[_type == "globalSeoSettings"][0]`).then(setSeoDefaults);
 	}, [client]);
 
 	const document = useFormValue([]) || {};
