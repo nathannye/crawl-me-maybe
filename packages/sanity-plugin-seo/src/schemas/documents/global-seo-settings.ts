@@ -39,7 +39,6 @@ export default defineType({
 		defineField({
 			name: "metaDescription",
 			type: "metaDescription",
-
 			description: "The default meta description for all pages.",
 		}),
 		defineField({
