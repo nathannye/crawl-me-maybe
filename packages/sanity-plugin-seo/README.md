@@ -41,6 +41,43 @@ export default defineConfig({
 | `global.robots` | `boolean` | `true` | Includes the robots rules builder in Global SEO Settings |
 | `page.searchIndexing` | `boolean` | `true` | Includes noIndex / noFollow controls on the `pageMetadata` field |
 
+
+### Adding SEO fields to a page document
+
+Include the `pageMetadata` object type on any document schema. Global defaults are displayed automatically but not inherited by the frontend, this must be wired manually.
+
+```ts
+// schemas/page.ts
+import { defineType, defineField } from "sanity";
+
+export default defineType({
+  name: "page",
+  title: "Page",
+  type: "document",
+  fields: [
+    defineField({
+      name: "title",
+      title: "Title",
+      type: "string",
+    }),
+    defineField({
+      name: "slug",
+      title: "Slug",
+      type: "slug",
+      options: { source: "title" },
+    }),
+    defineField({
+      name: "seo",
+      title: "SEO",
+      type: "pageMetadata", // registered by the plugin
+    }),
+  ],
+});
+```
+
+Each `pageMetadata` field shows the live global default as a placeholder when the field is empty, and renders social preview cards (Facebook, Twitter/X, LinkedIn, Google) in a tabbed panel.
+
+
 ### Studio structure — surfacing Global SEO Settings
 
 Register the plugin, then add the `globalSeoSettings` singleton to your Studio's structure so editors can reach it:
@@ -74,41 +111,6 @@ export default defineConfig({
 });
 ```
 
-### Adding SEO fields to a page document
-
-Include the `pageMetadata` object type on any document schema. The plugin wires up global-default inheritance automatically.
-
-```ts
-// schemas/page.ts
-import { defineType, defineField } from "sanity";
-
-export default defineType({
-  name: "page",
-  title: "Page",
-  type: "document",
-  fields: [
-    defineField({
-      name: "title",
-      title: "Title",
-      type: "string",
-    }),
-    defineField({
-      name: "slug",
-      title: "Slug",
-      type: "slug",
-      options: { source: "title" },
-    }),
-    defineField({
-      name: "seo",
-      title: "SEO",
-      type: "pageMetadata", // registered by the plugin
-    }),
-  ],
-});
-```
-
-Each `pageMetadata` field shows the live global default as a placeholder when the field is empty, and renders social preview cards (Facebook, Twitter/X, LinkedIn, Google) in a tabbed panel.
-
 ---
 
 ## Favicons
@@ -126,6 +128,24 @@ Preview-enabled array field for robots.txt entries. Disabled by setting `global.
 <img width="682" height="333" alt="Screenshot 2026-06-23 at 1 18 50 PM" src="https://github.com/user-attachments/assets/f8d7444c-cb8a-4571-80a8-352699dd36fc" />
 <br/>
 
+---
+
+## Frontend Integration
+This plugin only stores SEO metadata inside Sanity.
+
+You are responsible for reading these fields and generating:
+- meta tags
+- Open Graph tags
+- Twitter/X tags
+- canonical URLs
+- schema markup
+- robots.txt
+- sitemap.xml
+
+`@crawl-me-maybe/meta` and `@crawl-me-maybe/sitemap` can be used to format this data for your frontend.
+
+---
+
 ## Schemas
 
 ### `globalSeoSettings` document
@@ -136,7 +156,7 @@ A singleton document that provides site-wide defaults. Page-level fields inherit
 |---|---|---|---|---|
 | `siteTitle` | `string` | ✅ | Required | Injected into `pageTitleTemplate` via `{siteTitle}` |
 | `pageTitleTemplate` | `string` | ✅ | Required | Custom token input; initial value `{pageTitle} - {siteTitle}` |
-| `siteUrl` | `url` | ✅ | Must start with `https://` | Used for canonical and Open Graph tags |
+| `siteUrl` | `url` | ✅ | Must start with `https://` | Used when generating canonical URLs, Open Graph URLs, and sitemap entries. |
 | `metaDescription` | `metaDescription` | — | Warn < 120 or > 160 chars | Default description inherited by all pages |
 | `defaultMetaImage` | `metaImage` | — | — | Default OG image inherited by all pages |
 | `favicon` | `image` | — | — | Browser-tab preview in Studio. Controlled by `global.favicon` option |
