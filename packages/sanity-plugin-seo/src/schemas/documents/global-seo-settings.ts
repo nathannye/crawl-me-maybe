@@ -1,5 +1,6 @@
 import { MdSearch, MdShare } from "react-icons/md";
 import { defineField, defineType, type StringRule } from "sanity";
+import PageTitleTemplateInput from "../../components/core/PageTitleTemplateInput";
 
 export default defineType({
 	name: "globalSeoSettings",
@@ -31,6 +32,9 @@ export default defineType({
 			name: "pageTitleTemplate",
 			title: "Page Title Template",
 			type: "string",
+			components: {
+				input: PageTitleTemplateInput,
+			},
 			description:
 				"Template for page titles. Use {siteTitle} and {pageTitle} for the page title. Example: {pageTitle} - {siteTitle}",
 			validation: (Rule) => Rule.required(),
