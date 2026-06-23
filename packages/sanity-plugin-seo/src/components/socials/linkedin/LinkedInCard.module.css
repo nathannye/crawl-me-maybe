@@ -1,0 +1,44 @@
+.linkedInCard {
+	border: 1px solid #0a66c2;
+	background: #fff;
+	width: 100%;
+	margin: 0 auto;
+	box-sizing: border-box;
+	font-family: Arial, sans-serif;
+	padding: 0;
+	overflow: hidden;
+}
+
+.header {
+	display: flex;
+	gap: 1.2rem;
+	align-items: center;
+	border-bottom: 1px solid #e6edf5;
+	padding-bottom: 8px;
+	margin-bottom: 8px;
+}
+
+.imageWrapper {
+	width: 100%;
+	max-width: 100%;
+	overflow: hidden;
+}
+
+.image {
+	width: 100%;
+	max-width: 100%;
+	aspect-ratio: 1.91 / 1;
+	object-fit: cover;
+	display: block;
+	border-bottom: 1px solid #e6edf5;
+}
+
+@media (max-width: 600px) {
+	.linkedInCard {
+		max-width: 100%;
+	}
+
+	.header {
+		gap: 0.6rem;
+	}
+}

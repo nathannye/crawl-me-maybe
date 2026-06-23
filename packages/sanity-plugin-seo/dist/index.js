@@ -4,7 +4,7 @@
   if (typeof document === "undefined" || document.getElementById(id)) return;
   var style = document.createElement("style");
   style.id = id;
-  style.textContent = "/* src/components/core/Favicon/favicon-preview.module.css */\n.card_znijeg[data-theme=\"dark\"] {\n  --card-bg: #22242a;\n  --tab-bg: #22242a;\n  --tab-shadow: 0px 1.5px 3px 0px #181a1f, 0px .5px .5px .2px #23272b;\n  --tab-border: 1.5px solid #32353b;\n  --tab-favicon-bg: #22242a;\n  --tab-favicon-border: 1px solid #44464a;\n  --tab-url-text-color: #e1e6f0;\n}\n\n.card_znijeg[data-theme=\"light\"] {\n  --card-bg: #fff;\n  --tab-bg: #fff;\n  --tab-shadow: 0px 1.5px 3px 0px #ececec, 0px .5px .5px .2px #d4d9db;\n  --tab-border: 1.5px solid #e7ebed;\n  --tab-favicon-bg: #fff;\n  --tab-favicon-border: 1px solid #e5e5e5;\n  --tab-url-text-color: #242629;\n}\n\n.card_znijeg [data-tab-display] {\n  background: var(--tab-bg);\n  font-family: \"system-ui\", -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;\n}\n\n.image-preview_znijeg img {\n  background: #ececec !important;\n}\n\n/* src/components/socials/facebook/FacebookCard.module.css */\n.facebookCard_iq-4hA {\n  box-sizing: border-box;\n  overflow: hidden;\n  background: #fff;\n  border: 1px solid #1877f2;\n  width: 100%;\n  margin: 0 auto;\n  padding: 0;\n  font-family: Arial, sans-serif;\n}\n\n.header_iq-4hA {\n  display: flex;\n  border-bottom: 1px solid #f0f2f5;\n  align-items:  center;\n  gap: 1.2rem;\n  margin-bottom: 8px;\n  padding-bottom: 8px;\n}\n\n.imageWrapper_iq-4hA {\n  overflow: hidden;\n  width: 100%;\n  max-width: 100%;\n}\n\n.image_iq-4hA {\n  aspect-ratio: 1.91;\n  object-fit: cover;\n  display: block;\n  border-bottom: 1px solid #f0f2f5;\n  width: 100%;\n  max-width: 100%;\n}\n\n@media (max-width: 600px) {\n  .facebookCard_iq-4hA {\n    max-width: 100%;\n  }\n\n  .header_iq-4hA {\n    gap: .6rem;\n  }\n}\n\n/* src/components/socials/google/GoogleEntry.module.css */\n.googleCard_yJDEgw {\n  box-sizing: border-box;\n  background: #fff;\n  border: 1px solid #e1e4e8;\n  max-width: 550px;\n  margin: 0 auto 24px;\n  padding: 0;\n  font-family: Arial, sans-serif;\n}\n\n.title_yJDEgw {\n  color: #1a0dab;\n  margin-bottom: .25em;\n}\n\n.site_yJDEgw {\n  color: #202124;\n  margin-bottom: .2em;\n  font-size: .97em;\n}\n\n.desc_yJDEgw {\n  color: #4d5156;\n}\n\n.cardSection_yJDEgw {\n  margin: 16px 0;\n}\n\n@media (max-width: 600px) {\n  .googleCard_yJDEgw {\n    max-width: 99vw;\n  }\n}\n\n/* src/components/socials/twitter/TwitterCard.module.css */\n.twitterCard_1NtJNQ {\n  box-sizing: border-box;\n  overflow: hidden;\n  background: #fff;\n  border: 1px solid #1da1f2;\n  width: 100%;\n  max-width: 500px;\n  margin: 0 auto;\n  padding: 0;\n  font-family: Arial, sans-serif;\n}\n\n.userRow_1NtJNQ {\n  display: flex;\n  border-bottom: 1px solid #eaf5fe;\n  align-items:  center;\n  gap: 1.2rem;\n  margin-bottom: 8px;\n  padding-bottom: 8px;\n}\n\n.imageWrapper_1NtJNQ {\n  box-sizing: border-box;\n  width: 100%;\n  max-width: 100%;\n  padding: 0 12px;\n}\n\n.imageLarge_1NtJNQ {\n  aspect-ratio: 1.91;\n  object-fit: cover;\n  display: block;\n  border-radius: 12px;\n  width: 100%;\n  max-width: 100%;\n  margin: 12px 0 18px;\n}\n\n@media (max-width: 600px) {\n  .twitterCard_1NtJNQ {\n    max-width: 100%;\n  }\n\n  .userRow_1NtJNQ {\n    gap: .6rem;\n  }\n}\n";
+  style.textContent = "/* src/components/core/Favicon/favicon-preview.module.css */\n.card_znijeg[data-theme=\"dark\"] {\n  --card-bg: #22242a;\n  --tab-bg: #22242a;\n  --tab-shadow: 0px 1.5px 3px 0px #181a1f, 0px .5px .5px .2px #23272b;\n  --tab-border: 1.5px solid #32353b;\n  --tab-favicon-bg: #22242a;\n  --tab-favicon-border: 1px solid #44464a;\n  --tab-url-text-color: #e1e6f0;\n}\n\n.card_znijeg[data-theme=\"light\"] {\n  --card-bg: #fff;\n  --tab-bg: #fff;\n  --tab-shadow: 0px 1.5px 3px 0px #ececec, 0px .5px .5px .2px #d4d9db;\n  --tab-border: 1.5px solid #e7ebed;\n  --tab-favicon-bg: #fff;\n  --tab-favicon-border: 1px solid #e5e5e5;\n  --tab-url-text-color: #242629;\n}\n\n.card_znijeg [data-tab-display] {\n  background: var(--tab-bg);\n  font-family: \"system-ui\", -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu, Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;\n}\n\n.image-preview_znijeg img {\n  background: #ececec !important;\n}\n\n/* src/components/socials/facebook/FacebookCard.module.css */\n.facebookCard_iq-4hA {\n  box-sizing: border-box;\n  overflow: hidden;\n  background: #fff;\n  border: 1px solid #1877f2;\n  width: 100%;\n  margin: 0 auto;\n  padding: 0;\n  font-family: Arial, sans-serif;\n}\n\n.header_iq-4hA {\n  display: flex;\n  border-bottom: 1px solid #f0f2f5;\n  align-items:  center;\n  gap: 1.2rem;\n  margin-bottom: 8px;\n  padding-bottom: 8px;\n}\n\n.imageWrapper_iq-4hA {\n  overflow: hidden;\n  width: 100%;\n  max-width: 100%;\n}\n\n.image_iq-4hA {\n  aspect-ratio: 1.91;\n  object-fit: cover;\n  display: block;\n  border-bottom: 1px solid #f0f2f5;\n  width: 100%;\n  max-width: 100%;\n}\n\n@media (max-width: 600px) {\n  .facebookCard_iq-4hA {\n    max-width: 100%;\n  }\n\n  .header_iq-4hA {\n    gap: .6rem;\n  }\n}\n\n/* src/components/socials/google/GoogleEntry.module.css */\n.googleCard_yJDEgw {\n  box-sizing: border-box;\n  background: #fff;\n  border: 1px solid #e1e4e8;\n  max-width: 550px;\n  margin: 0 auto 24px;\n  padding: 0;\n  font-family: Arial, sans-serif;\n}\n\n.title_yJDEgw {\n  color: #1a0dab;\n  margin-bottom: .25em;\n}\n\n.site_yJDEgw {\n  color: #202124;\n  margin-bottom: .2em;\n  font-size: .97em;\n}\n\n.desc_yJDEgw {\n  color: #4d5156;\n}\n\n.cardSection_yJDEgw {\n  margin: 16px 0;\n}\n\n@media (max-width: 600px) {\n  .googleCard_yJDEgw {\n    max-width: 99vw;\n  }\n}\n\n/* src/components/socials/linkedin/LinkedInCard.module.css */\n.linkedInCard_EFV6Wg {\n  box-sizing: border-box;\n  overflow: hidden;\n  background: #fff;\n  border: 1px solid #0a66c2;\n  width: 100%;\n  margin: 0 auto;\n  padding: 0;\n  font-family: Arial, sans-serif;\n}\n\n.header_EFV6Wg {\n  display: flex;\n  border-bottom: 1px solid #e6edf5;\n  align-items:  center;\n  gap: 1.2rem;\n  margin-bottom: 8px;\n  padding-bottom: 8px;\n}\n\n.imageWrapper_EFV6Wg {\n  overflow: hidden;\n  width: 100%;\n  max-width: 100%;\n}\n\n.image_EFV6Wg {\n  aspect-ratio: 1.91;\n  object-fit: cover;\n  display: block;\n  border-bottom: 1px solid #e6edf5;\n  width: 100%;\n  max-width: 100%;\n}\n\n@media (max-width: 600px) {\n  .linkedInCard_EFV6Wg {\n    max-width: 100%;\n  }\n\n  .header_EFV6Wg {\n    gap: .6rem;\n  }\n}\n\n/* src/components/socials/twitter/TwitterCard.module.css */\n.twitterCard_1NtJNQ {\n  box-sizing: border-box;\n  overflow: hidden;\n  background: #fff;\n  border: 1px solid #1da1f2;\n  width: 100%;\n  max-width: 500px;\n  margin: 0 auto;\n  padding: 0;\n  font-family: Arial, sans-serif;\n}\n\n.userRow_1NtJNQ {\n  display: flex;\n  border-bottom: 1px solid #eaf5fe;\n  align-items:  center;\n  gap: 1.2rem;\n  margin-bottom: 8px;\n  padding-bottom: 8px;\n}\n\n.imageWrapper_1NtJNQ {\n  box-sizing: border-box;\n  width: 100%;\n  max-width: 100%;\n  padding: 0 12px;\n}\n\n.imageLarge_1NtJNQ {\n  aspect-ratio: 1.91;\n  object-fit: cover;\n  display: block;\n  border-radius: 12px;\n  width: 100%;\n  max-width: 100%;\n  margin: 12px 0 18px;\n}\n\n@media (max-width: 600px) {\n  .twitterCard_1NtJNQ {\n    max-width: 100%;\n  }\n\n  .userRow_1NtJNQ {\n    gap: .6rem;\n  }\n}\n";
   document.head.appendChild(style);
 })();
 // src/index.ts
@@ -177,13 +177,14 @@ var documents_default = [global_seo_settings_default];
 import { defineField as defineField2 } from "sanity";
 
 // src/components/core/Favicon/FaviconPreview.tsx
-import { Box as Box2, Card, Flex as Flex3, useRootTheme as useRootTheme2 } from "@sanity/ui";
+import { Box, Card, Flex as Flex3, useRootTheme } from "@sanity/ui";
 import { buildSrc } from "@sanity-image/url-builder";
-import { useMemo } from "react";
+import { useEffect as useEffect2, useMemo, useRef, useState as useState2 } from "react";
+import { MdDarkMode, MdLightMode } from "react-icons/md";
 import { useDataset, useProjectId } from "sanity";
 
 // src/components/core/Favicon/BrowserTab.tsx
-import { Flex, Text, useRootTheme } from "@sanity/ui";
+import { Flex, Text } from "@sanity/ui";
 
 // src/components/core/Favicon/favicon-preview.module.css
 var favicon_preview_module_default = {
@@ -194,14 +195,13 @@ var favicon_preview_module_default = {
 // src/components/core/Favicon/BrowserTab.tsx
 import { jsxDEV as jsxDEV3 } from "react/jsx-dev-runtime";
 function BrowserTab({
-  url = "https://example.com",
   favicon = "https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg",
-  title = "Your Site"
+  title = "Your Site",
+  scheme = "light"
 }) {
-  const theme = useRootTheme();
   return /* @__PURE__ */ jsxDEV3(Flex, {
     gap: 2,
-    "data-theme": theme.scheme,
+    "data-theme": scheme,
     className: favicon_preview_module_default.card,
     style: {
       borderRadius: "10px 10px 0 0",
@@ -218,7 +218,7 @@ function BrowserTab({
     },
     children: [
       /* @__PURE__ */ jsxDEV3("img", {
-        src: favicon,
+        src: favicon ?? undefined,
         width: 16,
         height: 16,
         alt: "Favicon on tab",
@@ -286,25 +286,30 @@ function WindowControls() {
 import { jsxDEV as jsxDEV5 } from "react/jsx-dev-runtime";
 function FaviconPreview(props) {
   const defaults = useSeoDefaults();
-  const theme = useRootTheme2();
+  const theme = useRootTheme();
   const dataset = useDataset();
   const projectId = useProjectId();
-  const url = useMemo(() => {
-    const domain = defaults?.siteUrl ? defaults.siteUrl : "https://example.com";
-    return domain.replace("https://", "");
-  }, [defaults]);
+  const [previewSchemeOverride, setPreviewSchemeOverride] = useState2(null);
+  const lastGlobalScheme = useRef(theme.scheme);
   const faviconUrl = useMemo(() => {
     return props.value?.asset?._ref ? buildSrc({
       id: props.value?.asset?._ref,
       baseUrl: `https://cdn.sanity.io/images/${projectId}/${dataset}/`
     })?.src : null;
   }, [props.value?.asset?._ref, projectId, dataset]);
+  useEffect2(() => {
+    if (lastGlobalScheme.current !== theme.scheme) {
+      lastGlobalScheme.current = theme.scheme;
+      setPreviewSchemeOverride(null);
+    }
+  }, [theme.scheme]);
+  const previewScheme = previewSchemeOverride ?? theme.scheme;
   return /* @__PURE__ */ jsxDEV5("div", {
     className: favicon_preview_module_default.card,
     children: [
       /* @__PURE__ */ jsxDEV5(Card, {
         "data-tab-display": true,
-        "data-theme": theme.scheme,
+        "data-theme": previewScheme,
         shadow: 2,
         marginBottom: 2,
         radius: 4,
@@ -314,20 +319,50 @@ function FaviconPreview(props) {
         children: /* @__PURE__ */ jsxDEV5(Flex3, {
           paddingX: 4,
           paddingY: 2,
-          justify: "start",
+          justify: "flex-start",
           align: "center",
           children: [
             /* @__PURE__ */ jsxDEV5(WindowControls, {}, undefined, false, undefined, this),
             /* @__PURE__ */ jsxDEV5(BrowserTab, {
-              url,
               title: defaults?.siteTitle,
-              favicon: faviconUrl
+              favicon: faviconUrl,
+              scheme: previewScheme
             }, undefined, false, undefined, this),
-            /* @__PURE__ */ jsxDEV5(BrowserTab, {}, undefined, false, undefined, this)
+            /* @__PURE__ */ jsxDEV5(BrowserTab, {
+              title: "Facebook",
+              scheme: previewScheme
+            }, undefined, false, undefined, this),
+            /* @__PURE__ */ jsxDEV5("button", {
+              type: "button",
+              title: "Toggle favicon preview theme",
+              "aria-label": "Toggle favicon preview theme",
+              onClick: () => {
+                const currentScheme = previewSchemeOverride ?? theme.scheme;
+                setPreviewSchemeOverride(currentScheme === "dark" ? "light" : "dark");
+              },
+              style: {
+                display: "inline-flex",
+                alignItems: "center",
+                justifyContent: "center",
+                marginLeft: "auto",
+                width: 24,
+                height: 24,
+                borderRadius: 999,
+                border: "1px solid var(--card-border-color)",
+                background: "var(--card-bg-color)",
+                color: "var(--card-muted-fg-color)",
+                cursor: "pointer"
+              },
+              children: previewScheme === "dark" ? /* @__PURE__ */ jsxDEV5(MdLightMode, {
+                size: 14
+              }, undefined, false, undefined, this) : /* @__PURE__ */ jsxDEV5(MdDarkMode, {
+                size: 14
+              }, undefined, false, undefined, this)
+            }, undefined, false, undefined, this)
           ]
         }, undefined, true, undefined, this)
       }, undefined, false, undefined, this),
-      /* @__PURE__ */ jsxDEV5(Box2, {
+      /* @__PURE__ */ jsxDEV5(Box, {
         className: favicon_preview_module_default?.["image-preview"],
         children: props.renderDefault(props)
       }, undefined, false, undefined, this)
@@ -397,14 +432,14 @@ var meta_title_default = defineField5({
 });
 
 // src/components/core/InputWithGlobalDefault.tsx
-import { Box as Box3, Card as Card3, Flex as Flex5, Stack, Text as Text4 } from "@sanity/ui";
+import { Box as Box2, Card as Card3, Flex as Flex5, Stack, Text as Text3 } from "@sanity/ui";
 import { buildSrc as buildSrc2 } from "@sanity-image/url-builder";
 import { useMemo as useMemo2 } from "react";
 import { MdCheck, MdWarning } from "react-icons/md";
 import { useDataset as useDataset2, useProjectId as useProjectId2 } from "sanity";
 
 // src/components/partials/CardWithIcon.tsx
-import { Card as Card2, Flex as Flex4, Text as Text3 } from "@sanity/ui";
+import { Card as Card2, Flex as Flex4, Text as Text2 } from "@sanity/ui";
 import { jsxDEV as jsxDEV6 } from "react/jsx-dev-runtime";
 function CardWithIcon({
   icon,
@@ -423,7 +458,7 @@ function CardWithIcon({
         Icon && /* @__PURE__ */ jsxDEV6(Icon, {
           size: 18
         }, undefined, false, undefined, this),
-        /* @__PURE__ */ jsxDEV6(Text3, {
+        /* @__PURE__ */ jsxDEV6(Text2, {
           size: 1,
           children: text
         }, undefined, false, undefined, this)
@@ -516,12 +551,12 @@ function InputWithGlobalDefault(props) {
                 /* @__PURE__ */ jsxDEV7(Stack, {
                   gap: 2,
                   children: [
-                    /* @__PURE__ */ jsxDEV7(Text4, {
+                    /* @__PURE__ */ jsxDEV7(Text3, {
                       size: 1,
                       weight: "semibold",
                       children: "Using the global default image."
                     }, undefined, false, undefined, this),
-                    /* @__PURE__ */ jsxDEV7(Text4, {
+                    /* @__PURE__ */ jsxDEV7(Text3, {
                       size: 0,
                       muted: true,
                       children: "Add an image below to override."
@@ -545,7 +580,7 @@ function InputWithGlobalDefault(props) {
           ]
         }, undefined, true, undefined, this)
       }, undefined, false, undefined, this),
-      /* @__PURE__ */ jsxDEV7(Box3, {
+      /* @__PURE__ */ jsxDEV7(Box2, {
         style: { position: "relative" },
         children: [
           props.renderDefault(propsWithPlaceholder),
@@ -560,7 +595,7 @@ function InputWithGlobalDefault(props) {
               border: "1px dashed var(--card-border-color)",
               borderRadius: "4px"
             },
-            children: /* @__PURE__ */ jsxDEV7(Text4, {
+            children: /* @__PURE__ */ jsxDEV7(Text3, {
               size: 1,
               muted: true,
               children: "Using global default image"
@@ -574,8 +609,8 @@ function InputWithGlobalDefault(props) {
 
 // src/components/core/PageSeoInput/PageSeoInput.tsx
 import { buildSrc as buildSrc3 } from "@sanity-image/url-builder";
-import { Box as Box8, Flex as Flex10 } from "@sanity/ui";
-import { useEffect as useEffect2, useMemo as useMemo3, useState as useState2 } from "react";
+import { Box as Box8, Flex as Flex11 } from "@sanity/ui";
+import { useEffect as useEffect3, useMemo as useMemo3, useState as useState3 } from "react";
 import { MdEdit, MdPreview } from "react-icons/md";
 import {
   useClient as useClient2,
@@ -607,7 +642,7 @@ var concatenatePageTitle = (pageTitle, siteTitle, template) => {
 };
 
 // src/components/partials/ButtonWithIcon.tsx
-import { Button, Flex as Flex6, Text as Text5 } from "@sanity/ui";
+import { Button, Flex as Flex6, Text as Text4 } from "@sanity/ui";
 import { jsxDEV as jsxDEV8 } from "react/jsx-dev-runtime";
 function ButtonWithIcon({
   icon,
@@ -625,7 +660,7 @@ function ButtonWithIcon({
         Icon && /* @__PURE__ */ jsxDEV8(Icon, {
           size: 17
         }, undefined, false, undefined, this),
-        /* @__PURE__ */ jsxDEV8(Text5, {
+        /* @__PURE__ */ jsxDEV8(Text4, {
           size: 1,
           weight: "semibold",
           children: label
@@ -636,7 +671,7 @@ function ButtonWithIcon({
 }
 
 // src/components/socials/facebook/FacebookCard.tsx
-import { Avatar, Box as Box4, Flex as Flex7, Stack as Stack2, Text as Text6 } from "@sanity/ui";
+import { Avatar, Box as Box3, Flex as Flex7, Stack as Stack2, Text as Text5 } from "@sanity/ui";
 
 // src/components/partials/SocialCardWrapper.tsx
 import { Card as Card4 } from "@sanity/ui";
@@ -687,12 +722,12 @@ function FacebookCard(props) {
           /* @__PURE__ */ jsxDEV10(Stack2, {
             gap: 2,
             children: [
-              /* @__PURE__ */ jsxDEV10(Text6, {
+              /* @__PURE__ */ jsxDEV10(Text5, {
                 weight: "semibold",
                 size: 2,
                 children: data.siteTitle
               }, undefined, false, undefined, this),
-              /* @__PURE__ */ jsxDEV10(Text6, {
+              /* @__PURE__ */ jsxDEV10(Text5, {
                 size: 1,
                 muted: true,
                 children: data.siteUrl
@@ -701,7 +736,7 @@ function FacebookCard(props) {
           }, undefined, true, undefined, this)
         ]
       }, undefined, true, undefined, this),
-      /* @__PURE__ */ jsxDEV10(Box4, {
+      /* @__PURE__ */ jsxDEV10(Box3, {
         className: FacebookCard_module_default.imageWrapper,
         children: /* @__PURE__ */ jsxDEV10("img", {
           className: FacebookCard_module_default.image,
@@ -709,24 +744,24 @@ function FacebookCard(props) {
           alt: "Facebook preview"
         }, undefined, false, undefined, this)
       }, undefined, false, undefined, this),
-      /* @__PURE__ */ jsxDEV10(Box4, {
+      /* @__PURE__ */ jsxDEV10(Box3, {
         padding: 3,
         children: /* @__PURE__ */ jsxDEV10(Stack2, {
           space: 3,
           children: [
-            /* @__PURE__ */ jsxDEV10(Text6, {
+            /* @__PURE__ */ jsxDEV10(Text5, {
               size: 1,
               muted: true,
               children: data.siteUrl
             }, undefined, false, undefined, this),
-            /* @__PURE__ */ jsxDEV10(Text6, {
+            /* @__PURE__ */ jsxDEV10(Text5, {
               weight: "semibold",
               size: 3,
               children: truncate(data.title, 60)
             }, undefined, false, undefined, this),
-            /* @__PURE__ */ jsxDEV10(Box4, {
+            /* @__PURE__ */ jsxDEV10(Box3, {
               marginTop: 1,
-              children: /* @__PURE__ */ jsxDEV10(Text6, {
+              children: /* @__PURE__ */ jsxDEV10(Text5, {
                 size: 2,
                 children: truncate(data.description, 110)
               }, undefined, false, undefined, this)
@@ -740,7 +775,7 @@ function FacebookCard(props) {
 var FacebookCard_default = FacebookCard;
 
 // src/components/socials/google/GoogleEntry.tsx
-import { Avatar as Avatar2, Box as Box5, Flex as Flex8, Stack as Stack3, Text as Text7, useRootTheme as useRootTheme3 } from "@sanity/ui";
+import { Avatar as Avatar2, Box as Box4, Flex as Flex8, Stack as Stack3, Text as Text6, useRootTheme as useRootTheme2 } from "@sanity/ui";
 
 // src/components/socials/google/GoogleEntry.module.css
 var GoogleEntry_module_default = {
@@ -761,9 +796,9 @@ function GoogleEntry(props) {
     favicon: "https://placehold.co/32x32"
   };
   const data = { ...fallback, ...props };
-  const theme = useRootTheme3();
+  const theme = useRootTheme2();
   return /* @__PURE__ */ jsxDEV11(SocialCardWrapper, {
-    children: /* @__PURE__ */ jsxDEV11(Box5, {
+    children: /* @__PURE__ */ jsxDEV11(Box4, {
       padding: 3,
       children: /* @__PURE__ */ jsxDEV11(Stack3, {
         space: 3,
@@ -781,13 +816,13 @@ function GoogleEntry(props) {
               /* @__PURE__ */ jsxDEV11(Stack3, {
                 space: 2,
                 children: [
-                  /* @__PURE__ */ jsxDEV11(Text7, {
+                  /* @__PURE__ */ jsxDEV11(Text6, {
                     size: 1,
                     weight: "semibold",
                     className: GoogleEntry_module_default.site,
                     children: data.siteTitle
                   }, undefined, false, undefined, this),
-                  /* @__PURE__ */ jsxDEV11(Text7, {
+                  /* @__PURE__ */ jsxDEV11(Text6, {
                     size: 1,
                     muted: true,
                     className: GoogleEntry_module_default.site,
@@ -797,7 +832,7 @@ function GoogleEntry(props) {
               }, undefined, true, undefined, this)
             ]
           }, undefined, true, undefined, this),
-          /* @__PURE__ */ jsxDEV11(Text7, {
+          /* @__PURE__ */ jsxDEV11(Text6, {
             style: {
               color: theme.scheme === "light" ? "#1D11AC" : "#99C2FF"
             },
@@ -806,7 +841,7 @@ function GoogleEntry(props) {
             className: GoogleEntry_module_default.title,
             children: truncate(data.title, 60)
           }, undefined, false, undefined, this),
-          /* @__PURE__ */ jsxDEV11(Text7, {
+          /* @__PURE__ */ jsxDEV11(Text6, {
             size: 2,
             muted: true,
             className: GoogleEntry_module_default.desc,
@@ -819,8 +854,95 @@ function GoogleEntry(props) {
 }
 var GoogleEntry_default = GoogleEntry;
 
+// src/components/socials/linkedin/LinkedInCard.tsx
+import { Avatar as Avatar3, Box as Box5, Flex as Flex9, Stack as Stack4, Text as Text7 } from "@sanity/ui";
+
+// src/components/socials/linkedin/LinkedInCard.module.css
+var LinkedInCard_module_default = {
+  linkedInCard: "linkedInCard_EFV6Wg",
+  header: "header_EFV6Wg",
+  imageWrapper: "imageWrapper_EFV6Wg",
+  image: "image_EFV6Wg"
+};
+
+// src/components/socials/linkedin/LinkedInCard.tsx
+import { jsxDEV as jsxDEV12 } from "react/jsx-dev-runtime";
+function LinkedInCard(props) {
+  const fallback = {
+    title: "My Awesome Page",
+    description: "A concise preview crafted for LinkedIn feeds. Keep it clear, professional, and easy to scan.",
+    image: "https://placehold.co/1200x627",
+    siteUrl: "mywebsite.com",
+    siteTitle: "My Website",
+    avatar: "https://placehold.co/40x40"
+  };
+  const data = { ...fallback, ...props };
+  return /* @__PURE__ */ jsxDEV12(SocialCardWrapper, {
+    className: LinkedInCard_module_default.linkedInCard,
+    children: [
+      /* @__PURE__ */ jsxDEV12(Flex9, {
+        gap: 2,
+        padding: 3,
+        className: LinkedInCard_module_default.header,
+        children: [
+          /* @__PURE__ */ jsxDEV12(Avatar3, {
+            src: data.avatar,
+            size: 3
+          }, undefined, false, undefined, this),
+          /* @__PURE__ */ jsxDEV12(Stack4, {
+            space: 2,
+            children: [
+              /* @__PURE__ */ jsxDEV12(Text7, {
+                weight: "semibold",
+                size: 2,
+                children: data.siteTitle
+              }, undefined, false, undefined, this),
+              /* @__PURE__ */ jsxDEV12(Text7, {
+                size: 1,
+                muted: true,
+                children: data.siteUrl
+              }, undefined, false, undefined, this)
+            ]
+          }, undefined, true, undefined, this)
+        ]
+      }, undefined, true, undefined, this),
+      /* @__PURE__ */ jsxDEV12(Box5, {
+        className: LinkedInCard_module_default.imageWrapper,
+        children: /* @__PURE__ */ jsxDEV12("img", {
+          className: LinkedInCard_module_default.image,
+          src: data.image,
+          alt: "LinkedIn preview"
+        }, undefined, false, undefined, this)
+      }, undefined, false, undefined, this),
+      /* @__PURE__ */ jsxDEV12(Box5, {
+        padding: 3,
+        children: /* @__PURE__ */ jsxDEV12(Stack4, {
+          space: 3,
+          children: [
+            /* @__PURE__ */ jsxDEV12(Text7, {
+              size: 1,
+              muted: true,
+              children: data.siteUrl
+            }, undefined, false, undefined, this),
+            /* @__PURE__ */ jsxDEV12(Text7, {
+              weight: "semibold",
+              size: 3,
+              children: truncate(data.title, 70)
+            }, undefined, false, undefined, this),
+            /* @__PURE__ */ jsxDEV12(Text7, {
+              size: 2,
+              children: truncate(data.description, 140)
+            }, undefined, false, undefined, this)
+          ]
+        }, undefined, true, undefined, this)
+      }, undefined, false, undefined, this)
+    ]
+  }, undefined, true, undefined, this);
+}
+var LinkedInCard_default = LinkedInCard;
+
 // src/components/socials/twitter/TwitterCard.tsx
-import { Avatar as Avatar3, Box as Box6, Flex as Flex9, Stack as Stack4, Text as Text8 } from "@sanity/ui";
+import { Avatar as Avatar4, Box as Box6, Flex as Flex10, Stack as Stack5, Text as Text8 } from "@sanity/ui";
 
 // src/components/socials/twitter/TwitterCard.module.css
 var TwitterCard_module_default = {
@@ -831,7 +953,7 @@ var TwitterCard_module_default = {
 };
 
 // src/components/socials/twitter/TwitterCard.tsx
-import { jsxDEV as jsxDEV12 } from "react/jsx-dev-runtime";
+import { jsxDEV as jsxDEV13 } from "react/jsx-dev-runtime";
 function TwitterCard(props) {
   const fallback = {
     siteTitle: "Why Static Site Generators Rock",
@@ -845,27 +967,27 @@ function TwitterCard(props) {
     ...fallback,
     ...props
   };
-  return /* @__PURE__ */ jsxDEV12(SocialCardWrapper, {
+  return /* @__PURE__ */ jsxDEV13(SocialCardWrapper, {
     className: TwitterCard_module_default.twitterCard,
     children: [
-      /* @__PURE__ */ jsxDEV12(Flex9, {
+      /* @__PURE__ */ jsxDEV13(Flex10, {
         gap: 2,
         padding: 3,
         className: TwitterCard_module_default.userRow,
         children: [
-          /* @__PURE__ */ jsxDEV12(Avatar3, {
+          /* @__PURE__ */ jsxDEV13(Avatar4, {
             src: data.avatar,
             size: 3
           }, undefined, false, undefined, this),
-          /* @__PURE__ */ jsxDEV12(Stack4, {
+          /* @__PURE__ */ jsxDEV13(Stack5, {
             space: 2,
             children: [
-              /* @__PURE__ */ jsxDEV12(Text8, {
+              /* @__PURE__ */ jsxDEV13(Text8, {
                 weight: "semibold",
                 size: 2,
                 children: data.siteTitle
               }, undefined, false, undefined, this),
-              /* @__PURE__ */ jsxDEV12(Text8, {
+              /* @__PURE__ */ jsxDEV13(Text8, {
                 size: 1,
                 muted: true,
                 children: data.twitterHandle
@@ -874,31 +996,31 @@ function TwitterCard(props) {
           }, undefined, true, undefined, this)
         ]
       }, undefined, true, undefined, this),
-      /* @__PURE__ */ jsxDEV12(Box6, {
+      /* @__PURE__ */ jsxDEV13(Box6, {
         className: TwitterCard_module_default.imageWrapper,
-        children: /* @__PURE__ */ jsxDEV12("img", {
+        children: /* @__PURE__ */ jsxDEV13("img", {
           className: TwitterCard_module_default.imageLarge,
           src: data.image,
           alt: "Twitter preview"
         }, undefined, false, undefined, this)
       }, undefined, false, undefined, this),
-      /* @__PURE__ */ jsxDEV12(Box6, {
+      /* @__PURE__ */ jsxDEV13(Box6, {
         padding: 3,
-        children: /* @__PURE__ */ jsxDEV12(Flex9, {
+        children: /* @__PURE__ */ jsxDEV13(Flex10, {
           direction: "column",
           gap: 4,
           children: [
-            /* @__PURE__ */ jsxDEV12(Text8, {
+            /* @__PURE__ */ jsxDEV13(Text8, {
               size: 1,
               muted: true,
               children: data.siteUrl
             }, undefined, false, undefined, this),
-            /* @__PURE__ */ jsxDEV12(Text8, {
+            /* @__PURE__ */ jsxDEV13(Text8, {
               weight: "semibold",
               size: 3,
               children: truncate(data.title, 70)
             }, undefined, false, undefined, this),
-            /* @__PURE__ */ jsxDEV12(Text8, {
+            /* @__PURE__ */ jsxDEV13(Text8, {
               size: 2,
               children: truncate(data.description, 120)
             }, undefined, false, undefined, this)
@@ -912,16 +1034,16 @@ var TwitterCard_default = TwitterCard;
 
 // src/components/core/PageSeoInput/PreviewGroup.tsx
 import { Box as Box7, Text as Text9 } from "@sanity/ui";
-import { jsxDEV as jsxDEV13 } from "react/jsx-dev-runtime";
+import { jsxDEV as jsxDEV14 } from "react/jsx-dev-runtime";
 function PreviewGroup({
   title,
   children
 }) {
-  return /* @__PURE__ */ jsxDEV13("div", {
+  return /* @__PURE__ */ jsxDEV14("div", {
     children: [
-      /* @__PURE__ */ jsxDEV13(Box7, {
+      /* @__PURE__ */ jsxDEV14(Box7, {
         marginBottom: 4,
-        children: /* @__PURE__ */ jsxDEV13(Text9, {
+        children: /* @__PURE__ */ jsxDEV14(Text9, {
           weight: "semibold",
           size: 2,
           children: title
@@ -933,7 +1055,7 @@ function PreviewGroup({
 }
 
 // src/components/core/PageSeoInput/PageSeoInput.tsx
-import { jsxDEV as jsxDEV14 } from "react/jsx-dev-runtime";
+import { jsxDEV as jsxDEV15 } from "react/jsx-dev-runtime";
 var PREVIEW_GROUPS = [
   {
     name: "Facebook",
@@ -944,6 +1066,11 @@ var PREVIEW_GROUPS = [
     name: "Twitter / X",
     component: TwitterCard_default,
     title: "Twitter"
+  },
+  {
+    name: "LinkedIn",
+    component: LinkedInCard_default,
+    title: "LinkedIn"
   },
   {
     name: "Google",
@@ -959,9 +1086,9 @@ function PageSeoInput(props) {
     { name: "fields", title: "Fields", icon: MdEdit },
     { name: "preview", title: "Preview", icon: MdPreview }
   ];
-  const [currentMode, setCurrentMode] = useState2(MODES[0]?.name);
-  const [seoDefaults, setSeoDefaults] = useState2(null);
-  useEffect2(() => {
+  const [currentMode, setCurrentMode] = useState3(MODES[0]?.name);
+  const [seoDefaults, setSeoDefaults] = useState3(null);
+  useEffect3(() => {
     client.fetch(`*[_type == "globalSeoSettings"][0]`).then(setSeoDefaults);
   }, [client]);
   const document = useFormValue([]) || {};
@@ -983,15 +1110,15 @@ function PageSeoInput(props) {
     image: previewImageUrl,
     title: concatenatePageTitle(document?.title, defaults.siteTitle, defaults.pageTitleTemplate)
   };
-  return /* @__PURE__ */ jsxDEV14("div", {
+  return /* @__PURE__ */ jsxDEV15("div", {
     children: [
-      /* @__PURE__ */ jsxDEV14(Box8, {
+      /* @__PURE__ */ jsxDEV15(Box8, {
         marginBottom: 4,
         width: "fill",
-        children: /* @__PURE__ */ jsxDEV14(Flex10, {
+        children: /* @__PURE__ */ jsxDEV15(Flex11, {
           gap: 2,
           width: "fill",
-          children: MODES.map((m) => /* @__PURE__ */ jsxDEV14(ButtonWithIcon, {
+          children: MODES.map((m) => /* @__PURE__ */ jsxDEV15(ButtonWithIcon, {
             buttonProps: {
               padding: 2,
               width: "fill",
@@ -1004,13 +1131,13 @@ function PageSeoInput(props) {
         }, undefined, false, undefined, this)
       }, undefined, false, undefined, this),
       currentMode === "fields" && props.renderDefault(props),
-      currentMode === "preview" && /* @__PURE__ */ jsxDEV14(Flex10, {
+      currentMode === "preview" && /* @__PURE__ */ jsxDEV15(Flex11, {
         gap: 6,
         marginTop: 6,
         direction: "column",
-        children: PREVIEW_GROUPS.map((group) => /* @__PURE__ */ jsxDEV14(PreviewGroup, {
+        children: PREVIEW_GROUPS.map((group) => /* @__PURE__ */ jsxDEV15(PreviewGroup, {
           title: group.title,
-          children: /* @__PURE__ */ jsxDEV14(group.component, {
+          children: /* @__PURE__ */ jsxDEV15(group.component, {
             ...seoData
           }, undefined, false, undefined, this)
         }, group.name, false, undefined, this))
@@ -1062,11 +1189,11 @@ import { defineField as defineField6 } from "sanity";
 
 // src/components/core/IndexingControls.tsx
 import { set } from "sanity";
-import { Button as Button2, Flex as Flex11, Stack as Stack5 } from "@sanity/ui";
+import { Button as Button2, Flex as Flex12, Stack as Stack6 } from "@sanity/ui";
 import { useCallback as useCallback2 } from "react";
 import { MdInfo, MdPlaylistRemove } from "react-icons/md";
 import { IoArrowRedo } from "react-icons/io5";
-import { jsxDEV as jsxDEV15 } from "react/jsx-dev-runtime";
+import { jsxDEV as jsxDEV16 } from "react/jsx-dev-runtime";
 function getNested(obj, key) {
   return obj && Object.prototype.hasOwnProperty.call(obj, key) ? obj[key] : undefined;
 }
@@ -1087,18 +1214,18 @@ function IndexingControls(props) {
   } else if (noIndex && noFollow) {
     note = "This page will not be indexed by search engines, and links on this page will not be crawled or considered for ranking.";
   }
-  return /* @__PURE__ */ jsxDEV15(Stack5, {
+  return /* @__PURE__ */ jsxDEV16(Stack6, {
     space: 3,
     children: [
-      /* @__PURE__ */ jsxDEV15(CardWithIcon, {
+      /* @__PURE__ */ jsxDEV16(CardWithIcon, {
         icon: MdInfo,
         tone: noIndex && noFollow ? "critical" : "suggest",
         text: note
       }, undefined, false, undefined, this),
-      /* @__PURE__ */ jsxDEV15(Flex11, {
+      /* @__PURE__ */ jsxDEV16(Flex12, {
         gap: 3,
         children: [
-          /* @__PURE__ */ jsxDEV15(Button2, {
+          /* @__PURE__ */ jsxDEV16(Button2, {
             width: "fill",
             icon: IoArrowRedo,
             mode: noFollow ? "default" : "ghost",
@@ -1107,7 +1234,7 @@ function IndexingControls(props) {
             tone: noFollow ? "critical" : "default",
             onClick: () => setValue("noFollow", !noFollow)
           }, undefined, false, undefined, this),
-          /* @__PURE__ */ jsxDEV15(Button2, {
+          /* @__PURE__ */ jsxDEV16(Button2, {
             width: "fill",
             icon: MdPlaylistRemove,
             mode: noIndex ? "default" : "ghost",
@@ -1124,7 +1251,7 @@ function IndexingControls(props) {
 // src/components/core/SchemaFieldWithDefault.tsx
 import { Box as Box10 } from "@sanity/ui";
 import { MdCheck as MdCheck2, MdWarning as MdWarning2 } from "react-icons/md";
-import { jsxDEV as jsxDEV16 } from "react/jsx-dev-runtime";
+import { jsxDEV as jsxDEV17 } from "react/jsx-dev-runtime";
 // src/schemas/fields/search-indexing.ts
 var search_indexing_default = defineField6({
   name: "searchIndexing",
@@ -1173,4 +1300,4 @@ export {
   src_default as default
 };
 
-//# debugId=BC72FEFCDBB9DD1D64756E2164756E21
+//# debugId=2F79D66DA421C99F64756E2164756E21

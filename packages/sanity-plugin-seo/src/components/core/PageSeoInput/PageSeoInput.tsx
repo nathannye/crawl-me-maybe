@@ -13,6 +13,7 @@ import { concatenatePageTitle } from "../../../utils/string";
 import ButtonWithIcon from "../../partials/ButtonWithIcon";
 import FacebookCard from "../../socials/facebook/FacebookCard";
 import GoogleEntry from "../../socials/google/GoogleEntry";
+import LinkedInCard from "../../socials/linkedin/LinkedInCard";
 import TwitterCard from "../../socials/twitter/TwitterCard";
 import { PreviewGroup } from "./PreviewGroup";
 
@@ -26,6 +27,11 @@ const PREVIEW_GROUPS = [
 		name: "Twitter / X",
 		component: TwitterCard,
 		title: "Twitter",
+	},
+	{
+		name: "LinkedIn",
+		component: LinkedInCard,
+		title: "LinkedIn",
 	},
 	{
 		name: "Google",

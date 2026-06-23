@@ -1,21 +1,19 @@
-import { Box, Flex, Text, useRootTheme } from "@sanity/ui";
+import { Flex, Text } from "@sanity/ui";
 import styles from "./favicon-preview.module.css";
 
 export default function BrowserTab({
-	url = "https://example.com",
 	favicon = "https://upload.wikimedia.org/wikipedia/commons/b/b8/2021_Facebook_icon.svg",
 	title = "Your Site",
+	scheme = "light",
 }: {
-	url?: string | null;
 	favicon?: string | null;
 	title?: string | null;
+	scheme?: "light" | "dark";
 }) {
-	const theme = useRootTheme();
-
 	return (
 		<Flex
 			gap={2}
-			data-theme={theme.scheme}
+			data-theme={scheme}
 			className={styles.card}
 			style={{
 				borderRadius: "10px 10px 0 0",
@@ -32,7 +30,7 @@ export default function BrowserTab({
 			}}
 		>
 			<img
-				src={favicon}
+				src={favicon ?? undefined}
 				width={16}
 				height={16}
 				alt="Favicon on tab"
