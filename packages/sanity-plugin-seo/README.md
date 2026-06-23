@@ -41,6 +41,76 @@ export default defineConfig({
 | `global.robots` | `boolean` | `true` | Includes the robots rules builder in Global SEO Settings |
 | `page.searchIndexing` | `boolean` | `true` | Includes noIndex / noFollow controls on the `pageMetadata` field |
 
+### Studio structure — surfacing Global SEO Settings
+
+Register the plugin, then add the `globalSeoSettings` singleton to your Studio's structure so editors can reach it:
+
+```ts
+// sanity.config.ts
+import { defineConfig } from "sanity";
+import { structureTool } from "sanity/structure";
+import crawlMeMaybeSeo from "@crawl-me-maybe/sanity-plugin-seo";
+
+export default defineConfig({
+  plugins: [
+    structureTool({
+      structure: (S) =>
+        S.list()
+          .title("Content")
+          .items([
+            // ... your other list items ...
+            S.divider(),
+            S.listItem()
+              .title("Global SEO Settings")
+              .child(
+                S.document()
+                  .schemaType("globalSeoSettings")
+                  .documentId("globalSeoSettings")
+              ),
+          ]),
+    }),
+    crawlMeMaybeSeo(),
+  ],
+});
+```
+
+### Adding SEO fields to a page document
+
+Include the `pageMetadata` object type on any document schema. The plugin wires up global-default inheritance automatically.
+
+```ts
+// schemas/page.ts
+import { defineType, defineField } from "sanity";
+
+export default defineType({
+  name: "page",
+  title: "Page",
+  type: "document",
+  fields: [
+    defineField({
+      name: "title",
+      title: "Title",
+      type: "string",
+    }),
+    defineField({
+      name: "slug",
+      title: "Slug",
+      type: "slug",
+      options: { source: "title" },
+    }),
+    defineField({
+      name: "seo",
+      title: "SEO",
+      type: "pageMetadata", // registered by the plugin
+    }),
+  ],
+});
+```
+
+Each `pageMetadata` field shows the live global default as a placeholder when the field is empty, and renders social preview cards (Facebook, Twitter/X, LinkedIn, Google) in a tabbed panel.
+
+---
+
 ## Favicons
 Browser-tab preview for dynamic favicons with theme-switching button. Can be disabled by setting `global.favicon` to `false`.
 
@@ -93,7 +163,6 @@ These named types are registered by the plugin and can be reused in your own sch
 | Type name | Base type | Description |
 |---|---|---|
 | `metaDescription` | `text` | 3-row textarea with 120–160 char warnings |
-| `metaTitle` | `string` | Single-line with 50–60 char warnings |
 | `metaImage` | `image` | Standard image field for OG/social use |
 | `favicon` | `image` | Image with browser-tab preview component |
 | `searchIndexing` | `object` | noIndex + noFollow boolean controls |
