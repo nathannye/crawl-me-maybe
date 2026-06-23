@@ -47,7 +47,20 @@ export default defineType({
 			type: "url",
 			description:
 				"Root URL of the website (e.g. https://your-domain.com). Used for canonical and Open Graph tags.",
-			validation: (Rule) => Rule.required(),
+			validation: (Rule) =>
+				Rule.custom((value) => {
+					if (!value) return "Site URL is required";
+					if (typeof value !== "string") return "Site URL must be a string";
+					if (!value.startsWith("https://"))
+						return "Site URL must start with https://";
+					return true;
+				}),
+		}),
+		defineField({
+			name: "defaultMetaImage",
+			type: "metaImage",
+			description:
+				"The default meta image for all pages if not overridden on the page.",
 		}),
 		defineField({
 			name: "favicon",

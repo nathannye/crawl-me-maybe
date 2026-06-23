@@ -18,14 +18,7 @@ export default {
 			options: {
 				matchingDefaultField: "metaDescription",
 			},
-			type: "text",
-			rows: 3,
-			description:
-				"The description displayed when a user finds the site in search results. Defaults to the description provided in Settings > SEO.",
-			validation: (Rule) =>
-				Rule.max(160).warning(
-					"Long titles (over 160 characters) will be truncated by Google.",
-				),
+			type: "metaDescription",
 		},
 		{
 			name: "searchIndexing",
@@ -39,10 +32,9 @@ export default {
 			options: {
 				matchingDefaultField: "metaImage",
 			},
-			title: "Meta Image",
 			description:
 				"Displayed when the site link is posted on social media, defaults to a screenshot of the homepage.",
-			type: "image",
+			type: "metaImage",
 		},
 	],
 };
