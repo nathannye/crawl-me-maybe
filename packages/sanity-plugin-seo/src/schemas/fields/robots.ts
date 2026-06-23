@@ -55,6 +55,7 @@ export default defineField({
 					name: "userAgent",
 					title: "User Agent",
 					type: "string",
+					validation: (Rule) => Rule.required(),
 				},
 				{
 					name: "allow",
