@@ -1326,6 +1326,88 @@ var metadata_default = {
 // src/schemas/fields/robots.ts
 import { FaRobot } from "react-icons/fa";
 import { defineField as defineField6 } from "sanity";
+
+// src/components/core/RobotsRulesInput.tsx
+import { Box as Box9, Card as Card6, Flex as Flex13, Text as Text11 } from "@sanity/ui";
+import { useMemo as useMemo4, useState as useState5 } from "react";
+import { MdEdit as MdEdit2, MdPreview as MdPreview2 } from "react-icons/md";
+import { jsxDEV as jsxDEV17 } from "react/jsx-dev-runtime";
+function buildRobotsPreview(rules) {
+  if (rules.length === 0) {
+    return `User-agent: *
+Allow: /`;
+  }
+  const content = rules.map((rule) => {
+    const lines = [];
+    lines.push(`User-agent: ${rule.userAgent?.trim() || "*"}`);
+    if (rule.allow?.trim())
+      lines.push(`Allow: ${rule.allow.trim()}`);
+    if (rule.disallow?.trim())
+      lines.push(`Disallow: ${rule.disallow.trim()}`);
+    return lines.join(`
+`);
+  }).join(`
+
+`);
+  return content;
+}
+function RobotsRulesInput(props) {
+  const [mode, setMode] = useState5("input");
+  const rules = props.value ?? [];
+  const robotsPreview = useMemo4(() => buildRobotsPreview(rules), [rules]);
+  return /* @__PURE__ */ jsxDEV17("div", {
+    children: [
+      /* @__PURE__ */ jsxDEV17(Box9, {
+        marginBottom: 4,
+        width: "fill",
+        children: /* @__PURE__ */ jsxDEV17(Flex13, {
+          gap: 2,
+          width: "fill",
+          children: [
+            /* @__PURE__ */ jsxDEV17(ButtonWithIcon, {
+              icon: MdEdit2,
+              label: "Input",
+              buttonProps: {
+                padding: 2,
+                width: "fill",
+                mode: mode === "input" ? "default" : "ghost",
+                onClick: () => setMode("input")
+              }
+            }, undefined, false, undefined, this),
+            /* @__PURE__ */ jsxDEV17(ButtonWithIcon, {
+              icon: MdPreview2,
+              label: "Preview",
+              buttonProps: {
+                padding: 2,
+                width: "fill",
+                mode: mode === "preview" ? "default" : "ghost",
+                onClick: () => setMode("preview")
+              }
+            }, undefined, false, undefined, this)
+          ]
+        }, undefined, true, undefined, this)
+      }, undefined, false, undefined, this),
+      mode === "input" && props.renderDefault(props),
+      mode === "preview" && /* @__PURE__ */ jsxDEV17(PreviewGroup, {
+        title: "robots.txt",
+        children: /* @__PURE__ */ jsxDEV17(Card6, {
+          border: true,
+          radius: 2,
+          padding: 4,
+          tone: "transparent",
+          children: /* @__PURE__ */ jsxDEV17(Text11, {
+            size: 1,
+            muted: true,
+            style: { whiteSpace: "pre-wrap", fontFamily: "monospace" },
+            children: robotsPreview
+          }, undefined, false, undefined, this)
+        }, undefined, false, undefined, this)
+      }, undefined, false, undefined, this)
+    ]
+  }, undefined, true, undefined, this);
+}
+
+// src/schemas/fields/robots.ts
 var validateRobotsDirectivePath = (value) => {
   if (value === undefined || value === null || value === "")
     return true;
@@ -1346,25 +1428,12 @@ var robots_default = defineField6({
   type: "object",
   fields: [
     {
-      name: "aiRules",
-      type: "object",
-      fields: [
-        {
-          name: "blockAiCrawlers",
-          title: "User Agent",
-          type: "string"
-        },
-        {
-          name: "blockAiTraining",
-          title: "Block AI Training",
-          type: "boolean"
-        }
-      ]
-    },
-    {
       name: "rules",
       title: "Rules",
       type: "array",
+      components: {
+        input: RobotsRulesInput
+      },
       of: [
         {
           type: "object",
@@ -1424,11 +1493,11 @@ import { defineField as defineField7 } from "sanity";
 
 // src/components/core/IndexingControls.tsx
 import { set as set2 } from "sanity";
-import { Button as Button2, Flex as Flex13, Stack as Stack7 } from "@sanity/ui";
+import { Button as Button2, Flex as Flex14, Stack as Stack7 } from "@sanity/ui";
 import { useCallback as useCallback2 } from "react";
 import { MdInfo, MdPlaylistRemove } from "react-icons/md";
 import { IoArrowRedo } from "react-icons/io5";
-import { jsxDEV as jsxDEV17 } from "react/jsx-dev-runtime";
+import { jsxDEV as jsxDEV18 } from "react/jsx-dev-runtime";
 function getNested(obj, key) {
   return obj && Object.prototype.hasOwnProperty.call(obj, key) ? obj[key] : undefined;
 }
@@ -1449,18 +1518,18 @@ function IndexingControls(props) {
   } else if (noIndex && noFollow) {
     note = "This page will not be indexed by search engines, and links on this page will not be crawled or considered for ranking.";
   }
-  return /* @__PURE__ */ jsxDEV17(Stack7, {
+  return /* @__PURE__ */ jsxDEV18(Stack7, {
     space: 3,
     children: [
-      /* @__PURE__ */ jsxDEV17(CardWithIcon, {
+      /* @__PURE__ */ jsxDEV18(CardWithIcon, {
         icon: MdInfo,
         tone: noIndex && noFollow ? "critical" : "suggest",
         text: note
       }, undefined, false, undefined, this),
-      /* @__PURE__ */ jsxDEV17(Flex13, {
+      /* @__PURE__ */ jsxDEV18(Flex14, {
         gap: 3,
         children: [
-          /* @__PURE__ */ jsxDEV17(Button2, {
+          /* @__PURE__ */ jsxDEV18(Button2, {
             width: "fill",
             icon: IoArrowRedo,
             mode: noFollow ? "default" : "ghost",
@@ -1469,7 +1538,7 @@ function IndexingControls(props) {
             tone: noFollow ? "critical" : "default",
             onClick: () => setValue("noFollow", !noFollow)
           }, undefined, false, undefined, this),
-          /* @__PURE__ */ jsxDEV17(Button2, {
+          /* @__PURE__ */ jsxDEV18(Button2, {
             width: "fill",
             icon: MdPlaylistRemove,
             mode: noIndex ? "default" : "ghost",
@@ -1484,9 +1553,9 @@ function IndexingControls(props) {
   }, undefined, true, undefined, this);
 }
 // src/components/core/SchemaFieldWithDefault.tsx
-import { Box as Box10 } from "@sanity/ui";
+import { Box as Box11 } from "@sanity/ui";
 import { MdCheck as MdCheck2, MdWarning as MdWarning2 } from "react-icons/md";
-import { jsxDEV as jsxDEV18 } from "react/jsx-dev-runtime";
+import { jsxDEV as jsxDEV19 } from "react/jsx-dev-runtime";
 // src/schemas/fields/search-indexing.ts
 var search_indexing_default = defineField7({
   name: "searchIndexing",
@@ -1536,4 +1605,4 @@ export {
   src_default as default
 };
 
-//# debugId=8C5E5760972C58A664756E2164756E21
+//# debugId=DAE09323285F00BD64756E2164756E21

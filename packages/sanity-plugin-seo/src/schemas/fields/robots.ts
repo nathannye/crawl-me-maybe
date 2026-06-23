@@ -1,5 +1,6 @@
 import { FaRobot } from "react-icons/fa";
 import { defineField } from "sanity";
+import RobotsRulesInput from "../../components/core/RobotsRulesInput";
 
 const validateRobotsDirectivePath = (value: unknown) => {
 	if (value === undefined || value === null || value === "") return true;
@@ -20,26 +21,29 @@ export default defineField({
 	description: "Define robots.txt rules",
 	type: "object",
 	fields: [
-		{
-			name: "aiRules",
-			type: "object",
-			fields: [
-				{
-					name: "blockAiCrawlers",
-					title: "User Agent",
-					type: "string",
-				},
-				{
-					name: "blockAiTraining",
-					title: "Block AI Training",
-					type: "boolean",
-				},
-			],
-		},
+		// {
+		// 	name: "aiRules",
+		// 	type: "object",
+		// 	fields: [
+		// 		{
+		// 			name: "blockAiCrawlers",
+		// 			title: "User Agent",
+		// 			type: "string",
+		// 		},
+		// 		{
+		// 			name: "blockAiTraining",
+		// 			title: "Block AI Training",
+		// 			type: "boolean",
+		// 		},
+		// 	],
+		// },
 		{
 			name: "rules",
 			title: "Rules",
 			type: "array",
+			components: {
+				input: RobotsRulesInput,
+			},
 			of: [
 				{
 					type: "object",
