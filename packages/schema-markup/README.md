@@ -37,7 +37,7 @@ yarn add @crawl-me-maybe/schema-markup
 
 ## Why this exists
 
-Schema markup from CMS → frontend is usually handled with a bulk of fields that editors are forced to fill in, often duplicating content that's already present. This library takes advantage of more developer work up front to reduce the load on editors.
+Schema markup from CMS → frontend is usually handled with a bulk of fields that editors are forced to fill in, often duplicating content that's already present. This library takes advantage of a bit more developer work up front to reduce the load on editors.
 
 ---
 

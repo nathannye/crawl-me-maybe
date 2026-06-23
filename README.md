@@ -1,6 +1,6 @@
 # Crawl me maybe
 
-A suite of framework-agnostic tools for CMS-driven SEO.
+Framework-agnostic tools for CMS-driven SEO.
 
 Other plugins place most of the work on editors, schema markup and metadata that users must fill in by hand, usually duplicating content that already exists. These libraries flip this and advocate for passing that content once in your template and saving editors the effort.
 
@@ -59,7 +59,7 @@ yarn add @crawl-me-maybe/meta
 
 ### Sitemap
 
-Minimal sitemap generator. Query your CMS, pass the result, done. Supports localization and multiple sitemaps.
+Minimal sitemap generator. Query your CMS, pass the result, done. Ships with Vite-Plugin and API-route friendly helpers that support localization and multiple sitemaps.
 
 [See docs](./packages/sitemap)
 
