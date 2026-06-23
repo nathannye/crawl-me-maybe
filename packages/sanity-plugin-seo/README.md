@@ -12,7 +12,7 @@ SEO fields, global defaults, and social preview cards for Sanity Studio.
 - **Favicon browser-tab preview** — renders your favicon and site title in a mock browser tab with light/dark toggle
 - **robots.txt rules editor** — structured rule builder with a read-only `robots.txt` preview tab
 
-## Configuration
+## Getting Started
 
 Pass options to the plugin to enable or disable individual features. All options default to `true`.
 
@@ -41,29 +41,58 @@ export default defineConfig({
 | `global.robots` | `boolean` | `true` | Includes the robots rules builder in Global SEO Settings |
 | `page.searchIndexing` | `boolean` | `true` | Includes noIndex / noFollow controls on the `pageMetadata` field |
 
-## Getting started
-
-### Global Defaults Awareness
-A global context to show when fields have a default or are empty with no fallback.
- (img)
+## Favicons
+Browser-tab preview for dynamic favicons with theme-switching button. Can be disabled by setting `global.favicon` to `false`.
 
 
-### Social & Search Preview Cards
-Previews for Facebook cards, Twitter cards, and Google Results
 
-### Favicon & meta title previews
-Favicon & meta title browser-tab preview
+## Robots.txt
+Preview-enabled array field for robots.txt entries. Disabled by setting `global.robots` to `false`.
+
 
 
 ## Schemas
 
-**metadata**
+### `globalSeoSettings` document
 
-Includes:
-- description
-- 
+A singleton document that provides site-wide defaults. Page-level fields inherit from these values when empty.
 
-### Fields
+| Field | Sanity type | Required | Validation | Notes |
+|---|---|---|---|---|
+| `siteTitle` | `string` | ✅ | Required | Injected into `pageTitleTemplate` via `{siteTitle}` |
+| `pageTitleTemplate` | `string` | ✅ | Required | Custom token input; initial value `{pageTitle} - {siteTitle}` |
+| `siteUrl` | `url` | ✅ | Must start with `https://` | Used for canonical and Open Graph tags |
+| `metaDescription` | `metaDescription` | — | Warn < 120 or > 160 chars | Default description inherited by all pages |
+| `defaultMetaImage` | `metaImage` | — | — | Default OG image inherited by all pages |
+| `favicon` | `image` | — | — | Browser-tab preview in Studio. Controlled by `global.favicon` option |
+| `twitterHandle` | `string` | — | Must start with `@` | Social group |
+| `logo` | `image` | — | — | Used for Organization / WebSite schema markup |
+| `advanced.robots` | `robots[]` | — | Paths must start with `/` | robots.txt rule builder with preview tab. Controlled by `global.robots` option |
 
-### Singletons
+---
+
+### `pageMetadata` object
+
+Add this type to any document that needs per-page SEO. Fields display the active global default as placeholder when empty.
+
+| Field | Sanity type | Required | Validation | Notes |
+|---|---|---|---|---|
+| `description` | `metaDescription` | — | Warn < 120 or > 160 chars | Overrides `globalSeoSettings.metaDescription` |
+| `searchIndexing` | `searchIndexing` | — | — | noIndex / noFollow controls. Controlled by `page.searchIndexing` option |
+| `metaImage` | `metaImage` | — | — | Overrides `globalSeoSettings.defaultMetaImage`; shows thumbnail of active default when empty |
+
+---
+
+### Shared field types
+
+These named types are registered by the plugin and can be reused in your own schemas:
+
+| Type name | Base type | Description |
+|---|---|---|
+| `metaDescription` | `text` | 3-row textarea with 120–160 char warnings |
+| `metaTitle` | `string` | Single-line with 50–60 char warnings |
+| `metaImage` | `image` | Standard image field for OG/social use |
+| `favicon` | `image` | Image with browser-tab preview component |
+| `searchIndexing` | `object` | noIndex + noFollow boolean controls |
+| `robots` | `array` | Rule builder with userAgent / allow / disallow fields and robots.txt preview |
 
