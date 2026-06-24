@@ -35,7 +35,7 @@ Use a **single sitemap** when all routes can live in one file. Use **multiple si
 
 - [Install](#install)
 - [Sitemap entry shape](#sitemap-entry-shape)
-- [Locale modes](#locale-modes)
+- [Locale configuration](#locale-configuration)
 - [Vite plugin](#vite-plugin)
 - [Runtime generation](#runtime-generation)
 - [Low-level primitives](#low-level-primitives)
@@ -66,7 +66,8 @@ type SitemapEntry = {
   priority?: number
   imageUrls?: string[]
   videoUrls?: string[]
-  skipLocalization?: boolean
+  locales?: string[]
+  localePaths?: Record<string, string>
 }
 ```
 
@@ -83,38 +84,31 @@ Example:
 
 - `path` should be relative, e.g. `/about`
 - the domain is always configured separately via `domain`
-- `skipLocalization: true` prevents locale variants from being generated for that entry
+- `locales` limits which configured locales a page exists in
+- `localePaths` overrides the slug for specific locales when it differs from the default path
 
 ---
 
-## Locale modes
+## Locale configuration
 
-Pass `locales` to the Vite plugin, `createSitemapManifest`, or `generateSitemap` to emit hreflang alternates. Set `localeMode` to control how localized URLs are built (default: `"prefix"`).
-
-**`prefix`** — locale code as a path segment. The default locale has no prefix unless `prefixDefault: true`.
-
-| Locale | `/about` |
-|--------|----------|
-| `en` (default) | `https://example.com/about` |
-| `fr` | `https://example.com/fr/about` |
-
-**`subdomain`** — locale code as a subdomain (`www` is stripped from the domain).
-
-| Locale | `/about` |
-|--------|----------|
-| `en` (default) | `https://example.com/about` |
-| `fr` | `https://fr.example.com/about` |
+Pass a `SitemapLocaleConfig` object to the Vite plugin, `createSitemapManifest`, or `generateSitemap` to enable automatic locale expansion and hreflang alternates. When `locales` is omitted, the package stays in manual mode and does not expand entries.
 
 ```ts
-locales: [
-  { code: "en", default: true },
-  { code: "fr" },
-],
-localeMode: "prefix", // or "subdomain"
-prefixDefault: false,  // prefix the default locale too when true
+const locales = {
+  locales: ["en", "fr"],
+  defaultLocale: "en",
+  mode: "prefix", // "prefix" | "subdomain" | "domain"
+  prefixDefault: false,
+  alternates: true,
+  xDefault: "en",
+  domainByLocale: {
+    en: "https://example.com",
+    fr: "https://fr.example.com",
+  },
+};
 ```
 
-Use `skipLocalization: true` on entries that should not get locale variants (feeds, static assets, etc.).
+Use `locales` on an individual entry to limit which configured locales it appears in, and `localePaths` to override localized slugs for selected locales.
 
 ---
 
@@ -227,19 +221,23 @@ vitePluginSitemap({
 
 ### d. Localized
 
-See [Locale modes](#locale-modes). Works with single or multiple sitemap configs.
+See [Locale configuration](#locale-configuration). Works with single or multiple sitemap configs.
 
 ```ts
 vitePluginSitemap({
   domain: "https://example.com",
-  locales: [
-    { code: "en", default: true },
-    { code: "fr" },
-    { code: "es" },
-  ],
+  locales: {
+    locales: ["en", "fr", "es"],
+    defaultLocale: "en",
+    mode: "prefix",
+  },
   sitemaps: async () => [
-    { path: "/about" },
-    { path: "/feed.xml", skipLocalization: true },
+    {
+      path: "/about",
+      locales: ["en", "fr"],
+      localePaths: { fr: "/a-propos" },
+    },
+    { path: "/feed.xml" },
   ],
 });
 ```
@@ -383,10 +381,11 @@ export async function GET(
 ```ts
 createSitemapManifest({
   domain: "https://example.com",
-  locales: [
-    { code: "en", default: true },
-    { code: "fr" },
-  ],
+  locales: {
+    locales: ["en", "fr"],
+    defaultLocale: "en",
+    mode: "prefix",
+  },
   entries: getSitemapEntries,
 });
 ```
@@ -505,9 +504,7 @@ If `rules` is `undefined` (not configured in Studio), `generateRobotsTxt` falls 
 | `basePath` | `string` | Stable child route base path, defaulting to `/sitemap`. |
 | `maxUrls` | `number` | Default maximum URLs per child sitemap file, defaulting to `50_000`. |
 | `entries` | `SitemapEntrySource` or `Record<string, SitemapDefinition>` | Single sitemap source or a named sitemap map. |
-| `locales` | `LocaleConfig[]` | Locale list for hreflang generation. |
-| `localeMode` | `"prefix"` \| `"subdomain"` | URL strategy for localized entries. |
-| `prefixDefault` | `boolean` | Prefix the default locale too when `true`. |
+| `locales` | `SitemapLocaleConfig` | Locale expansion rules for automatic hreflang generation. |
 
 ### Vite plugin options
 
@@ -518,9 +515,7 @@ If `rules` is `undefined` (not configured in Studio), `generateRobotsTxt` falls 
 | `sitemaps` | source or object | A single sitemap source, or named sitemap definitions with optional per-sitemap `maxUrls`. |
 | `maxUrls` | `number` | Default split threshold used when a named sitemap definition omits `maxUrls`. |
 | `robots` | `RobotsRule` or array | Crawler rules used when writing `robots.txt`. |
-| `locales` | `LocaleConfig[]` | Locale list for hreflang generation. |
-| `localeMode` | `"prefix"` \| `"subdomain"` | URL strategy (default: `prefix`). |
-| `prefixDefault` | `boolean` | Prefix the default locale too (default: `false`). |
+| `locales` | `SitemapLocaleConfig` | Locale expansion rules for automatic hreflang generation. |
 
 ### Low-level primitives
 

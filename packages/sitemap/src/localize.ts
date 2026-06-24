@@ -1,5 +1,9 @@
 import { normalizeDomain, normalizeDomainBase } from "./domain";
-import type { LocaleConfig, SitemapEntry, SitemapEntryWithAlternates } from "./types";
+import type {
+	SitemapEntry,
+	SitemapEntryWithAlternates,
+	SitemapLocaleConfig,
+} from "./types";
 
 /**
  * Resolves a site-relative path against a domain origin.
@@ -11,90 +15,210 @@ export function resolveUrl(path: string, domain: string): string {
 	return new URL(slug, normalizeDomainBase(domain)).href;
 }
 
-/**
- * Builds a localized absolute URL for a path and locale.
- * @param path - Site-relative path or slug
- * @param locale - Target locale configuration
- * @param domain - Site origin
- * @param localeMode - URL strategy (default: "prefix")
- * @param prefixDefault - Whether the default locale also receives a prefix
- */
-export function localizeUrl(
-	path: string,
-	locale: LocaleConfig,
+function validateLocaleConfig(config: SitemapLocaleConfig): void {
+	if (!config || typeof config !== "object") {
+		throw new Error("sitemap locales config must be an object");
+	}
+
+	if (!Array.isArray(config.locales) || config.locales.length === 0) {
+		throw new Error("sitemap locales config must include at least one locale");
+	}
+
+	if (new Set(config.locales).size !== config.locales.length) {
+		throw new Error("sitemap locales config locales must not contain duplicates");
+	}
+
+	if (!config.defaultLocale || typeof config.defaultLocale !== "string") {
+		throw new Error("sitemap locales config must include a defaultLocale");
+	}
+
+	if (!config.locales.includes(config.defaultLocale)) {
+		throw new Error(
+			`sitemap locales config defaultLocale "${config.defaultLocale}" must exist in locales`,
+		);
+	}
+
+	const mode = config.mode ?? "prefix";
+	if (!["prefix", "subdomain", "domain"].includes(mode)) {
+		throw new Error(`sitemap locales config mode "${mode}" is not supported`);
+	}
+
+	if (mode !== "prefix") {
+		if (!config.domainByLocale || typeof config.domainByLocale !== "object") {
+			throw new Error(
+				`sitemap locales config domainByLocale is required for ${mode} mode`,
+			);
+		}
+
+		for (const locale of config.locales) {
+			const base = config.domainByLocale[locale];
+			if (!base || typeof base !== "string") {
+				throw new Error(
+					`sitemap locales config domainByLocale must include a valid base domain for locale "${locale}"`,
+				);
+			}
+		}
+	}
+
+	if (typeof config.xDefault === "string" && !config.locales.includes(config.xDefault)) {
+		throw new Error(
+			`sitemap locales config xDefault locale "${config.xDefault}" must exist in locales`,
+		);
+	}
+}
+
+function getLocaleBaseDomain(
 	domain: string,
-	localeMode: "prefix" | "subdomain" = "prefix",
-	prefixDefault: boolean = false,
+	config: SitemapLocaleConfig,
+	localeCode: string,
 ): string {
-	if (locale.default && !prefixDefault) {
-		return resolveUrl(path, domain);
+	const mode = config.mode ?? "prefix";
+	if (mode === "prefix") return domain;
+
+	const mappedDomain = config.domainByLocale?.[localeCode];
+	if (!mappedDomain) {
+		throw new Error(
+			`sitemap locales config domainByLocale is missing a base domain for locale "${localeCode}"`,
+		);
 	}
 
-	if (localeMode === "subdomain") {
-		const urlObj = new URL(domain);
-		const hostname = urlObj.hostname.replace(/^www\./, "");
-		const subdomain = `${locale.code}.${hostname}`;
-		const port = urlObj.port ? `:${urlObj.port}` : "";
-		const subdomainBase = `${urlObj.protocol}//${subdomain}${port}/`;
-		return resolveUrl(path, subdomainBase);
+	return mappedDomain;
+}
+
+function localizeUrl(
+	path: string,
+	localeCode: string,
+	config: SitemapLocaleConfig,
+	domain: string,
+): string {
+	const mode = config.mode ?? "prefix";
+	const baseDomain = getLocaleBaseDomain(domain, config, localeCode);
+
+	if (mode === "prefix") {
+		if (localeCode === config.defaultLocale && !config.prefixDefault) {
+			return resolveUrl(path, domain);
+		}
+
+		const prefixedBase = `${normalizeDomain(baseDomain)}/${localeCode}/`;
+		return resolveUrl(path, prefixedBase);
 	}
 
-	const domainWithLocale = `${normalizeDomain(domain)}/${locale.code}/`;
-	return resolveUrl(path, domainWithLocale);
+	return resolveUrl(path, baseDomain);
+}
+
+function getEntryLocaleCodes(
+	entry: SitemapEntry,
+	config: SitemapLocaleConfig,
+): string[] {
+	const configuredLocales = new Set(config.locales);
+	const entryLocales = entry.locales ?? config.locales;
+
+	if (entryLocales.length === 0) {
+		return [];
+	}
+
+	if (new Set(entryLocales).size !== entryLocales.length) {
+		throw new Error("sitemap entry locales must not contain duplicates");
+	}
+
+	for (const locale of entryLocales) {
+		if (!configuredLocales.has(locale)) {
+			throw new Error(
+				`sitemap entry locale "${locale}" is not present in the sitemap locales config`,
+			);
+		}
+	}
+
+	if (entry.localePaths) {
+		for (const locale of Object.keys(entry.localePaths)) {
+			if (!configuredLocales.has(locale)) {
+				throw new Error(
+					`sitemap entry localePaths locale "${locale}" is not present in the sitemap locales config`,
+				);
+			}
+		}
+	}
+
+	return entryLocales;
+}
+
+function buildAlternates(
+	entryPathByLocale: Map<string, string>,
+	config: SitemapLocaleConfig,
+	domain: string,
+): { hreflang: string; href: string }[] {
+	const alternates = Array.from(entryPathByLocale.entries()).map(
+		([localeCode, path]) => ({
+			hreflang: localeCode,
+			href: localizeUrl(path, localeCode, config, domain),
+		}),
+	);
+
+	const xDefaultTarget =
+		config.xDefault === true
+			? config.defaultLocale
+			: typeof config.xDefault === "string"
+				? config.xDefault
+				: undefined;
+
+	if (xDefaultTarget && entryPathByLocale.has(xDefaultTarget)) {
+		const path = entryPathByLocale.get(xDefaultTarget);
+		if (path) {
+			alternates.push({
+				hreflang: "x-default",
+				href: localizeUrl(path, xDefaultTarget, config, domain),
+			});
+		}
+	}
+
+	return alternates;
 }
 
 /**
- * Generates localized versions of sitemap entries with hreflang alternates.
- * @param baseEntries - Input entries with site-relative paths
- * @param locales - Locale configurations
- * @param domain - Site origin
- * @param localeMode - URL strategy (default: "prefix")
- * @param prefixDefault - Whether the default locale also receives a prefix
+ * Expands a set of sitemap entries into concrete URLs with optional hreflang alternates.
+ * When no locale config is provided, entries are emitted exactly once without alternates.
  */
-export function generateLocalizedEntries(
+export function expandLocalizedEntries(
 	baseEntries: SitemapEntry[],
-	locales: LocaleConfig[],
 	domain: string,
-	localeMode: "prefix" | "subdomain" = "prefix",
-	prefixDefault: boolean = false,
+	locales?: SitemapLocaleConfig,
 ): SitemapEntryWithAlternates[] {
+	if (!locales) {
+		return baseEntries.map(({ path, locales: _locales, localePaths: _localePaths, ...rest }) => ({
+			...rest,
+			url: resolveUrl(path, domain),
+		}));
+	}
+
+	validateLocaleConfig(locales);
+
 	const localizedEntries: SitemapEntryWithAlternates[] = [];
-	const defaultLocale = locales.find((l) => l.default);
 
 	for (const entry of baseEntries) {
-		const { path, ...rest } = entry;
+		const { path, locales: entryLocales, localePaths, ...rest } = entry;
+		const localeCodes = getEntryLocaleCodes(entry, locales);
+		if (localeCodes.length === 0) continue;
 
-		if (entry.skipLocalization) {
-			localizedEntries.push({
-				...rest,
-				url: resolveUrl(path, domain),
-			});
-			continue;
+		const entryPathByLocale = new Map<string, string>();
+		for (const localeCode of localeCodes) {
+			const resolvedPath =
+				localeCode === locales.defaultLocale
+					? path
+					: localePaths?.[localeCode] ?? path;
+
+			entryPathByLocale.set(localeCode, resolvedPath);
 		}
 
-		const alternates = locales.map((locale) => ({
-			hreflang: locale.code,
-			href: localizeUrl(path, locale, domain, localeMode, prefixDefault),
-		}));
+		const alternates =
+			locales.alternates === false
+				? undefined
+				: buildAlternates(entryPathByLocale, locales, domain);
 
-		const xDefaultLocale = defaultLocale || locales[0];
-		if (xDefaultLocale) {
-			alternates.push({
-				hreflang: "x-default",
-				href: localizeUrl(
-					path,
-					xDefaultLocale,
-					domain,
-					localeMode,
-					prefixDefault,
-				),
-			});
-		}
-
-		for (const locale of locales) {
+		for (const localeCode of localeCodes) {
+			const resolvedPath = entryPathByLocale.get(localeCode) ?? path;
 			localizedEntries.push({
 				...rest,
-				url: localizeUrl(path, locale, domain, localeMode, prefixDefault),
+				url: localizeUrl(resolvedPath, localeCode, locales, domain),
 				alternates,
 			});
 		}

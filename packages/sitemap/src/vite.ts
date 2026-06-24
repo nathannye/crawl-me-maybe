@@ -1,7 +1,7 @@
 export { vitePluginSitemap } from "./vite-plugin";
 export type {
-	LocaleConfig,
 	RobotsRule,
 	SitemapConfig,
 	SitemapEntry,
+	SitemapLocaleConfig,
 } from "./types";

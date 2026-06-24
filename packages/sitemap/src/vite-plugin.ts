@@ -20,8 +20,6 @@ export function vitePluginSitemap(config: SitemapConfig) {
 		entries: pluginConfig.sitemaps,
 		maxUrls: pluginConfig.maxUrls,
 		locales: pluginConfig.locales,
-		localeMode: pluginConfig.localeMode,
-		prefixDefault: pluginConfig.prefixDefault,
 	});
 
 	const writeRobots = (sitemapIndex = "sitemap.xml") => {

@@ -1,6 +1,8 @@
 import { SitemapNotFoundError, SitemapPartNotFoundError } from "./errors";
-import { generateSitemap, generateSitemapIndex } from "./sitemap";
 import { resolveSitemapEntrySource } from "./resolve-entries";
+import { expandLocalizedEntries } from "./localize";
+import { createSitemapXml } from "./xml";
+import { generateSitemapIndex } from "./sitemap";
 import type {
 	CreateSitemapManifestOptions,
 	ResolvedSitemapFile,
@@ -172,11 +174,7 @@ export function createSitemapManifest(
 	const basePath = normalizeBasePath(options.basePath);
 	const maxUrls = normalizeMaxUrls(options.maxUrls, DEFAULT_MAX_URLS);
 	const definitions = normalizeSitemapDefinitions(options.entries, maxUrls);
-	const {
-		locales,
-		localeMode = "prefix",
-		prefixDefault = false,
-	} = options;
+	const { locales } = options;
 
 	const definitionCache = new Map<number, Promise<ResolvedSitemapPlan>>();
 
@@ -191,7 +189,12 @@ export function createSitemapManifest(
 
 		const promise = (async () => {
 			const entries = await resolveSitemapEntrySource(definition.entries);
-			const chunks = chunkEntries(entries, definition.maxUrls);
+			const concreteEntries = expandLocalizedEntries(
+				entries,
+				options.domain,
+				locales,
+			);
+			const chunks = chunkEntries(concreteEntries, definition.maxUrls);
 			const files: ResolvedSitemapFile[] = chunks.map((chunk, chunkIndex) => ({
 				sitemap: definition.sitemap,
 				index: chunkIndex,
@@ -250,19 +253,14 @@ export function createSitemapManifest(
 			});
 		}
 
-		return generateSitemap(options.domain, {
-			entries: file.entries,
-			locales,
-			localeMode,
-			prefixDefault,
-		});
+		return createSitemapXml(file.entries);
 	}
 
 	return {
 		async getRootSitemap() {
 			const files = await getAllFiles();
 			if (files.length === 1) {
-				return renderFileBySelector({ index: 0 });
+				return createSitemapXml(files[0].entries);
 			}
 
 			return generateSitemapIndex(options.domain, {

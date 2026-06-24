@@ -128,3 +128,53 @@ it("uses the default maxUrls for a single sitemap source", async () => {
 		removeTempDir(tempDir);
 	}
 });
+
+it("splits localized content before writing plugin output", async () => {
+	const tempDir = makeTempDir();
+
+	try {
+		const plugin = vitePluginSitemap({
+			domain: "https://example.com",
+			outDir: tempDir,
+			maxUrls: 1,
+			locales: {
+				locales: ["en", "fr"],
+				defaultLocale: "en",
+				mode: "prefix",
+			},
+			sitemaps: async () => [
+				{
+					path: "/about",
+					locales: ["en", "fr"],
+					localePaths: { fr: "/a-propos" },
+				},
+			],
+		});
+
+		await plugin.closeBundle?.();
+
+		const rootFile = path.join(tempDir, "sitemap.xml");
+		const childFile0 = path.join(tempDir, "sitemap-0.xml");
+		const childFile1 = path.join(tempDir, "sitemap-1.xml");
+
+		expect(existsSync(rootFile)).toBe(true);
+		expect(existsSync(childFile0)).toBe(true);
+		expect(existsSync(childFile1)).toBe(true);
+
+		expect(readFileSync(rootFile, "utf8")).toContain("<sitemapindex");
+		expect(readFileSync(rootFile, "utf8")).toContain(
+			"https://example.com/sitemap-0.xml",
+		);
+		expect(readFileSync(rootFile, "utf8")).toContain(
+			"https://example.com/sitemap-1.xml",
+		);
+		expect(readFileSync(childFile0, "utf8")).toContain(
+			"https://example.com/about",
+		);
+		expect(readFileSync(childFile1, "utf8")).toContain(
+			"https://example.com/fr/a-propos",
+		);
+	} finally {
+		removeTempDir(tempDir);
+	}
+});

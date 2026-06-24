@@ -1,10 +1,7 @@
 import { normalizeDomain } from "./domain";
-import { generateLocalizedEntries, resolveUrl } from "./localize";
 import { resolveSitemapEntrySource } from "./resolve-entries";
-import type {
-	GenerateSitemapIndexOptions,
-	GenerateSitemapOptions,
-} from "./types";
+import { expandLocalizedEntries } from "./localize";
+import type { GenerateSitemapIndexOptions, GenerateSitemapOptions } from "./types";
 import { createSitemapXml } from "./xml";
 
 /**
@@ -14,27 +11,12 @@ export async function generateSitemap(
 	domain: string,
 	options: GenerateSitemapOptions,
 ): Promise<string> {
-	const {
-		locales,
-		localeMode = "prefix",
-		prefixDefault = false,
-	} = options;
-
 	const entries = await resolveSitemapEntrySource(options.entries);
-
-	const processedUrls =
-		locales && locales.length > 0
-			? generateLocalizedEntries(
-					entries,
-					locales,
-					domain,
-					localeMode,
-					prefixDefault,
-				)
-			: entries.map(({ path, ...rest }) => ({
-					...rest,
-					url: resolveUrl(path, domain),
-				}));
+	const processedUrls = expandLocalizedEntries(
+		entries,
+		domain,
+		options.locales,
+	);
 
 	return createSitemapXml(processedUrls);
 }

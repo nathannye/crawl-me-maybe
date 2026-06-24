@@ -12,13 +12,23 @@ export type RobotsRule = {
 };
 
 /**
- * Configuration for a locale/language.
+ * Configuration for automatic locale-aware sitemap generation.
  */
-export type LocaleConfig = {
-	/** Language/locale code (e.g., 'en', 'fr', 'es') */
-	code: string;
-	/** Whether this is the default locale (doesn't get prefix/subdomain) */
-	default?: boolean;
+export type SitemapLocaleConfig = {
+	/** All locales the sitemap can emit. */
+	locales: string[];
+	/** The canonical default locale. */
+	defaultLocale: string;
+	/** How locale URLs are addressed. */
+	mode?: "prefix" | "subdomain" | "domain";
+	/** In prefix mode, whether the default locale also receives a prefix. */
+	prefixDefault?: boolean;
+	/** Base domain per locale, required for subdomain and domain modes. */
+	domainByLocale?: Record<string, string>;
+	/** Whether to emit hreflang alternates. Defaults to `true`. */
+	alternates?: boolean;
+	/** Optional x-default handling. */
+	xDefault?: boolean | string;
 };
 
 /**
@@ -45,8 +55,10 @@ export type SitemapEntry = {
 	videoUrls?: string[];
 	/** 0.0–1.0 relative priority hint for crawlers */
 	priority?: number;
-	/** If true, this entry is not localized even when locales are configured */
-	skipLocalization?: boolean;
+	/** Locales this page exists in. Defaults to all configured locales. */
+	locales?: string[];
+	/** Locale-specific path overrides keyed by locale code. */
+	localePaths?: Record<string, string>;
 };
 
 /** Resolved sitemap entry used for XML output after path localization. */
@@ -77,9 +89,7 @@ export type SitemapDefinition =
 export type GenerateSitemapOptions =
 	{
 		entries: SitemapEntrySource;
-		locales?: LocaleConfig[];
-		localeMode?: "prefix" | "subdomain";
-		prefixDefault?: boolean;
+		locales?: SitemapLocaleConfig;
 	};
 
 /** Low-level options for {@link generateSitemapIndex}. */
@@ -116,12 +126,8 @@ export type CreateSitemapManifestOptions = {
 	maxUrls?: number;
 	/** Single sitemap source or named sitemap definitions. */
 	entries: SitemapEntrySource | Record<string, SitemapDefinition>;
-	/** Locale configurations for multi-language sitemap support. */
-	locales?: LocaleConfig[];
-	/** How to format localized URLs (default: "prefix"). */
-	localeMode?: "prefix" | "subdomain";
-	/** Whether to add a locale prefix to the default locale URL (default: false) */
-	prefixDefault?: boolean;
+	/** Locale configurations for automatic locale-aware sitemap generation. */
+	locales?: SitemapLocaleConfig;
 };
 
 /** Runtime manifest interface. */
@@ -136,7 +142,7 @@ export type ResolvedSitemapFile = {
 	sitemap: string | null;
 	index: number;
 	path: string;
-	entries: SitemapEntry[];
+	entries: SitemapEntryWithAlternates[];
 };
 
 /**
@@ -161,14 +167,6 @@ export type SitemapConfig = {
 	 * The correct `Sitemap:` lines are always appended automatically.
 	 */
 	robots?: RobotsRule | RobotsRule[];
-	/** Locale configurations for multi-language sitemap support */
-	locales?: LocaleConfig[];
-	/**
-	 * How to format localized URLs (default: "prefix").
-	 * - "prefix": /fr/about
-	 * - "subdomain": fr.example.com/about
-	 */
-	localeMode?: "prefix" | "subdomain";
-	/** Whether to add a locale prefix to the default locale URL (default: false) */
-	prefixDefault?: boolean;
+	/** Locale configurations for automatic locale-aware sitemap generation. */
+	locales?: SitemapLocaleConfig;
 };
