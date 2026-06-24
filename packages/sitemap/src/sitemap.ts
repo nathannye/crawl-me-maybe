@@ -31,10 +31,13 @@ export function generateSitemapIndex(
 	try {
 		const normalizedBase = normalizeDomain(domain);
 		const normalizedFiles = options.sitemaps.map((f) => f.replace(/^\/+/, ""));
-		const items: string = normalizedFiles
-			.map((f) => `<sitemap><loc>${normalizedBase}/${f}</loc></sitemap>`)
+		const items = normalizedFiles
+			.map(
+				(f) =>
+					`  <sitemap>\n    <loc>${normalizedBase}/${f}</loc>\n  </sitemap>\n`,
+			)
 			.join("");
-		return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${items}</sitemapindex>`;
+		return `<?xml version="1.0" encoding="UTF-8"?>\n<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${items}</sitemapindex>\n`;
 	} catch (err) {
 		throw new Error(
 			`Sitemap index XML creation failed: ${err instanceof Error ? err.message : String(err)}`,

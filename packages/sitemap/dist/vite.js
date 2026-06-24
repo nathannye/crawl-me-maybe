@@ -197,28 +197,73 @@ function validateSitemapVideos(videos, entryPath) {
 }
 
 // src/xml.ts
+var INDENT = "  ";
+function indent(level) {
+  return INDENT.repeat(level);
+}
+function xmlLine(level, content) {
+  return `${indent(level)}${content}
+`;
+}
 function escapeXml(text) {
   return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
 }
-function createVideoXml(video) {
-  let xml = "<video:video>";
-  xml += `<video:thumbnail_loc>${video.thumbnailUrl}</video:thumbnail_loc>`;
-  xml += `<video:title>${escapeXml(video.title)}</video:title>`;
-  xml += `<video:description>${escapeXml(video.description)}</video:description>`;
+function createVideoXml(video, level) {
+  const lines = [
+    xmlLine(level, "<video:video>"),
+    xmlLine(level + 1, `<video:thumbnail_loc>${video.thumbnailUrl}</video:thumbnail_loc>`),
+    xmlLine(level + 1, `<video:title>${escapeXml(video.title)}</video:title>`),
+    xmlLine(level + 1, `<video:description>${escapeXml(video.description)}</video:description>`)
+  ];
   if (video.contentUrl) {
-    xml += `<video:content_loc>${video.contentUrl}</video:content_loc>`;
+    lines.push(xmlLine(level + 1, `<video:content_loc>${video.contentUrl}</video:content_loc>`));
   }
   if (video.playerUrl) {
-    xml += `<video:player_loc>${video.playerUrl}</video:player_loc>`;
+    lines.push(xmlLine(level + 1, `<video:player_loc>${video.playerUrl}</video:player_loc>`));
   }
   if (video.duration !== undefined) {
-    xml += `<video:duration>${video.duration}</video:duration>`;
+    lines.push(xmlLine(level + 1, `<video:duration>${video.duration}</video:duration>`));
   }
   if (video.publicationDate) {
-    xml += `<video:publication_date>${video.publicationDate}</video:publication_date>`;
+    lines.push(xmlLine(level + 1, `<video:publication_date>${video.publicationDate}</video:publication_date>`));
   }
-  xml += "</video:video>";
-  return xml;
+  lines.push(xmlLine(level, "</video:video>"));
+  return lines.join("");
+}
+function createUrlXml(u, now) {
+  if (u.videos?.length) {
+    validateSitemapVideos(u.videos);
+  }
+  const lines = [
+    xmlLine(1, "<url>"),
+    xmlLine(2, `<loc>${u.url}</loc>`),
+    xmlLine(2, `<lastmod>${u.lastmod ?? now}</lastmod>`)
+  ];
+  if (u.changefreq) {
+    lines.push(xmlLine(2, `<changefreq>${u.changefreq}</changefreq>`));
+  }
+  if (typeof u.priority === "number") {
+    lines.push(xmlLine(2, `<priority>${u.priority.toFixed(1)}</priority>`));
+  }
+  if (u.alternates?.length) {
+    for (const alt of u.alternates) {
+      lines.push(xmlLine(2, `<xhtml:link rel="alternate" hreflang="${alt.hreflang}" href="${alt.href}" />`));
+    }
+  }
+  if (u.imageUrls?.length) {
+    for (const img of u.imageUrls) {
+      lines.push(xmlLine(2, "<image:image>"));
+      lines.push(xmlLine(3, `<image:loc>${img}</image:loc>`));
+      lines.push(xmlLine(2, "</image:image>"));
+    }
+  }
+  if (u.videos?.length) {
+    for (const video of u.videos) {
+      lines.push(createVideoXml(video, 2));
+    }
+  }
+  lines.push(xmlLine(1, "</url>"));
+  return lines.join("");
 }
 function createSitemapXml(urls) {
   try {
@@ -226,38 +271,15 @@ function createSitemapXml(urls) {
     let imageNS = false;
     let videoNS = false;
     let xhtmlNS = false;
-    const items = urls.map((u) => {
-      if (u.videos?.length) {
-        validateSitemapVideos(u.videos);
-      }
-      let xml = `<url><loc>${u.url}</loc><lastmod>${u.lastmod ?? now}</lastmod>`;
-      if (u.changefreq) {
-        xml += `<changefreq>${u.changefreq}</changefreq>`;
-      }
-      if (typeof u.priority === "number") {
-        xml += `<priority>${u.priority.toFixed(1)}</priority>`;
-      }
-      if (u.alternates?.length) {
+    for (const u of urls) {
+      if (u.alternates?.length)
         xhtmlNS = true;
-        for (const alt of u.alternates) {
-          xml += `<xhtml:link rel="alternate" hreflang="${alt.hreflang}" href="${alt.href}" />`;
-        }
-      }
-      if (u.imageUrls?.length) {
+      if (u.imageUrls?.length)
         imageNS = true;
-        for (const img of u.imageUrls) {
-          xml += `<image:image><image:loc>${img}</image:loc></image:image>`;
-        }
-      }
-      if (u.videos?.length) {
+      if (u.videos?.length)
         videoNS = true;
-        for (const video of u.videos) {
-          xml += createVideoXml(video);
-        }
-      }
-      xml += "</url>";
-      return xml;
-    }).join("");
+    }
+    const items = urls.map((u) => createUrlXml(u, now)).join("");
     const ns = [
       'xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"',
       xhtmlNS ? 'xmlns:xhtml="http://www.w3.org/1999/xhtml"' : null,
@@ -265,7 +287,9 @@ function createSitemapXml(urls) {
       videoNS ? 'xmlns:video="http://www.google.com/schemas/sitemap-video/1.1"' : null
     ].filter(Boolean).join(" ");
     return `<?xml version="1.0" encoding="UTF-8"?>
-<urlset ${ns}>${items}</urlset>`;
+<urlset ${ns}>
+${items}</urlset>
+`;
   } catch (err) {
     throw new Error(`Sitemap XML creation failed: ${err instanceof Error ? err.message : String(err)}`);
   }
@@ -276,9 +300,14 @@ function generateSitemapIndex(domain, options) {
   try {
     const normalizedBase = normalizeDomain(domain);
     const normalizedFiles = options.sitemaps.map((f) => f.replace(/^\/+/, ""));
-    const items = normalizedFiles.map((f) => `<sitemap><loc>${normalizedBase}/${f}</loc></sitemap>`).join("");
+    const items = normalizedFiles.map((f) => `  <sitemap>
+    <loc>${normalizedBase}/${f}</loc>
+  </sitemap>
+`).join("");
     return `<?xml version="1.0" encoding="UTF-8"?>
-<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${items}</sitemapindex>`;
+<sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+${items}</sitemapindex>
+`;
   } catch (err) {
     throw new Error(`Sitemap index XML creation failed: ${err instanceof Error ? err.message : String(err)}`);
   }
@@ -585,5 +614,5 @@ export {
   vitePluginSitemap
 };
 
-//# debugId=F9E53283307DC75364756E2164756E21
+//# debugId=D99D015353E7651664756E2164756E21
 //# sourceMappingURL=vite.js.map
