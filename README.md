@@ -18,7 +18,7 @@ Sanity Studio
 
 Your app / site
   ├── @crawl-me-maybe/meta                ← merge page + global metadata
-  ├── @crawl-me-maybe/schema       ← derive JSON-LD from Sanity content
+  ├── @crawl-me-maybe/schema              ← derive JSON-LD from Sanity content
   └── @crawl-me-maybe/sitemap             ← generate sitemap.xml and robots.txt
 ```
 
