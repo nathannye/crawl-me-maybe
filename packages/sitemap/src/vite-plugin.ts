@@ -35,22 +35,29 @@ export function vitePluginSitemap(config: SitemapConfig) {
 		name: "vite-plugin-sitemap",
 		apply: "build" as const,
 		async closeBundle() {
+			const files = await manifest.getSitemapFiles();
 			const rootXml = await manifest.getRootSitemap();
 			createFile(resolvedOutDir, "sitemap.xml", rootXml);
 
-			const files = await manifest.getSitemapFiles();
-			for (const file of files) {
-				const xml = await manifest.getSitemap({
-					sitemap: file.sitemap ?? undefined,
-					index: file.index,
-				});
-				createFile(resolvedOutDir, file.path, xml);
+			if (files.length > 1) {
+				for (const file of files) {
+					const xml = await manifest.getSitemap({
+						sitemap: file.sitemap ?? undefined,
+						index: file.index,
+					});
+					createFile(resolvedOutDir, file.path, xml);
+				}
 			}
 
 			writeRobots("sitemap.xml");
-			console.log(
-				`✅ Generated ${files.length} sitemap file(s) + root + robots.txt`,
-			);
+
+			if (files.length === 1) {
+				console.log("✅ Generated sitemap.xml + robots.txt");
+			} else {
+				console.log(
+					`✅ Generated sitemap.xml, ${files.length} child sitemap file(s), and robots.txt`,
+				);
+			}
 		},
 	};
 }

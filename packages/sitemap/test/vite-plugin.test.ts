@@ -30,6 +30,61 @@ it("creates parent directories for nested sitemap outputs", () => {
 	}
 });
 
+it("writes only sitemap.xml and robots.txt for a single unsplit sitemap", async () => {
+	const tempDir = makeTempDir();
+
+	try {
+		const plugin = vitePluginSitemap({
+			domain: "https://example.com",
+			outDir: tempDir,
+			sitemaps: async () => [{ path: "/" }],
+		});
+
+		await plugin.closeBundle?.();
+
+		const rootFile = path.join(tempDir, "sitemap.xml");
+		const childFile0 = path.join(tempDir, "sitemap-0.xml");
+		const robotsFile = path.join(tempDir, "robots.txt");
+
+		expect(existsSync(rootFile)).toBe(true);
+		expect(existsSync(robotsFile)).toBe(true);
+		expect(existsSync(childFile0)).toBe(false);
+
+		expect(readFileSync(rootFile, "utf8")).toContain("<urlset");
+		expect(readFileSync(rootFile, "utf8")).not.toContain("<sitemapindex");
+	} finally {
+		removeTempDir(tempDir);
+	}
+});
+
+it("writes only sitemap.xml for a single named unsplit sitemap", async () => {
+	const tempDir = makeTempDir();
+
+	try {
+		const plugin = vitePluginSitemap({
+			domain: "https://example.com",
+			outDir: tempDir,
+			sitemaps: {
+				pages: async () => [{ path: "/about" }],
+			},
+		});
+
+		await plugin.closeBundle?.();
+
+		const rootFile = path.join(tempDir, "sitemap.xml");
+		const childFile = path.join(tempDir, "sitemap-pages-0.xml");
+
+		expect(existsSync(rootFile)).toBe(true);
+		expect(existsSync(childFile)).toBe(false);
+		expect(readFileSync(rootFile, "utf8")).toContain("<urlset");
+		expect(readFileSync(rootFile, "utf8")).toContain(
+			"https://example.com/about",
+		);
+	} finally {
+		removeTempDir(tempDir);
+	}
+});
+
 it("writes child sitemap files and index with per-sitemap maxUrls overrides", async () => {
 	const tempDir = makeTempDir();
 

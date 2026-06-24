@@ -148,7 +148,7 @@ export default {
 };
 ```
 
-Writes `dist/sitemap.xml`, the generated child files, and `dist/robots.txt`.
+Writes `dist/sitemap.xml` and `dist/robots.txt`. When the sitemap fits in a single file, only those two are written — child files like `sitemap-0.xml` are omitted because `sitemap.xml` already contains the full `<urlset>`. Child files are written when the manifest splits into multiple concrete files (see [Build output](#build-output)).
 
 ### b. Multiple sitemaps
 
@@ -202,6 +202,19 @@ export default {
 ```
 
 This writes `sitemap.xml` plus child files like `sitemap-pages-0.xml` and `sitemap-products-0.xml` under `dist/`, along with `robots.txt`.
+
+### Build output
+
+The plugin mirrors `getRootSitemap()` behavior from the runtime manifest:
+
+| Concrete files | `sitemap.xml` | Child files on disk |
+|---|---|---|
+| 1 (unsplit) | Full `<urlset>` | None — `sitemap-0.xml` is not written |
+| 2+ (split or multiple named sitemaps) | `<sitemapindex>` | All child files (`sitemap-0.xml`, `sitemap-pages-0.xml`, etc.) |
+
+Child paths always use the index-always format (`-0`, `-1`, …) so runtime routes stay stable when a sitemap later grows and splits. For static builds, child files are only materialized when the root is a sitemap index.
+
+Register the plugin under `vite.plugins` in `astro.config.mjs` (or `vite.config.ts`), not `integrations`.
 
 ### c. With robots
 
