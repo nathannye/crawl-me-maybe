@@ -224,17 +224,8 @@ export function createSitemapManifest(
 		validateSelectorIndex(selector.index);
 
 		let definitionIndex = 0;
-		if (definitions.length === 1) {
-			if (selector.sitemap) {
-				throw new SitemapNotFoundError(selector.sitemap);
-			}
-		} else {
-			if (!selector.sitemap) {
-				throw new Error(
-					"createSitemapManifest: sitemap is required when multiple sitemap definitions are configured",
-				);
-			}
 
+		if (selector.sitemap) {
 			definitionIndex = definitions.findIndex(
 				(definition) => definition.sitemap === selector.sitemap,
 			);
@@ -242,6 +233,10 @@ export function createSitemapManifest(
 			if (definitionIndex < 0) {
 				throw new SitemapNotFoundError(selector.sitemap);
 			}
+		} else if (definitions.length > 1) {
+			throw new Error(
+				"createSitemapManifest: sitemap is required when multiple sitemap definitions are configured",
+			);
 		}
 
 		const plan = await resolveDefinition(definitionIndex);

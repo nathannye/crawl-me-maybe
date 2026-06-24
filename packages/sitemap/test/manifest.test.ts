@@ -83,6 +83,7 @@ it("serves a single named sitemap directly when it is the only file", async () =
 
 	const rootXml = await manifest.getRootSitemap();
 	const files = await manifest.getSitemapFiles();
+	const childXml = await manifest.getSitemap({ sitemap: "pages", index: 0 });
 
 	expect(rootXml).toContain("<urlset");
 	expect(files).toEqual([
@@ -92,6 +93,7 @@ it("serves a single named sitemap directly when it is the only file", async () =
 			path: "/sitemap-pages-0.xml",
 		},
 	]);
+	expect(childXml).toContain("https://example.com/pages");
 });
 
 it("keeps named sitemap routes stable and resolves only the requested sitemap", async () => {
@@ -139,10 +141,25 @@ it("throws typed errors for invalid sitemap names and indexes", async () => {
 		namedManifest.getSitemap({ sitemap: "blog-posts", index: 0 }),
 	).rejects.toBeInstanceOf(SitemapNotFoundError);
 
+	const singleNamedManifest = createSitemapManifest({
+		domain: "https://example.com",
+		entries: {
+			pages: [{ path: "/pages" }],
+		},
+	});
+
+	await expect(
+		singleNamedManifest.getSitemap({ sitemap: "blog", index: 0 }),
+	).rejects.toBeInstanceOf(SitemapNotFoundError);
+
 	const singleManifest = createSitemapManifest({
 		domain: "https://example.com",
 		entries: [{ path: "/pages" }],
 	});
+
+	await expect(
+		singleManifest.getSitemap({ sitemap: "pages", index: 0 }),
+	).rejects.toBeInstanceOf(SitemapNotFoundError);
 
 	await expect(
 		singleManifest.getSitemap({ index: 1 }),

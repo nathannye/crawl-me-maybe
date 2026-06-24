@@ -360,18 +360,13 @@ function createSitemapManifest(options) {
   async function renderFileBySelector(selector) {
     validateSelectorIndex(selector.index);
     let definitionIndex = 0;
-    if (definitions.length === 1) {
-      if (selector.sitemap) {
-        throw new SitemapNotFoundError(selector.sitemap);
-      }
-    } else {
-      if (!selector.sitemap) {
-        throw new Error("createSitemapManifest: sitemap is required when multiple sitemap definitions are configured");
-      }
+    if (selector.sitemap) {
       definitionIndex = definitions.findIndex((definition) => definition.sitemap === selector.sitemap);
       if (definitionIndex < 0) {
         throw new SitemapNotFoundError(selector.sitemap);
       }
+    } else if (definitions.length > 1) {
+      throw new Error("createSitemapManifest: sitemap is required when multiple sitemap definitions are configured");
     }
     const plan = await resolveDefinition(definitionIndex);
     const file = plan.files[selector.index];
@@ -536,5 +531,5 @@ export {
   vitePluginSitemap
 };
 
-//# debugId=05F9A4355709371664756E2164756E21
+//# debugId=06E28A08D3295F9564756E2164756E21
 //# sourceMappingURL=vite.js.map

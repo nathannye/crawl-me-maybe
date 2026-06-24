@@ -413,18 +413,13 @@ function createSitemapManifest(options) {
   async function renderFileBySelector(selector) {
     validateSelectorIndex(selector.index);
     let definitionIndex = 0;
-    if (definitions.length === 1) {
-      if (selector.sitemap) {
-        throw new SitemapNotFoundError(selector.sitemap);
-      }
-    } else {
-      if (!selector.sitemap) {
-        throw new Error("createSitemapManifest: sitemap is required when multiple sitemap definitions are configured");
-      }
+    if (selector.sitemap) {
       definitionIndex = definitions.findIndex((definition) => definition.sitemap === selector.sitemap);
       if (definitionIndex < 0) {
         throw new SitemapNotFoundError(selector.sitemap);
       }
+    } else if (definitions.length > 1) {
+      throw new Error("createSitemapManifest: sitemap is required when multiple sitemap definitions are configured");
     }
     const plan = await resolveDefinition(definitionIndex);
     const file = plan.files[selector.index];
@@ -465,5 +460,5 @@ export {
   DEFAULT_ROBOTS_RULES
 };
 
-//# debugId=F7A14F69DCE61BB164756E2164756E21
+//# debugId=366E02F54252DC6C64756E2164756E21
 //# sourceMappingURL=index.js.map

@@ -261,6 +261,12 @@ vitePluginSitemap({
 
 Use `createSitemapManifest` when a route needs to stay stable as content grows. The manifest lazily resolves the sitemap(s) needed for the current request and gives you the root route plus child files from the same shared config.
 
+### `getSitemap()` selectors
+
+- `getSitemap({ index })` — works for any single-definition manifest, named or unnamed.
+- `getSitemap({ sitemap, index })` — works when `sitemap` matches a configured key, including when there is only one named sitemap (e.g. `{ pages: ... }` with `{ sitemap: "pages", index: 0 }`).
+- When multiple named sitemaps are configured, `sitemap` is required in the selector.
+
 ### a. Single sitemap, unsplit
 
 ```ts
@@ -537,7 +543,7 @@ If `rules` is `undefined` (not configured in Studio), `generateRobotsTxt` falls 
 - `SitemapDefinition` - per-sitemap manifest definition
 - `SitemapFile` - concrete child sitemap metadata from `getSitemapFiles()`
 - `SitemapManifest` - manifest interface from `createSitemapManifest()`
-- `SitemapSelector` - selector passed to `getSitemap()`
+- `SitemapSelector` - selector passed to `getSitemap()`; `sitemap` is optional for single-definition manifests and required when multiple named sitemaps are configured
 - `SitemapNotFoundError` - thrown when a named sitemap does not exist
 - `SitemapPartNotFoundError` - thrown when the requested child index does not exist
 - `SitemapEntrySource` - array or callback returning sitemap entries
