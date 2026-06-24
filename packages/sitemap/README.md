@@ -156,7 +156,7 @@ Writes `dist/sitemap.xml` and `dist/robots.txt`.
 
 ### b. Multiple sitemaps
 
-Split by content type when you exceed ~50k URLs per file. Writes `sitemap-{name}.xml` per key and a `sitemap.xml` index.
+Split by content type when you exceed ~50k URLs per file. Writes `sitemap/{name}.xml` per key and a `sitemap.xml` index.
 
 ```ts
 vitePluginSitemap({
@@ -226,16 +226,16 @@ vitePluginSitemap({
 
 ## Runtime generation
 
-Return XML from a route handler or API endpoint. This uses the same entry shape as the Vite plugin, but does not write files to disk.
+Return XML from a route handler or API endpoint. `generateSitemap` is async and accepts the same entry shapes as the Vite plugin: a static array, a callback, or a named object for multi-sitemap mode.
 
-### a. Single sitemap
+### a. Static entries
 
 ```ts
 // app/sitemap.xml/route.ts
 import { generateSitemap } from "@crawl-me-maybe/sitemap";
 
 export async function GET() {
-  const xml = generateSitemap("https://example.com", {
+  const xml = await generateSitemap("https://example.com", {
     entries: [{ path: "/" }, { path: "/about" }],
   });
 
@@ -245,25 +245,57 @@ export async function GET() {
 }
 ```
 
-### b. Multiple sitemaps
+### b. Async entry source
 
-When generating multiple sitemaps at runtime, the sitemap index needs to know the filenames of the child sitemap routes. In most apps this is a small shared list such as `pages`, `blog`, or `products`.
-
-Serve a sitemap index at `/sitemap.xml` and child sitemaps at `/sitemap-{name}.xml`.
+Pass a function when entries come from a CMS or database:
 
 ```ts
-// lib/sitemap-names.ts
-export const SITEMAP_NAMES = ["pages", "blog"] as const;
+// app/sitemap.xml/route.ts
+import { generateSitemap } from "@crawl-me-maybe/sitemap";
+
+export async function GET() {
+  const xml = await generateSitemap("https://example.com", {
+    entries: async () => {
+      const pages = await getPages();
+
+      return pages.map((page) => ({
+        path: page.slug,
+        lastmod: page.updatedAt,
+      }));
+    },
+  });
+
+  return new Response(xml, {
+    headers: { "Content-Type": "application/xml" },
+  });
+}
+```
+
+### c. Multiple sitemaps (dynamic route)
+
+Use a named `entries` object and a `sitemap` key to select which sitemap to generate. Serve a sitemap index at `/sitemap.xml` and child sitemaps at `/sitemap/<sitemap>.xml`.
+
+```ts
+// lib/sitemap-entries.ts
+import { getBlogSitemapEntries } from "./sitemap/blog";
+import { getPageSitemapEntries } from "./sitemap/pages";
+
+export const sitemapEntries = {
+  pages: getPageSitemapEntries,
+  blog: getBlogSitemapEntries,
+} as const;
 ```
 
 ```ts
 // app/sitemap.xml/route.ts
 import { generateIndexSitemap } from "@crawl-me-maybe/sitemap";
-import { SITEMAP_NAMES } from "@/lib/sitemap-names";
+import { sitemapEntries } from "@/lib/sitemap-entries";
 
 export async function GET() {
   const xml = generateIndexSitemap("https://example.com", {
-    childSitemapNames: SITEMAP_NAMES.map((name) => `sitemap-${name}.xml`),
+    childSitemapNames: Object.keys(sitemapEntries).map(
+      (name) => `sitemap/${name}.xml`,
+    ),
   });
 
   return new Response(xml, {
@@ -273,21 +305,39 @@ export async function GET() {
 ```
 
 ```ts
-// app/sitemap-pages.xml/route.ts
-import { generateSitemap } from "@crawl-me-maybe/sitemap";
+// app/sitemap/[sitemap].xml/route.ts
+import {
+  generateSitemap,
+  SitemapNotFoundError,
+} from "@crawl-me-maybe/sitemap";
+import { sitemapEntries } from "@/lib/sitemap-entries";
 
-export async function GET() {
-  const xml = generateSitemap("https://example.com", {
-    entries: [{ path: "/" }, { path: "/about" }],
-  });
+export async function GET(
+  _req: Request,
+  { params }: { params: Promise<{ sitemap: keyof typeof sitemapEntries }> },
+) {
+  const { sitemap } = await params;
 
-  return new Response(xml, {
-    headers: { "Content-Type": "application/xml" },
-  });
+  try {
+    const xml = await generateSitemap("https://example.com", {
+      entries: sitemapEntries,
+      sitemap,
+    });
+
+    return new Response(xml, {
+      headers: { "Content-Type": "application/xml" },
+    });
+  } catch (error) {
+    if (error instanceof SitemapNotFoundError) {
+      return new Response("Not found", { status: 404 });
+    }
+
+    throw error;
+  }
 }
 ```
 
-### c. Localized
+### d. Localized
 
 See [Locale modes](#locale-modes).
 
@@ -296,7 +346,7 @@ See [Locale modes](#locale-modes).
 import { generateSitemap } from "@crawl-me-maybe/sitemap";
 
 export async function GET() {
-  const xml = generateSitemap("https://example.com", {
+  const xml = await generateSitemap("https://example.com", {
     entries: [{ path: "/about" }, { path: "/contact" }],
     locales: [
       { code: "en", default: true },
@@ -400,8 +450,9 @@ If `rules` is `undefined` (not configured in Studio), `generateRobotsTxt` falls 
 | `domain` | `string` | Vite + runtime | Site origin, e.g. `https://example.com`. First argument to `generateSitemap`, `generateIndexSitemap`, and `generateRobotsTxt`. |
 | `outDir` | `string` | Vite | Output directory (default: `dist`) |
 | `sitemaps` | fn or object | Vite | Entry callback(s) for one or more sitemap files |
-| `entries` | `SitemapEntry[]` | Runtime (`GenerateSitemapOptions`) | Entries for a single generated sitemap |
-| `childSitemapNames` | `string[]` | Runtime (`GenerateIndexSitemapOptions`) | Child sitemap filenames for `generateIndexSitemap` |
+| `entries` | array, fn, or named object | Runtime (`GenerateSitemapOptions`) | Entry source for a generated sitemap |
+| `sitemap` | `string` | Runtime (`GenerateSitemapOptions`) | Required when `entries` is a named object; selects which sitemap to generate |
+| `childSitemapNames` | `string[]` | Runtime (`GenerateIndexSitemapOptions`) | Child sitemap filenames for `generateIndexSitemap`, such as `sitemap/pages.xml` |
 | `robots` | `RobotsRule` or array | Vite | Crawler rules used when writing `robots.txt` |
 | `locales` | `LocaleConfig[]` | Vite + runtime | Locale list for hreflang generation |
 | `localeMode` | `"prefix"` \| `"subdomain"` | Vite + runtime | URL strategy (default: `prefix`) |
@@ -409,8 +460,11 @@ If `rules` is `undefined` (not configured in Studio), `generateRobotsTxt` falls 
 
 ### Exported types
 
-- `GenerateSitemapOptions` — options object for `generateSitemap(domain, options)`
+- `GenerateSitemapOptions` — options object for `await generateSitemap(domain, options)`
 - `GenerateIndexSitemapOptions` — options object for `generateIndexSitemap(domain, options)`
+- `SitemapEntrySource` — array or callback returning sitemap entries
+- `NamedSitemapEntrySources` — named object of entry sources for multi-sitemap mode
+- `SitemapNotFoundError` — thrown when `sitemap` does not match a key in a named `entries` object
 
 ## License
 

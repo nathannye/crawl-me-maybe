@@ -79,8 +79,8 @@ Minimal sitemap generator. Query your CMS, pass the result, done.
 ```ts
 import { generateSitemap } from "@crawl-me-maybe/sitemap";
 
-const xml = generateSitemap("https://example.com", {
-  entries: [{ path: "/" }, { path: "/about" }],
+const xml = await generateSitemap("https://example.com", {
+  entries: async () => [{ path: "/" }, { path: "/about" }],
 });
 ```
 

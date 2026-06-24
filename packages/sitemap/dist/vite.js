@@ -117,6 +117,43 @@ function generateLocalizedEntries(baseEntries, locales, domain, localeMode = "pr
   return localizedEntries;
 }
 
+// src/errors.ts
+class SitemapNotFoundError extends Error {
+  constructor(sitemap) {
+    super(`Sitemap not found: ${sitemap}`);
+    this.name = "SitemapNotFoundError";
+  }
+}
+
+// src/resolve-entries.ts
+function isNamedSitemapEntrySources(entries) {
+  return typeof entries === "object" && entries !== null && !Array.isArray(entries);
+}
+async function resolveEntrySource(source) {
+  const resolved = typeof source === "function" ? await source() : source;
+  if (!Array.isArray(resolved)) {
+    throw new Error("Sitemap entry source must resolve to an array of entries");
+  }
+  return resolved;
+}
+async function resolveSitemapEntries(options) {
+  const { entries } = options;
+  if (Array.isArray(entries) || typeof entries === "function") {
+    return resolveEntrySource(entries);
+  }
+  if (!isNamedSitemapEntrySources(entries)) {
+    throw new Error("Invalid sitemap entry source");
+  }
+  if (!("sitemap" in options) || !options.sitemap) {
+    throw new Error("generateSitemap: `sitemap` is required when `entries` is a named object");
+  }
+  const source = entries[options.sitemap];
+  if (source === undefined) {
+    throw new SitemapNotFoundError(options.sitemap);
+  }
+  return resolveEntrySource(source);
+}
+
 // src/xml.ts
 function createSitemapXml(urls) {
   try {
@@ -167,13 +204,13 @@ function createSitemapXml(urls) {
 }
 
 // src/sitemap.ts
-function generateSitemap(domain, options) {
+async function generateSitemap(domain, options) {
   const {
-    entries,
     locales,
     localeMode = "prefix",
     prefixDefault = false
   } = options;
+  const entries = await resolveSitemapEntries(options);
   const processedUrls = locales && locales.length > 0 ? generateLocalizedEntries(entries, locales, domain, localeMode, prefixDefault) : entries.map(({ path, ...rest }) => ({
     ...rest,
     url: resolveUrl(path, domain)
@@ -218,11 +255,13 @@ function validateConfig(config) {
 }
 
 // src/file.ts
-import { writeFileSync } from "node:fs";
+import { mkdirSync, writeFileSync } from "node:fs";
 import path from "node:path";
 var createFile = (outputPath, filename, content) => {
   try {
-    writeFileSync(path.join(outputPath, filename), content);
+    const targetPath = path.join(outputPath, filename);
+    mkdirSync(path.dirname(targetPath), { recursive: true });
+    writeFileSync(targetPath, content);
   } catch (err) {
     throw new Error(`Failed to write file ${filename} to ${outputPath}: ${err instanceof Error ? err.message : String(err)}`);
   }
@@ -241,9 +280,9 @@ function vitePluginSitemap(config) {
     const content = generateRobotsTxt(domain, sitemapIndex, pluginConfig.robots);
     createFile(resolvedOutDir, "robots.txt", content);
   };
-  const writeSitemap = (filename, urls) => {
-    const xml = generateSitemap(domain, {
-      entries: urls,
+  const writeSitemap = async (filename, entriesOptions) => {
+    const xml = await generateSitemap(domain, {
+      ...entriesOptions,
       locales,
       localeMode,
       prefixDefault
@@ -257,8 +296,7 @@ function vitePluginSitemap(config) {
       fs.mkdirSync(resolvedOutDir, { recursive: true });
       const { sitemaps } = pluginConfig;
       if (typeof sitemaps === "function") {
-        const urls = await sitemaps();
-        writeSitemap("sitemap.xml", urls);
+        await writeSitemap("sitemap.xml", { entries: sitemaps });
         writeRobots("sitemap.xml");
         console.log("✅ Generated single sitemap");
         return;
@@ -267,9 +305,12 @@ function vitePluginSitemap(config) {
       for (const [name, cb] of Object.entries(sitemaps)) {
         if (typeof cb !== "function")
           continue;
-        const urls = await cb();
-        writeSitemap(`sitemap-${name}.xml`, urls);
-        indexFiles.push(`sitemap-${name}.xml`);
+        const filename = `sitemap/${name}.xml`;
+        await writeSitemap(filename, {
+          entries: sitemaps,
+          sitemap: name
+        });
+        indexFiles.push(filename);
       }
       const indexXml = generateIndexSitemap(domain, {
         childSitemapNames: indexFiles
@@ -284,5 +325,5 @@ export {
   vitePluginSitemap
 };
 
-//# debugId=A3D7AB349E50BA3764756E2164756E21
+//# debugId=8AD62C9E3001817564756E2164756E21
 //# sourceMappingURL=vite.js.map

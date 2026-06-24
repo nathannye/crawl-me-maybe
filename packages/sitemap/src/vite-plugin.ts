@@ -2,7 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import { generateRobotsTxt } from "./robots";
 import { generateIndexSitemap, generateSitemap } from "./sitemap";
-import type { SitemapConfig, SitemapEntry } from "./types";
+import type { GenerateSitemapOptions, SitemapConfig } from "./types";
 import { validateConfig } from "./validate-config";
 import { createFile } from "./file";
 
@@ -29,13 +29,16 @@ export function vitePluginSitemap(config: SitemapConfig) {
 		createFile(resolvedOutDir, "robots.txt", content);
 	};
 
-	const writeSitemap = (filename: string, urls: SitemapEntry[]) => {
-		const xml = generateSitemap(domain, {
-			entries: urls,
+	const writeSitemap = async (
+		filename: string,
+		entriesOptions: Pick<GenerateSitemapOptions, "entries" | "sitemap">,
+	) => {
+		const xml = await generateSitemap(domain, {
+			...entriesOptions,
 			locales,
 			localeMode,
 			prefixDefault,
-		});
+		} as GenerateSitemapOptions);
 		createFile(resolvedOutDir, filename, xml);
 	};
 
@@ -47,8 +50,7 @@ export function vitePluginSitemap(config: SitemapConfig) {
 			const { sitemaps } = pluginConfig;
 
 			if (typeof sitemaps === "function") {
-				const urls = await sitemaps();
-				writeSitemap("sitemap.xml", urls);
+				await writeSitemap("sitemap.xml", { entries: sitemaps });
 				writeRobots("sitemap.xml");
 				console.log("✅ Generated single sitemap");
 				return;
@@ -57,9 +59,12 @@ export function vitePluginSitemap(config: SitemapConfig) {
 			const indexFiles: string[] = [];
 			for (const [name, cb] of Object.entries(sitemaps)) {
 				if (typeof cb !== "function") continue;
-				const urls = await cb();
-				writeSitemap(`sitemap-${name}.xml`, urls);
-				indexFiles.push(`sitemap-${name}.xml`);
+				const filename = `sitemap/${name}.xml`;
+				await writeSitemap(filename, {
+					entries: sitemaps,
+					sitemap: name,
+				});
+				indexFiles.push(filename);
 			}
 
 			const indexXml = generateIndexSitemap(domain, {

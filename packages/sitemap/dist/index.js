@@ -1,3 +1,10 @@
+// src/errors.ts
+class SitemapNotFoundError extends Error {
+  constructor(sitemap) {
+    super(`Sitemap not found: ${sitemap}`);
+    this.name = "SitemapNotFoundError";
+  }
+}
 // src/domain.ts
 function normalizeDomain(domain) {
   return domain.replace(/\/+$/, "");
@@ -112,6 +119,35 @@ function generateLocalizedEntries(baseEntries, locales, domain, localeMode = "pr
   return localizedEntries;
 }
 
+// src/resolve-entries.ts
+function isNamedSitemapEntrySources(entries) {
+  return typeof entries === "object" && entries !== null && !Array.isArray(entries);
+}
+async function resolveEntrySource(source) {
+  const resolved = typeof source === "function" ? await source() : source;
+  if (!Array.isArray(resolved)) {
+    throw new Error("Sitemap entry source must resolve to an array of entries");
+  }
+  return resolved;
+}
+async function resolveSitemapEntries(options) {
+  const { entries } = options;
+  if (Array.isArray(entries) || typeof entries === "function") {
+    return resolveEntrySource(entries);
+  }
+  if (!isNamedSitemapEntrySources(entries)) {
+    throw new Error("Invalid sitemap entry source");
+  }
+  if (!("sitemap" in options) || !options.sitemap) {
+    throw new Error("generateSitemap: `sitemap` is required when `entries` is a named object");
+  }
+  const source = entries[options.sitemap];
+  if (source === undefined) {
+    throw new SitemapNotFoundError(options.sitemap);
+  }
+  return resolveEntrySource(source);
+}
+
 // src/xml.ts
 function createSitemapXml(urls) {
   try {
@@ -162,13 +198,13 @@ function createSitemapXml(urls) {
 }
 
 // src/sitemap.ts
-function generateSitemap(domain, options) {
+async function generateSitemap(domain, options) {
   const {
-    entries,
     locales,
     localeMode = "prefix",
     prefixDefault = false
   } = options;
+  const entries = await resolveSitemapEntries(options);
   const processedUrls = locales && locales.length > 0 ? generateLocalizedEntries(entries, locales, domain, localeMode, prefixDefault) : entries.map(({ path, ...rest }) => ({
     ...rest,
     url: resolveUrl(path, domain)
@@ -190,8 +226,9 @@ export {
   generateSitemap,
   generateRobotsTxt,
   generateIndexSitemap,
+  SitemapNotFoundError,
   DEFAULT_ROBOTS_RULES
 };
 
-//# debugId=026C840DFFF58B0364756E2164756E21
+//# debugId=FD28F27B4F2E711F64756E2164756E21
 //# sourceMappingURL=index.js.map

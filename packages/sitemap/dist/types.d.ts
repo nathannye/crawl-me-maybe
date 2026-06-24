@@ -49,6 +49,29 @@ export type SitemapEntryWithAlternates = Omit<SitemapEntry, "path"> & {
         href: string;
     }[];
 };
+/** A single sitemap entry source: a static array or a sync/async callback. */
+export type SitemapEntrySource = SitemapEntry[] | (() => SitemapEntry[] | Promise<SitemapEntry[]>);
+/** Named sitemap entry sources for multi-sitemap mode. */
+export type NamedSitemapEntrySources = Record<string, SitemapEntrySource>;
+/** Options for {@link generateSitemap}. */
+export type GenerateSitemapOptions = {
+    entries: SitemapEntrySource;
+    sitemap?: never;
+    locales?: LocaleConfig[];
+    localeMode?: "prefix" | "subdomain";
+    prefixDefault?: boolean;
+} | {
+    entries: NamedSitemapEntrySources;
+    sitemap: string;
+    locales?: LocaleConfig[];
+    localeMode?: "prefix" | "subdomain";
+    prefixDefault?: boolean;
+};
+/** Options for {@link generateIndexSitemap}. */
+export type GenerateIndexSitemapOptions = {
+    /** Sitemap filenames without a leading slash (e.g. "sitemap/pages.xml", not "/sitemap/pages.xml") */
+    childSitemapNames: string[];
+};
 /**
  * Main plugin configuration object.
  */

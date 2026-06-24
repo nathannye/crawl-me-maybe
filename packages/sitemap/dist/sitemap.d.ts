@@ -1,27 +1,12 @@
-import type { LocaleConfig, SitemapEntry } from "./types";
-/** Options for {@link generateSitemap}. */
-export type GenerateSitemapOptions = {
-    /** Sitemap entries with site-relative paths */
-    entries: SitemapEntry[];
-    /** Locale list for hreflang alternates */
-    locales?: LocaleConfig[];
-    /** How to format localized URLs (default: "prefix") */
-    localeMode?: "prefix" | "subdomain";
-    /** Whether to add a locale prefix to the default locale URL (default: false) */
-    prefixDefault?: boolean;
-};
-/** Options for {@link generateIndexSitemap}. */
-export type GenerateIndexSitemapOptions = {
-    /** Sitemap filenames without a leading slash (e.g. "sitemap-pages.xml", not "/sitemap-pages.xml") */
-    childSitemapNames: string[];
-};
+import type { GenerateIndexSitemapOptions, GenerateSitemapOptions } from "./types";
+export type { GenerateIndexSitemapOptions, GenerateSitemapOptions, NamedSitemapEntrySources, SitemapEntrySource, } from "./types";
 /**
  * Generates a sitemap XML string from entries and optional locale configuration.
  * @param domain - Site origin for resolving entry paths (e.g. https://example.com)
  * @param options - Entries and optional locale settings
  * @returns Sitemap XML string
  */
-export declare function generateSitemap(domain: string, options: GenerateSitemapOptions): string;
+export declare function generateSitemap(domain: string, options: GenerateSitemapOptions): Promise<string>;
 /**
  * Generates a sitemap index XML string referencing child sitemap files.
  * @param domain - Site origin used to build absolute `<loc>` URLs

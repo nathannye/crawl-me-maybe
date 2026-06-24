@@ -1,25 +1,15 @@
 import { normalizeDomain } from "./domain";
 import { generateLocalizedEntries, resolveUrl } from "./localize";
-import type { LocaleConfig, SitemapEntry } from "./types";
+import { resolveSitemapEntries } from "./resolve-entries";
+import type { GenerateIndexSitemapOptions, GenerateSitemapOptions } from "./types";
 import { createSitemapXml } from "./xml";
 
-/** Options for {@link generateSitemap}. */
-export type GenerateSitemapOptions = {
-	/** Sitemap entries with site-relative paths */
-	entries: SitemapEntry[];
-	/** Locale list for hreflang alternates */
-	locales?: LocaleConfig[];
-	/** How to format localized URLs (default: "prefix") */
-	localeMode?: "prefix" | "subdomain";
-	/** Whether to add a locale prefix to the default locale URL (default: false) */
-	prefixDefault?: boolean;
-};
-
-/** Options for {@link generateIndexSitemap}. */
-export type GenerateIndexSitemapOptions = {
-	/** Sitemap filenames without a leading slash (e.g. "sitemap-pages.xml", not "/sitemap-pages.xml") */
-	childSitemapNames: string[];
-};
+export type {
+	GenerateIndexSitemapOptions,
+	GenerateSitemapOptions,
+	NamedSitemapEntrySources,
+	SitemapEntrySource,
+} from "./types";
 
 /**
  * Generates a sitemap XML string from entries and optional locale configuration.
@@ -27,16 +17,17 @@ export type GenerateIndexSitemapOptions = {
  * @param options - Entries and optional locale settings
  * @returns Sitemap XML string
  */
-export function generateSitemap(
+export async function generateSitemap(
 	domain: string,
 	options: GenerateSitemapOptions,
-): string {
+): Promise<string> {
 	const {
-		entries,
 		locales,
 		localeMode = "prefix",
 		prefixDefault = false,
 	} = options;
+
+	const entries = await resolveSitemapEntries(options);
 
 	const processedUrls =
 		locales && locales.length > 0
