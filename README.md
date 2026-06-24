@@ -5,7 +5,9 @@
 
 Framework-agnostic tools for CMS-driven SEO.
 
-Other plugins place most of the work on editors, schema markup and metadata that users must fill in by hand, usually duplicating content that already exists. These libraries flip this and advocate for passing that content once in your template and saving editors the effort.
+Most SEO tooling pushes the work onto editors: extra schema fields, repeated metadata, and a pile of content that already exists somewhere else in the CMS.
+
+Crawl me maybe takes the opposite approach. Editors fill in the few things that actually need editorial control, and the rest is derived from your existing content model in the frontend.
 
 ---
 
@@ -22,6 +24,7 @@ Your app / site
   └── @crawl-me-maybe/sitemap             ← generate sitemap.xml and robots.txt
 ```
 
+> 🧠 Note: Use the whole stack together, or just the pieces you need. The packages are designed to work together, but can be used independently.
 
 ## Packages
 
