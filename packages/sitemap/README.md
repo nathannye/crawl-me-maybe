@@ -229,15 +229,11 @@ const indexXml = generateSitemapIndex("https://example.com", {
 
 Each video requires `title`, `description`, and `thumbnailUrl`, plus `contentUrl` or `playerUrl`. `duration` and `publicationDate` are optional.
 
-### Locale alternates and video metadata
+### Locale alternates and videos
 
-When a page defines locale alternates, sitemap entries are emitted once per localized URL so each URL can include the full hreflang alternate set.
+Videos are attached to the sitemap entry, not per locale variant. If a page has locale alternates, the same video metadata is emitted for each localized URL in that alternate set.
 
-Video metadata, however, is currently attached at the page entry level, not per locale variant. That means any videos provided for a page will be emitted for each localized URL in that alternate group.
-
-For example, if a page defines `/en/about` and `/de/about` as alternates and includes one `videos` array, those videos will appear on both sitemap entries.
-
-This keeps the API simple, but it also means locale-specific video metadata is not currently modeled. If your localized pages need different video sitemap data, the recommended workaround is to generate them as separate sitemap entries or separate locale-specific sitemaps.
+If localized pages need different videos, model them as separate entries or separate sitemaps.
 
 ## API overview
 
