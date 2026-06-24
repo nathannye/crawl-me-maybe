@@ -1,4 +1,4 @@
-<img width="1060" height="272" alt="crawl-me-maybe-thumb" src="https://github.com/user-attachments/assets/daf50064-4d4b-44c5-a9f5-4a9106f6e219" />
+<img width="2120" height="544" alt="crawl-me-maybe-thumb" src="https://github.com/user-attachments/assets/cc684f0d-61df-4720-85b3-19a588529c66" />
 <br/>
 
 # Crawl me maybe
