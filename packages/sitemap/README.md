@@ -235,8 +235,7 @@ Return XML from a route handler or API endpoint. This uses the same entry shape 
 import { generateSitemap } from "@crawl-me-maybe/sitemap";
 
 export async function GET() {
-  const xml = generateSitemap({
-    domain: "https://example.com",
+  const xml = generateSitemap("https://example.com", {
     entries: [{ path: "/" }, { path: "/about" }],
   });
 
@@ -263,10 +262,9 @@ import { generateIndexSitemap } from "@crawl-me-maybe/sitemap";
 import { SITEMAP_NAMES } from "@/lib/sitemap-names";
 
 export async function GET() {
-  const xml = generateIndexSitemap(
-    "https://example.com",
-    SITEMAP_NAMES.map((name) => `sitemap-${name}.xml`),
-  );
+  const xml = generateIndexSitemap("https://example.com", {
+    childSitemapNames: SITEMAP_NAMES.map((name) => `sitemap-${name}.xml`),
+  });
 
   return new Response(xml, {
     headers: { "Content-Type": "application/xml" },
@@ -279,8 +277,7 @@ export async function GET() {
 import { generateSitemap } from "@crawl-me-maybe/sitemap";
 
 export async function GET() {
-  const xml = generateSitemap({
-    domain: "https://example.com",
+  const xml = generateSitemap("https://example.com", {
     entries: [{ path: "/" }, { path: "/about" }],
   });
 
@@ -299,8 +296,7 @@ See [Locale modes](#locale-modes).
 import { generateSitemap } from "@crawl-me-maybe/sitemap";
 
 export async function GET() {
-  const xml = generateSitemap({
-    domain: "https://example.com",
+  const xml = generateSitemap("https://example.com", {
     entries: [{ path: "/about" }, { path: "/contact" }],
     locales: [
       { code: "en", default: true },
@@ -401,14 +397,20 @@ If `rules` is `undefined` (not configured in Studio), `generateRobotsTxt` falls 
 
 | Option | Type | Applies to | Description |
 |--------|------|------------|-------------|
-| `domain` | `string` | Vite + runtime | Site origin, e.g. `https://example.com` |
+| `domain` | `string` | Vite + runtime | Site origin, e.g. `https://example.com`. First argument to `generateSitemap`, `generateIndexSitemap`, and `generateRobotsTxt`. |
 | `outDir` | `string` | Vite | Output directory (default: `dist`) |
 | `sitemaps` | fn or object | Vite | Entry callback(s) for one or more sitemap files |
-| `entries` | `SitemapEntry[]` | Runtime | Entries for a single generated sitemap |
+| `entries` | `SitemapEntry[]` | Runtime (`GenerateSitemapOptions`) | Entries for a single generated sitemap |
+| `childSitemapNames` | `string[]` | Runtime (`GenerateIndexSitemapOptions`) | Child sitemap filenames for `generateIndexSitemap` |
 | `robots` | `RobotsRule` or array | Vite | Crawler rules used when writing `robots.txt` |
 | `locales` | `LocaleConfig[]` | Vite + runtime | Locale list for hreflang generation |
 | `localeMode` | `"prefix"` \| `"subdomain"` | Vite + runtime | URL strategy (default: `prefix`) |
 | `prefixDefault` | `boolean` | Vite + runtime | Prefix the default locale too (default: `false`) |
+
+### Exported types
+
+- `GenerateSitemapOptions` — options object for `generateSitemap(domain, options)`
+- `GenerateIndexSitemapOptions` — options object for `generateIndexSitemap(domain, options)`
 
 ## License
 

@@ -162,24 +162,23 @@ function createSitemapXml(urls) {
 }
 
 // src/sitemap.ts
-function generateSitemap(config) {
+function generateSitemap(domain, options) {
   const {
-    domain,
     entries,
     locales,
     localeMode = "prefix",
     prefixDefault = false
-  } = config;
+  } = options;
   const processedUrls = locales && locales.length > 0 ? generateLocalizedEntries(entries, locales, domain, localeMode, prefixDefault) : entries.map(({ path, ...rest }) => ({
     ...rest,
     url: resolveUrl(path, domain)
   }));
   return createSitemapXml(processedUrls);
 }
-function generateIndexSitemap(baseUrl, childSitemapNames) {
+function generateIndexSitemap(domain, options) {
   try {
-    const normalizedBase = normalizeDomain(baseUrl);
-    const normalizedFiles = childSitemapNames.map((f) => f.replace(/^\/+/, ""));
+    const normalizedBase = normalizeDomain(domain);
+    const normalizedFiles = options.childSitemapNames.map((f) => f.replace(/^\/+/, ""));
     const items = normalizedFiles.map((f) => `<sitemap><loc>${normalizedBase}/${f}</loc></sitemap>`).join("");
     return `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${items}</sitemapindex>`;
@@ -194,5 +193,5 @@ export {
   DEFAULT_ROBOTS_RULES
 };
 
-//# debugId=1E4AA3AB54EDE05D64756E2164756E21
+//# debugId=026C840DFFF58B0364756E2164756E21
 //# sourceMappingURL=index.js.map

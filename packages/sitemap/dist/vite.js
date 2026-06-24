@@ -167,24 +167,23 @@ function createSitemapXml(urls) {
 }
 
 // src/sitemap.ts
-function generateSitemap(config) {
+function generateSitemap(domain, options) {
   const {
-    domain,
     entries,
     locales,
     localeMode = "prefix",
     prefixDefault = false
-  } = config;
+  } = options;
   const processedUrls = locales && locales.length > 0 ? generateLocalizedEntries(entries, locales, domain, localeMode, prefixDefault) : entries.map(({ path, ...rest }) => ({
     ...rest,
     url: resolveUrl(path, domain)
   }));
   return createSitemapXml(processedUrls);
 }
-function generateIndexSitemap(baseUrl, childSitemapNames) {
+function generateIndexSitemap(domain, options) {
   try {
-    const normalizedBase = normalizeDomain(baseUrl);
-    const normalizedFiles = childSitemapNames.map((f) => f.replace(/^\/+/, ""));
+    const normalizedBase = normalizeDomain(domain);
+    const normalizedFiles = options.childSitemapNames.map((f) => f.replace(/^\/+/, ""));
     const items = normalizedFiles.map((f) => `<sitemap><loc>${normalizedBase}/${f}</loc></sitemap>`).join("");
     return `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${items}</sitemapindex>`;
@@ -243,8 +242,7 @@ function vitePluginSitemap(config) {
     createFile(resolvedOutDir, "robots.txt", content);
   };
   const writeSitemap = (filename, urls) => {
-    const xml = generateSitemap({
-      domain,
+    const xml = generateSitemap(domain, {
       entries: urls,
       locales,
       localeMode,
@@ -273,7 +271,9 @@ function vitePluginSitemap(config) {
         writeSitemap(`sitemap-${name}.xml`, urls);
         indexFiles.push(`sitemap-${name}.xml`);
       }
-      const indexXml = generateIndexSitemap(domain, indexFiles);
+      const indexXml = generateIndexSitemap(domain, {
+        childSitemapNames: indexFiles
+      });
       createFile(resolvedOutDir, "sitemap.xml", indexXml);
       writeRobots("sitemap.xml");
       console.log(`✅ Generated ${indexFiles.length} sitemaps + index + robots.txt`);
@@ -284,5 +284,5 @@ export {
   vitePluginSitemap
 };
 
-//# debugId=82EE08DA0129C9F564756E2164756E21
+//# debugId=A3D7AB349E50BA3764756E2164756E21
 //# sourceMappingURL=vite.js.map

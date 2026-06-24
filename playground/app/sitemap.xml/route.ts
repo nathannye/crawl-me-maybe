@@ -5,8 +5,7 @@ import { getPageSitemapEntries } from "@/lib/sitemap/pages";
 export const dynamic = "force-dynamic";
 
 export async function GET() {
-	const xml = generateSitemap({
-		domain: getSiteUrl(),
+	const xml = generateSitemap(getSiteUrl(), {
 		entries: await getPageSitemapEntries(),
 	});
 

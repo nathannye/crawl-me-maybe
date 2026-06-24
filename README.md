@@ -76,6 +76,14 @@ Minimal sitemap generator. Query your CMS, pass the result, done.
 - Localized sitemaps with hreflang alternates and multi-sitemap indexes
 - `robots.txt` generation with sitemap link — pairs with `sanity-plugin-seo` robots rules
 
+```ts
+import { generateSitemap } from "@crawl-me-maybe/sitemap";
+
+const xml = generateSitemap("https://example.com", {
+  entries: [{ path: "/" }, { path: "/about" }],
+});
+```
+
 ```bash
 npm install @crawl-me-maybe/sitemap
 pnpm add @crawl-me-maybe/sitemap

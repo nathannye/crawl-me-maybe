@@ -30,8 +30,7 @@ export function vitePluginSitemap(config: SitemapConfig) {
 	};
 
 	const writeSitemap = (filename: string, urls: SitemapEntry[]) => {
-		const xml = generateSitemap({
-			domain,
+		const xml = generateSitemap(domain, {
 			entries: urls,
 			locales,
 			localeMode,
@@ -63,7 +62,9 @@ export function vitePluginSitemap(config: SitemapConfig) {
 				indexFiles.push(`sitemap-${name}.xml`);
 			}
 
-			const indexXml = generateIndexSitemap(domain, indexFiles);
+			const indexXml = generateIndexSitemap(domain, {
+				childSitemapNames: indexFiles,
+			});
 			createFile(resolvedOutDir, "sitemap.xml", indexXml);
 			writeRobots("sitemap.xml");
 			console.log(

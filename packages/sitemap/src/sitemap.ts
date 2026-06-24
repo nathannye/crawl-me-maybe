@@ -3,10 +3,8 @@ import { generateLocalizedEntries, resolveUrl } from "./localize";
 import type { LocaleConfig, SitemapEntry } from "./types";
 import { createSitemapXml } from "./xml";
 
-/** Configuration for {@link generateSitemap}. */
-export type SitemapGeneratorConfig = {
-	/** Site origin for resolving entry paths (e.g. https://example.com) */
-	domain: string;
+/** Options for {@link generateSitemap}. */
+export type GenerateSitemapOptions = {
 	/** Sitemap entries with site-relative paths */
 	entries: SitemapEntry[];
 	/** Locale list for hreflang alternates */
@@ -17,19 +15,28 @@ export type SitemapGeneratorConfig = {
 	prefixDefault?: boolean;
 };
 
+/** Options for {@link generateIndexSitemap}. */
+export type GenerateIndexSitemapOptions = {
+	/** Sitemap filenames without a leading slash (e.g. "sitemap-pages.xml", not "/sitemap-pages.xml") */
+	childSitemapNames: string[];
+};
+
 /**
  * Generates a sitemap XML string from entries and optional locale configuration.
- * @param config - Domain, entries, and optional locale settings
+ * @param domain - Site origin for resolving entry paths (e.g. https://example.com)
+ * @param options - Entries and optional locale settings
  * @returns Sitemap XML string
  */
-export function generateSitemap(config: SitemapGeneratorConfig): string {
+export function generateSitemap(
+	domain: string,
+	options: GenerateSitemapOptions,
+): string {
 	const {
-		domain,
 		entries,
 		locales,
 		localeMode = "prefix",
 		prefixDefault = false,
-	} = config;
+	} = options;
 
 	const processedUrls =
 		locales && locales.length > 0
@@ -50,17 +57,19 @@ export function generateSitemap(config: SitemapGeneratorConfig): string {
 
 /**
  * Generates a sitemap index XML string referencing child sitemap files.
- * @param baseUrl - Site origin used to build absolute `<loc>` URLs
- * @param childSitemapNames - Sitemap filenames without a leading slash (e.g. "sitemap-pages.xml", not "/sitemap-pages.xml")
+ * @param domain - Site origin used to build absolute `<loc>` URLs
+ * @param options - Child sitemap filenames to reference in the index
  * @returns Sitemap index XML string
  */
 export function generateIndexSitemap(
-	baseUrl: string,
-	childSitemapNames: string[],
+	domain: string,
+	options: GenerateIndexSitemapOptions,
 ): string {
 	try {
-		const normalizedBase = normalizeDomain(baseUrl);
-		const normalizedFiles = childSitemapNames.map((f) => f.replace(/^\/+/, ""));
+		const normalizedBase = normalizeDomain(domain);
+		const normalizedFiles = options.childSitemapNames.map((f) =>
+			f.replace(/^\/+/, ""),
+		);
 		const items: string = normalizedFiles
 			.map((f) => `<sitemap><loc>${normalizedBase}/${f}</loc></sitemap>`)
 			.join("");
