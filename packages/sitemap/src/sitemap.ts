@@ -1,21 +1,14 @@
 import { normalizeDomain } from "./domain";
 import { generateLocalizedEntries, resolveUrl } from "./localize";
-import { resolveSitemapEntries } from "./resolve-entries";
-import type { GenerateIndexSitemapOptions, GenerateSitemapOptions } from "./types";
-import { createSitemapXml } from "./xml";
-
-export type {
-	GenerateIndexSitemapOptions,
+import { resolveSitemapEntrySource } from "./resolve-entries";
+import type {
+	GenerateSitemapIndexOptions,
 	GenerateSitemapOptions,
-	NamedSitemapEntrySources,
-	SitemapEntrySource,
 } from "./types";
+import { createSitemapXml } from "./xml";
 
 /**
  * Generates a sitemap XML string from entries and optional locale configuration.
- * @param domain - Site origin for resolving entry paths (e.g. https://example.com)
- * @param options - Entries and optional locale settings
- * @returns Sitemap XML string
  */
 export async function generateSitemap(
 	domain: string,
@@ -27,7 +20,7 @@ export async function generateSitemap(
 		prefixDefault = false,
 	} = options;
 
-	const entries = await resolveSitemapEntries(options);
+	const entries = await resolveSitemapEntrySource(options.entries);
 
 	const processedUrls =
 		locales && locales.length > 0
@@ -48,19 +41,14 @@ export async function generateSitemap(
 
 /**
  * Generates a sitemap index XML string referencing child sitemap files.
- * @param domain - Site origin used to build absolute `<loc>` URLs
- * @param options - Child sitemap filenames to reference in the index
- * @returns Sitemap index XML string
  */
-export function generateIndexSitemap(
+export function generateSitemapIndex(
 	domain: string,
-	options: GenerateIndexSitemapOptions,
+	options: GenerateSitemapIndexOptions,
 ): string {
 	try {
 		const normalizedBase = normalizeDomain(domain);
-		const normalizedFiles = options.childSitemapNames.map((f) =>
-			f.replace(/^\/+/, ""),
-		);
+		const normalizedFiles = options.sitemaps.map((f) => f.replace(/^\/+/, ""));
 		const items: string = normalizedFiles
 			.map((f) => `<sitemap><loc>${normalizedBase}/${f}</loc></sitemap>`)
 			.join("");

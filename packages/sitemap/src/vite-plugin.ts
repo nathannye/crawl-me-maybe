@@ -1,8 +1,7 @@
-import fs from "node:fs";
 import path from "node:path";
+import { createSitemapManifest } from "./manifest";
 import { generateRobotsTxt } from "./robots";
-import { generateIndexSitemap, generateSitemap } from "./sitemap";
-import type { GenerateSitemapOptions, SitemapConfig } from "./types";
+import type { SitemapConfig } from "./types";
 import { validateConfig } from "./validate-config";
 import { createFile } from "./file";
 
@@ -16,9 +15,14 @@ export function vitePluginSitemap(config: SitemapConfig) {
 	const domain = pluginConfig.domain;
 	const outDir = pluginConfig.outDir || "dist";
 	const resolvedOutDir = path.resolve(process.cwd(), outDir);
-	const locales = pluginConfig.locales;
-	const localeMode = pluginConfig.localeMode || "prefix";
-	const prefixDefault = pluginConfig.prefixDefault ?? false;
+	const manifest = createSitemapManifest({
+		domain,
+		entries: pluginConfig.sitemaps,
+		maxUrls: pluginConfig.maxUrls,
+		locales: pluginConfig.locales,
+		localeMode: pluginConfig.localeMode,
+		prefixDefault: pluginConfig.prefixDefault,
+	});
 
 	const writeRobots = (sitemapIndex = "sitemap.xml") => {
 		const content = generateRobotsTxt(
@@ -29,51 +33,25 @@ export function vitePluginSitemap(config: SitemapConfig) {
 		createFile(resolvedOutDir, "robots.txt", content);
 	};
 
-	const writeSitemap = async (
-		filename: string,
-		entriesOptions: Pick<GenerateSitemapOptions, "entries" | "sitemap">,
-	) => {
-		const xml = await generateSitemap(domain, {
-			...entriesOptions,
-			locales,
-			localeMode,
-			prefixDefault,
-		} as GenerateSitemapOptions);
-		createFile(resolvedOutDir, filename, xml);
-	};
-
 	return {
 		name: "vite-plugin-sitemap",
 		apply: "build" as const,
 		async closeBundle() {
-			fs.mkdirSync(resolvedOutDir, { recursive: true });
-			const { sitemaps } = pluginConfig;
+			const rootXml = await manifest.getRootSitemap();
+			createFile(resolvedOutDir, "sitemap.xml", rootXml);
 
-			if (typeof sitemaps === "function") {
-				await writeSitemap("sitemap.xml", { entries: sitemaps });
-				writeRobots("sitemap.xml");
-				console.log("✅ Generated single sitemap");
-				return;
-			}
-
-			const indexFiles: string[] = [];
-			for (const [name, cb] of Object.entries(sitemaps)) {
-				if (typeof cb !== "function") continue;
-				const filename = `sitemap/${name}.xml`;
-				await writeSitemap(filename, {
-					entries: sitemaps,
-					sitemap: name,
+			const files = await manifest.getSitemapFiles();
+			for (const file of files) {
+				const xml = await manifest.getSitemap({
+					sitemap: file.sitemap ?? undefined,
+					index: file.index,
 				});
-				indexFiles.push(filename);
+				createFile(resolvedOutDir, file.path, xml);
 			}
 
-			const indexXml = generateIndexSitemap(domain, {
-				childSitemapNames: indexFiles,
-			});
-			createFile(resolvedOutDir, "sitemap.xml", indexXml);
 			writeRobots("sitemap.xml");
 			console.log(
-				`✅ Generated ${indexFiles.length} sitemaps + index + robots.txt`,
+				`✅ Generated ${files.length} sitemap file(s) + root + robots.txt`,
 			);
 		},
 	};

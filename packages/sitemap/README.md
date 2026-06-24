@@ -10,6 +10,7 @@ This package takes a simpler approach. You provide routes, it generates sitemap.
 - Build-time generation with Vite
 - Runtime generation for ISR and SSR applications
 - Localized sitemaps with hreflang alternates
+- Split large sitemaps into numbered child files
 - robots.txt generation with sitemap link
 
 ## How this package is meant to be used
@@ -17,7 +18,7 @@ This package takes a simpler approach. You provide routes, it generates sitemap.
 `@crawl-me-maybe/sitemap` supports two output modes:
 
 - **Build-time generation** with the Vite plugin, which writes `sitemap.xml` and `robots.txt` to disk during your build
-- **Runtime generation** with `generateSitemap`, `generateIndexSitemap`, and `generateRobotsTxt`, which lets you return XML from a route handler or API endpoint for ISR, SSR, or CMS-backed routes
+- **Runtime generation** with `createSitemapManifest`, `generateSitemap`, `generateSitemapIndex`, and `generateRobotsTxt`, which lets you return XML from a route handler or API endpoint for ISR, SSR, or CMS-backed routes
 
 Both modes use the same sitemap entry shape, so route generation logic can be shared between them.
 
@@ -37,6 +38,7 @@ Use a **single sitemap** when all routes can live in one file. Use **multiple si
 - [Locale modes](#locale-modes)
 - [Vite plugin](#vite-plugin)
 - [Runtime generation](#runtime-generation)
+- [Low-level primitives](#low-level-primitives)
 - [Robots](#robots)
 - [Config reference](#config-reference)
 - [License](#license)
@@ -87,7 +89,7 @@ Example:
 
 ## Locale modes
 
-Pass `locales` to the Vite plugin or `generateSitemap` to emit hreflang alternates. Set `localeMode` to control how localized URLs are built (default: `"prefix"`).
+Pass `locales` to the Vite plugin, `createSitemapManifest`, or `generateSitemap` to emit hreflang alternates. Set `localeMode` to control how localized URLs are built (default: `"prefix"`).
 
 **`prefix`** — locale code as a path segment. The default locale has no prefix unless `prefixDefault: true`.
 
@@ -152,29 +154,31 @@ export default {
 };
 ```
 
-Writes `dist/sitemap.xml` and `dist/robots.txt`.
+Writes `dist/sitemap.xml`, the generated child files, and `dist/robots.txt`.
 
 ### b. Multiple sitemaps
 
-Split by content type when you exceed ~50k URLs per file. Writes `sitemap/{name}.xml` per key and a `sitemap.xml` index.
+Split by content type when you want separate route families or expect a sitemap to grow past the default limit. Named sitemap definitions can override `maxUrls` individually, and the plugin will still write the child files and root index automatically.
 
 ```ts
-vitePluginSitemap({
-  domain: "https://example.com",
-  sitemaps: {
-    pages: async () => [
+// lib/sitemaps.ts
+export const sitemaps = {
+  pages: {
+    entries: async () => [
       { path: "/", changefreq: "daily", priority: 1 },
       { path: "/about", lastmod: "2025-01-01", changefreq: "monthly", priority: 0.8 },
     ],
-    blog: async () => [
-      {
-        path: "/blog/hello",
-        lastmod: "2025-06-01",
-        changefreq: "weekly",
-        imageUrls: ["https://example.com/images/hello.jpg"],
-      },
-    ],
-    products: async () => [
+  },
+  blog: async () => [
+    {
+      path: "/blog/hello",
+      lastmod: "2025-06-01",
+      changefreq: "weekly",
+      imageUrls: ["https://example.com/images/hello.jpg"],
+    },
+  ],
+  products: {
+    entries: async () => [
       {
         path: "/products/widget",
         lastmod: "2025-05-15",
@@ -183,9 +187,27 @@ vitePluginSitemap({
         videoUrls: ["https://example.com/videos/widget.mp4"],
       },
     ],
+    maxUrls: 10_000,
   },
-});
+} as const;
 ```
+
+```ts
+// vite.config.ts
+import { sitemaps } from "@/lib/sitemaps";
+import { vitePluginSitemap } from "@crawl-me-maybe/sitemap/vite";
+
+export default {
+  plugins: [
+    vitePluginSitemap({
+      domain: "https://example.com",
+      sitemaps,
+    }),
+  ],
+};
+```
+
+This writes `sitemap.xml` plus child files like `sitemap-pages-0.xml` and `sitemap-products-0.xml` under `dist/`, along with `robots.txt`.
 
 ### c. With robots
 
@@ -226,18 +248,22 @@ vitePluginSitemap({
 
 ## Runtime generation
 
-Return XML from a route handler or API endpoint. `generateSitemap` is async and accepts the same entry shapes as the Vite plugin: a static array, a callback, or a named object for multi-sitemap mode.
+Use `createSitemapManifest` when a route needs to stay stable as content grows. The manifest lazily resolves the sitemap(s) needed for the current request and gives you the root route plus child files from the same shared config.
 
-### a. Static entries
+### a. Single sitemap, unsplit
 
 ```ts
 // app/sitemap.xml/route.ts
-import { generateSitemap } from "@crawl-me-maybe/sitemap";
+import { createSitemapManifest } from "@crawl-me-maybe/sitemap";
+import { getSitemapEntries } from "@/lib/sitemap";
+
+const manifest = createSitemapManifest({
+  domain: "https://example.com",
+  entries: getSitemapEntries,
+});
 
 export async function GET() {
-  const xml = await generateSitemap("https://example.com", {
-    entries: [{ path: "/" }, { path: "/about" }],
-  });
+  const xml = await manifest.getRootSitemap();
 
   return new Response(xml, {
     headers: { "Content-Type": "application/xml" },
@@ -245,58 +271,22 @@ export async function GET() {
 }
 ```
 
-### b. Async entry source
+### b. Single sitemap with split support
 
-Pass a function when entries come from a CMS or database:
-
-```ts
-// app/sitemap.xml/route.ts
-import { generateSitemap } from "@crawl-me-maybe/sitemap";
-
-export async function GET() {
-  const xml = await generateSitemap("https://example.com", {
-    entries: async () => {
-      const pages = await getPages();
-
-      return pages.map((page) => ({
-        path: page.slug,
-        lastmod: page.updatedAt,
-      }));
-    },
-  });
-
-  return new Response(xml, {
-    headers: { "Content-Type": "application/xml" },
-  });
-}
-```
-
-### c. Multiple sitemaps (dynamic route)
-
-Use a named `entries` object and a `sitemap` key to select which sitemap to generate. Serve a sitemap index at `/sitemap.xml` and child sitemaps at `/sitemap/<sitemap>.xml`.
-
-```ts
-// lib/sitemap-entries.ts
-import { getBlogSitemapEntries } from "./sitemap/blog";
-import { getPageSitemapEntries } from "./sitemap/pages";
-
-export const sitemapEntries = {
-  pages: getPageSitemapEntries,
-  blog: getBlogSitemapEntries,
-} as const;
-```
+Keep the root route stable and add a child route for numbered parts. If the sitemap stays small, `/sitemap.xml` serves the actual sitemap XML directly. If it grows later, the child route already exists.
 
 ```ts
 // app/sitemap.xml/route.ts
-import { generateIndexSitemap } from "@crawl-me-maybe/sitemap";
-import { sitemapEntries } from "@/lib/sitemap-entries";
+import { createSitemapManifest } from "@crawl-me-maybe/sitemap";
+import { getSitemapEntries } from "@/lib/sitemap";
+
+const manifest = createSitemapManifest({
+  domain: "https://example.com",
+  entries: getSitemapEntries,
+});
 
 export async function GET() {
-  const xml = generateIndexSitemap("https://example.com", {
-    childSitemapNames: Object.keys(sitemapEntries).map(
-      (name) => `sitemap/${name}.xml`,
-    ),
-  });
+  const xml = await manifest.getRootSitemap();
 
   return new Response(xml, {
     headers: { "Content-Type": "application/xml" },
@@ -305,59 +295,121 @@ export async function GET() {
 ```
 
 ```ts
-// app/sitemap/[sitemap].xml/route.ts
-import {
-  generateSitemap,
-  SitemapNotFoundError,
-} from "@crawl-me-maybe/sitemap";
-import { sitemapEntries } from "@/lib/sitemap-entries";
+// app/sitemap-[index].xml/route.ts
+import { createSitemapManifest } from "@crawl-me-maybe/sitemap";
+import { getSitemapEntries } from "@/lib/sitemap";
+
+const manifest = createSitemapManifest({
+  domain: "https://example.com",
+  entries: getSitemapEntries,
+});
 
 export async function GET(
   _req: Request,
-  { params }: { params: Promise<{ sitemap: keyof typeof sitemapEntries }> },
+  { params }: { params: Promise<{ index: string }> },
 ) {
-  const { sitemap } = await params;
-
-  try {
-    const xml = await generateSitemap("https://example.com", {
-      entries: sitemapEntries,
-      sitemap,
-    });
-
-    return new Response(xml, {
-      headers: { "Content-Type": "application/xml" },
-    });
-  } catch (error) {
-    if (error instanceof SitemapNotFoundError) {
-      return new Response("Not found", { status: 404 });
-    }
-
-    throw error;
-  }
-}
-```
-
-### d. Localized
-
-See [Locale modes](#locale-modes).
-
-```ts
-// app/sitemap.xml/route.ts
-import { generateSitemap } from "@crawl-me-maybe/sitemap";
-
-export async function GET() {
-  const xml = await generateSitemap("https://example.com", {
-    entries: [{ path: "/about" }, { path: "/contact" }],
-    locales: [
-      { code: "en", default: true },
-      { code: "fr" },
-    ],
+  const { index } = await params;
+  const xml = await manifest.getSitemap({
+    index: Number(index),
   });
 
   return new Response(xml, {
     headers: { "Content-Type": "application/xml" },
   });
 }
+```
+
+### c. Multiple named sitemaps
+
+Named sitemaps can be a raw source or a definition with a sitemap-specific `maxUrls` override.
+
+```ts
+// lib/sitemaps.ts
+import { createSitemapManifest } from "@crawl-me-maybe/sitemap";
+import { getBlogEntries } from "@/lib/sitemap/blog";
+import { getPageEntries } from "@/lib/sitemap/pages";
+import { getProductEntries } from "@/lib/sitemap/products";
+
+export const manifest = createSitemapManifest({
+  domain: "https://example.com",
+  entries: {
+    pages: getPageEntries,
+    blog: getBlogEntries,
+    products: {
+      entries: getProductEntries,
+      maxUrls: 10_000,
+    },
+  },
+});
+```
+
+```ts
+// app/sitemap.xml/route.ts
+import { manifest } from "@/lib/sitemaps";
+
+export async function GET() {
+  const xml = await manifest.getRootSitemap();
+
+  return new Response(xml, {
+    headers: { "Content-Type": "application/xml" },
+  });
+}
+```
+
+```ts
+// app/sitemap-[sitemap]-[index].xml/route.ts
+import { manifest } from "@/lib/sitemaps";
+
+export async function GET(
+  _req: Request,
+  { params }: { params: Promise<{ sitemap: string; index: string }> },
+) {
+  const { sitemap, index } = await params;
+  const xml = await manifest.getSitemap({
+    sitemap,
+    index: Number(index),
+  });
+
+  return new Response(xml, {
+    headers: { "Content-Type": "application/xml" },
+  });
+}
+```
+
+### d. Localized manifests
+
+`createSitemapManifest` accepts the same locale options as the low-level XML generator, so alternates stay consistent across root and child routes.
+
+```ts
+createSitemapManifest({
+  domain: "https://example.com",
+  locales: [
+    { code: "en", default: true },
+    { code: "fr" },
+  ],
+  entries: getSitemapEntries,
+});
+```
+
+---
+
+## Low-level primitives
+
+If you already know which XML file you need, use the primitives directly.
+
+```ts
+import {
+  generateSitemap,
+  generateSitemapIndex,
+} from "@crawl-me-maybe/sitemap";
+
+const sitemapXml = await generateSitemap("https://example.com", {
+  entries: [{ path: "/" }, { path: "/about" }],
+});
+
+const indexXml = generateSitemapIndex("https://example.com", {
+  sitemaps: ["/sitemap-0.xml", "/sitemap-1.xml"],
+});
 ```
 
 ---
@@ -445,26 +497,42 @@ If `rules` is `undefined` (not configured in Studio), `generateRobotsTxt` falls 
 
 ## Config reference
 
-| Option | Type | Applies to | Description |
-|--------|------|------------|-------------|
-| `domain` | `string` | Vite + runtime | Site origin, e.g. `https://example.com`. First argument to `generateSitemap`, `generateIndexSitemap`, and `generateRobotsTxt`. |
-| `outDir` | `string` | Vite | Output directory (default: `dist`) |
-| `sitemaps` | fn or object | Vite | Entry callback(s) for one or more sitemap files |
-| `entries` | array, fn, or named object | Runtime (`GenerateSitemapOptions`) | Entry source for a generated sitemap |
-| `sitemap` | `string` | Runtime (`GenerateSitemapOptions`) | Required when `entries` is a named object; selects which sitemap to generate |
-| `childSitemapNames` | `string[]` | Runtime (`GenerateIndexSitemapOptions`) | Child sitemap filenames for `generateIndexSitemap`, such as `sitemap/pages.xml` |
-| `robots` | `RobotsRule` or array | Vite | Crawler rules used when writing `robots.txt` |
-| `locales` | `LocaleConfig[]` | Vite + runtime | Locale list for hreflang generation |
-| `localeMode` | `"prefix"` \| `"subdomain"` | Vite + runtime | URL strategy (default: `prefix`) |
-| `prefixDefault` | `boolean` | Vite + runtime | Prefix the default locale too (default: `false`) |
+### Manifest options
 
-### Exported types
+| Option | Type | Description |
+|--------|------|-------------|
+| `domain` | `string` | Site origin used for absolute URLs. |
+| `basePath` | `string` | Stable child route base path, defaulting to `/sitemap`. |
+| `maxUrls` | `number` | Default maximum URLs per child sitemap file, defaulting to `50_000`. |
+| `entries` | `SitemapEntrySource` or `Record<string, SitemapDefinition>` | Single sitemap source or a named sitemap map. |
+| `locales` | `LocaleConfig[]` | Locale list for hreflang generation. |
+| `localeMode` | `"prefix"` \| `"subdomain"` | URL strategy for localized entries. |
+| `prefixDefault` | `boolean` | Prefix the default locale too when `true`. |
 
-- `GenerateSitemapOptions` — options object for `await generateSitemap(domain, options)`
-- `GenerateIndexSitemapOptions` — options object for `generateIndexSitemap(domain, options)`
-- `SitemapEntrySource` — array or callback returning sitemap entries
-- `NamedSitemapEntrySources` — named object of entry sources for multi-sitemap mode
-- `SitemapNotFoundError` — thrown when `sitemap` does not match a key in a named `entries` object
+### Vite plugin options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `domain` | `string` | Site origin used for absolute URLs. |
+| `outDir` | `string` | Output directory (default: `dist`). |
+| `sitemaps` | source or object | A single sitemap source, or named sitemap definitions with optional per-sitemap `maxUrls`. |
+| `maxUrls` | `number` | Default split threshold used when a named sitemap definition omits `maxUrls`. |
+| `robots` | `RobotsRule` or array | Crawler rules used when writing `robots.txt`. |
+| `locales` | `LocaleConfig[]` | Locale list for hreflang generation. |
+| `localeMode` | `"prefix"` \| `"subdomain"` | URL strategy (default: `prefix`). |
+| `prefixDefault` | `boolean` | Prefix the default locale too (default: `false`). |
+
+### Low-level primitives
+
+- `GenerateSitemapOptions` - options object for `await generateSitemap(domain, options)`
+- `GenerateSitemapIndexOptions` - options object for `generateSitemapIndex(domain, options)`
+- `SitemapDefinition` - per-sitemap manifest definition
+- `SitemapFile` - concrete child sitemap metadata from `getSitemapFiles()`
+- `SitemapManifest` - manifest interface from `createSitemapManifest()`
+- `SitemapSelector` - selector passed to `getSitemap()`
+- `SitemapNotFoundError` - thrown when a named sitemap does not exist
+- `SitemapPartNotFoundError` - thrown when the requested child index does not exist
+- `SitemapEntrySource` - array or callback returning sitemap entries
 
 ## License
 

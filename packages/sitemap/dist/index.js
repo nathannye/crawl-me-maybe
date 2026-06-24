@@ -5,6 +5,14 @@ class SitemapNotFoundError extends Error {
     this.name = "SitemapNotFoundError";
   }
 }
+
+class SitemapPartNotFoundError extends Error {
+  constructor(selector) {
+    const sitemapLabel = selector.sitemap ?? "sitemap";
+    super(`Sitemap part not found: ${sitemapLabel}[${selector.index}]`);
+    this.name = "SitemapPartNotFoundError";
+  }
+}
 // src/domain.ts
 function normalizeDomain(domain) {
   return domain.replace(/\/+$/, "");
@@ -120,32 +128,12 @@ function generateLocalizedEntries(baseEntries, locales, domain, localeMode = "pr
 }
 
 // src/resolve-entries.ts
-function isNamedSitemapEntrySources(entries) {
-  return typeof entries === "object" && entries !== null && !Array.isArray(entries);
-}
-async function resolveEntrySource(source) {
+async function resolveSitemapEntrySource(source) {
   const resolved = typeof source === "function" ? await source() : source;
   if (!Array.isArray(resolved)) {
     throw new Error("Sitemap entry source must resolve to an array of entries");
   }
   return resolved;
-}
-async function resolveSitemapEntries(options) {
-  const { entries } = options;
-  if (Array.isArray(entries) || typeof entries === "function") {
-    return resolveEntrySource(entries);
-  }
-  if (!isNamedSitemapEntrySources(entries)) {
-    throw new Error("Invalid sitemap entry source");
-  }
-  if (!("sitemap" in options) || !options.sitemap) {
-    throw new Error("generateSitemap: `sitemap` is required when `entries` is a named object");
-  }
-  const source = entries[options.sitemap];
-  if (source === undefined) {
-    throw new SitemapNotFoundError(options.sitemap);
-  }
-  return resolveEntrySource(source);
 }
 
 // src/xml.ts
@@ -204,17 +192,17 @@ async function generateSitemap(domain, options) {
     localeMode = "prefix",
     prefixDefault = false
   } = options;
-  const entries = await resolveSitemapEntries(options);
+  const entries = await resolveSitemapEntrySource(options.entries);
   const processedUrls = locales && locales.length > 0 ? generateLocalizedEntries(entries, locales, domain, localeMode, prefixDefault) : entries.map(({ path, ...rest }) => ({
     ...rest,
     url: resolveUrl(path, domain)
   }));
   return createSitemapXml(processedUrls);
 }
-function generateIndexSitemap(domain, options) {
+function generateSitemapIndex(domain, options) {
   try {
     const normalizedBase = normalizeDomain(domain);
-    const normalizedFiles = options.childSitemapNames.map((f) => f.replace(/^\/+/, ""));
+    const normalizedFiles = options.sitemaps.map((f) => f.replace(/^\/+/, ""));
     const items = normalizedFiles.map((f) => `<sitemap><loc>${normalizedBase}/${f}</loc></sitemap>`).join("");
     return `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${items}</sitemapindex>`;
@@ -222,13 +210,196 @@ function generateIndexSitemap(domain, options) {
     throw new Error(`Sitemap index XML creation failed: ${err instanceof Error ? err.message : String(err)}`);
   }
 }
+
+// src/manifest.ts
+var DEFAULT_MAX_URLS = 50000;
+var DEFAULT_BASE_PATH = "/sitemap";
+function normalizeBasePath(basePath) {
+  const resolved = basePath ?? DEFAULT_BASE_PATH;
+  if (typeof resolved !== "string" || resolved.trim() === "") {
+    throw new Error("createSitemapManifest: basePath must be a non-empty string");
+  }
+  const trimmed = resolved.trim().replace(/\/+$/, "");
+  if (trimmed === "") {
+    throw new Error("createSitemapManifest: basePath must be a non-empty string");
+  }
+  const withLeadingSlash = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+  if (withLeadingSlash.toLowerCase().endsWith(".xml")) {
+    throw new Error("createSitemapManifest: basePath must not include .xml");
+  }
+  return withLeadingSlash;
+}
+function normalizeMaxUrls(maxUrls, fallback) {
+  const resolved = maxUrls ?? fallback;
+  if (typeof resolved !== "number" || !Number.isFinite(resolved) || !Number.isInteger(resolved) || resolved <= 0) {
+    throw new Error("createSitemapManifest: maxUrls must be a positive integer");
+  }
+  return resolved;
+}
+function isSitemapDefinition(value) {
+  return typeof value === "object" && value !== null && !Array.isArray(value) && "entries" in value;
+}
+function normalizeSitemapDefinitions(entries, defaultMaxUrls) {
+  if (Array.isArray(entries) || typeof entries === "function") {
+    return [
+      {
+        sitemap: null,
+        entries,
+        maxUrls: defaultMaxUrls
+      }
+    ];
+  }
+  if (typeof entries !== "object" || entries === null) {
+    throw new Error("createSitemapManifest: entries must be a sitemap source or a named sitemap map");
+  }
+  const definitions = Object.entries(entries).map(([sitemap, definition]) => {
+    if (!sitemap || sitemap.trim() === "") {
+      throw new Error("createSitemapManifest: sitemap names must be non-empty strings");
+    }
+    if (Array.isArray(definition) || typeof definition === "function") {
+      return {
+        sitemap,
+        entries: definition,
+        maxUrls: defaultMaxUrls
+      };
+    }
+    if (!isSitemapDefinition(definition)) {
+      throw new Error(`createSitemapManifest: sitemap definition for "${sitemap}" must be a source or an object with entries`);
+    }
+    return {
+      sitemap,
+      entries: definition.entries,
+      maxUrls: normalizeMaxUrls(definition.maxUrls, defaultMaxUrls)
+    };
+  });
+  if (definitions.length === 0) {
+    throw new Error("createSitemapManifest: entries must include at least one sitemap");
+  }
+  return definitions;
+}
+function chunkEntries(entries, maxUrls) {
+  if (entries.length === 0)
+    return [[]];
+  const chunks = [];
+  for (let index = 0;index < entries.length; index += maxUrls) {
+    chunks.push(entries.slice(index, index + maxUrls));
+  }
+  return chunks;
+}
+function getChildSitemapPath(options) {
+  const sitemapName = options.sitemap === null ? "" : `-${options.sitemap.replace(/^\/+/, "")}`;
+  return `${options.basePath}${sitemapName}-${options.index}.xml`;
+}
+function validateSelectorIndex(index) {
+  if (typeof index !== "number" || !Number.isFinite(index) || !Number.isInteger(index) || index < 0) {
+    throw new SitemapPartNotFoundError({ index });
+  }
+}
+function createSitemapManifest(options) {
+  if (!options || typeof options !== "object") {
+    throw new Error("createSitemapManifest: options is required");
+  }
+  if (!options.domain || typeof options.domain !== "string") {
+    throw new Error("createSitemapManifest: domain must be a non-empty string");
+  }
+  const basePath = normalizeBasePath(options.basePath);
+  const maxUrls = normalizeMaxUrls(options.maxUrls, DEFAULT_MAX_URLS);
+  const definitions = normalizeSitemapDefinitions(options.entries, maxUrls);
+  const {
+    locales,
+    localeMode = "prefix",
+    prefixDefault = false
+  } = options;
+  const definitionCache = new Map;
+  function resolveDefinition(index) {
+    const cached = definitionCache.get(index);
+    if (cached)
+      return cached;
+    const definition = definitions[index];
+    if (!definition) {
+      throw new SitemapPartNotFoundError({ index });
+    }
+    const promise = (async () => {
+      const entries = await resolveSitemapEntrySource(definition.entries);
+      const chunks = chunkEntries(entries, definition.maxUrls);
+      const files = chunks.map((chunk, chunkIndex) => ({
+        sitemap: definition.sitemap,
+        index: chunkIndex,
+        path: getChildSitemapPath({
+          basePath,
+          sitemap: definition.sitemap,
+          index: chunkIndex
+        }),
+        entries: chunk
+      }));
+      return { definition, files };
+    })();
+    definitionCache.set(index, promise);
+    return promise;
+  }
+  async function getAllFiles() {
+    const plans = await Promise.all(definitions.map(async (_definition, index) => resolveDefinition(index)));
+    return plans.flatMap((plan) => plan.files);
+  }
+  async function renderFileBySelector(selector) {
+    validateSelectorIndex(selector.index);
+    let definitionIndex = 0;
+    if (definitions.length === 1) {
+      if (selector.sitemap) {
+        throw new SitemapNotFoundError(selector.sitemap);
+      }
+    } else {
+      if (!selector.sitemap) {
+        throw new Error("createSitemapManifest: sitemap is required when multiple sitemap definitions are configured");
+      }
+      definitionIndex = definitions.findIndex((definition) => definition.sitemap === selector.sitemap);
+      if (definitionIndex < 0) {
+        throw new SitemapNotFoundError(selector.sitemap);
+      }
+    }
+    const plan = await resolveDefinition(definitionIndex);
+    const file = plan.files[selector.index];
+    if (!file) {
+      throw new SitemapPartNotFoundError({
+        sitemap: plan.definition.sitemap ?? undefined,
+        index: selector.index
+      });
+    }
+    return generateSitemap(options.domain, {
+      entries: file.entries,
+      locales,
+      localeMode,
+      prefixDefault
+    });
+  }
+  return {
+    async getRootSitemap() {
+      const files = await getAllFiles();
+      if (files.length === 1) {
+        return renderFileBySelector({ index: 0 });
+      }
+      return generateSitemapIndex(options.domain, {
+        sitemaps: files.map((file) => file.path)
+      });
+    },
+    async getSitemap(selector) {
+      return renderFileBySelector(selector);
+    },
+    async getSitemapFiles() {
+      const files = await getAllFiles();
+      return files.map(({ sitemap, index, path }) => ({ sitemap, index, path }));
+    }
+  };
+}
 export {
+  generateSitemapIndex,
   generateSitemap,
   generateRobotsTxt,
-  generateIndexSitemap,
+  createSitemapManifest,
+  SitemapPartNotFoundError,
   SitemapNotFoundError,
   DEFAULT_ROBOTS_RULES
 };
 
-//# debugId=FD28F27B4F2E711F64756E2164756E21
+//# debugId=09AAFD3E6F5DB83264756E2164756E21
 //# sourceMappingURL=index.js.map

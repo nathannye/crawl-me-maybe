@@ -25,15 +25,14 @@ export function validateConfig(config: SitemapConfig): SitemapConfig {
 		throw new Error("vitePluginSitemap: sitemaps is required");
 	}
 
-	if (typeof config.sitemaps === "object" && !Array.isArray(config.sitemaps)) {
-		const callbacks = Object.values(config.sitemaps).filter(
-			(value) => typeof value === "function",
+	if (
+		typeof config.sitemaps === "object" &&
+		!Array.isArray(config.sitemaps) &&
+		Object.keys(config.sitemaps).length === 0
+	) {
+		throw new Error(
+			"vitePluginSitemap: sitemaps object must include at least one sitemap definition",
 		);
-		if (callbacks.length === 0) {
-			throw new Error(
-				"vitePluginSitemap: sitemaps object must include at least one callback",
-			);
-		}
 	}
 
 	return config;

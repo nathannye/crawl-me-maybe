@@ -1,6 +1,21 @@
 // src/vite-plugin.ts
-import fs from "node:fs";
 import path2 from "node:path";
+
+// src/errors.ts
+class SitemapNotFoundError extends Error {
+  constructor(sitemap) {
+    super(`Sitemap not found: ${sitemap}`);
+    this.name = "SitemapNotFoundError";
+  }
+}
+
+class SitemapPartNotFoundError extends Error {
+  constructor(selector) {
+    const sitemapLabel = selector.sitemap ?? "sitemap";
+    super(`Sitemap part not found: ${sitemapLabel}[${selector.index}]`);
+    this.name = "SitemapPartNotFoundError";
+  }
+}
 
 // src/domain.ts
 function normalizeDomain(domain) {
@@ -8,59 +23,6 @@ function normalizeDomain(domain) {
 }
 function normalizeDomainBase(domain) {
   return `${normalizeDomain(domain)}/`;
-}
-
-// src/robots.ts
-var DEFAULT_ROBOTS_RULES = [
-  {
-    userAgent: "*",
-    allow: "/",
-    disallow: ["/admin", "/api/"]
-  }
-];
-function serializeRobotsRules(rules) {
-  const ruleArray = Array.isArray(rules) ? rules : [rules];
-  return ruleArray.map((rule) => {
-    const agents = Array.isArray(rule.userAgent) ? rule.userAgent : [rule.userAgent];
-    const lines = agents.map((a) => `User-agent: ${a}`);
-    if (rule.allow) {
-      const allows = Array.isArray(rule.allow) ? rule.allow : [rule.allow];
-      for (const a of allows)
-        lines.push(`Allow: ${a}`);
-    }
-    if (rule.disallow) {
-      const disallows = Array.isArray(rule.disallow) ? rule.disallow : [rule.disallow];
-      for (const d of disallows)
-        lines.push(`Disallow: ${d}`);
-    }
-    return lines.join(`
-`);
-  }).join(`
-
-`);
-}
-function toSitemapPath(filename) {
-  const trimmed = filename.replace(/^\/+/, "");
-  return `/${trimmed}`;
-}
-function toSitemapUrl(domain, filename) {
-  return `${normalizeDomain(domain)}${toSitemapPath(filename)}`;
-}
-function generateRobotsTxt(domain, sitemapIndex = "sitemap.xml", rules) {
-  if (!domain || typeof domain !== "string") {
-    throw new Error("generateRobotsTxt: domain must be a non-empty string");
-  }
-  if (!sitemapIndex || typeof sitemapIndex !== "string") {
-    throw new Error("generateRobotsTxt: sitemapIndex must be a non-empty string");
-  }
-  let content = serializeRobotsRules(rules ?? DEFAULT_ROBOTS_RULES).trim();
-  if (!content.endsWith(`
-`))
-    content += `
-`;
-  content += `Sitemap: ${toSitemapUrl(domain, sitemapIndex)}
-`;
-  return content;
 }
 
 // src/localize.ts
@@ -117,41 +79,13 @@ function generateLocalizedEntries(baseEntries, locales, domain, localeMode = "pr
   return localizedEntries;
 }
 
-// src/errors.ts
-class SitemapNotFoundError extends Error {
-  constructor(sitemap) {
-    super(`Sitemap not found: ${sitemap}`);
-    this.name = "SitemapNotFoundError";
-  }
-}
-
 // src/resolve-entries.ts
-function isNamedSitemapEntrySources(entries) {
-  return typeof entries === "object" && entries !== null && !Array.isArray(entries);
-}
-async function resolveEntrySource(source) {
+async function resolveSitemapEntrySource(source) {
   const resolved = typeof source === "function" ? await source() : source;
   if (!Array.isArray(resolved)) {
     throw new Error("Sitemap entry source must resolve to an array of entries");
   }
   return resolved;
-}
-async function resolveSitemapEntries(options) {
-  const { entries } = options;
-  if (Array.isArray(entries) || typeof entries === "function") {
-    return resolveEntrySource(entries);
-  }
-  if (!isNamedSitemapEntrySources(entries)) {
-    throw new Error("Invalid sitemap entry source");
-  }
-  if (!("sitemap" in options) || !options.sitemap) {
-    throw new Error("generateSitemap: `sitemap` is required when `entries` is a named object");
-  }
-  const source = entries[options.sitemap];
-  if (source === undefined) {
-    throw new SitemapNotFoundError(options.sitemap);
-  }
-  return resolveEntrySource(source);
 }
 
 // src/xml.ts
@@ -210,23 +144,257 @@ async function generateSitemap(domain, options) {
     localeMode = "prefix",
     prefixDefault = false
   } = options;
-  const entries = await resolveSitemapEntries(options);
+  const entries = await resolveSitemapEntrySource(options.entries);
   const processedUrls = locales && locales.length > 0 ? generateLocalizedEntries(entries, locales, domain, localeMode, prefixDefault) : entries.map(({ path, ...rest }) => ({
     ...rest,
     url: resolveUrl(path, domain)
   }));
   return createSitemapXml(processedUrls);
 }
-function generateIndexSitemap(domain, options) {
+function generateSitemapIndex(domain, options) {
   try {
     const normalizedBase = normalizeDomain(domain);
-    const normalizedFiles = options.childSitemapNames.map((f) => f.replace(/^\/+/, ""));
+    const normalizedFiles = options.sitemaps.map((f) => f.replace(/^\/+/, ""));
     const items = normalizedFiles.map((f) => `<sitemap><loc>${normalizedBase}/${f}</loc></sitemap>`).join("");
     return `<?xml version="1.0" encoding="UTF-8"?>
 <sitemapindex xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${items}</sitemapindex>`;
   } catch (err) {
     throw new Error(`Sitemap index XML creation failed: ${err instanceof Error ? err.message : String(err)}`);
   }
+}
+
+// src/manifest.ts
+var DEFAULT_MAX_URLS = 50000;
+var DEFAULT_BASE_PATH = "/sitemap";
+function normalizeBasePath(basePath) {
+  const resolved = basePath ?? DEFAULT_BASE_PATH;
+  if (typeof resolved !== "string" || resolved.trim() === "") {
+    throw new Error("createSitemapManifest: basePath must be a non-empty string");
+  }
+  const trimmed = resolved.trim().replace(/\/+$/, "");
+  if (trimmed === "") {
+    throw new Error("createSitemapManifest: basePath must be a non-empty string");
+  }
+  const withLeadingSlash = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
+  if (withLeadingSlash.toLowerCase().endsWith(".xml")) {
+    throw new Error("createSitemapManifest: basePath must not include .xml");
+  }
+  return withLeadingSlash;
+}
+function normalizeMaxUrls(maxUrls, fallback) {
+  const resolved = maxUrls ?? fallback;
+  if (typeof resolved !== "number" || !Number.isFinite(resolved) || !Number.isInteger(resolved) || resolved <= 0) {
+    throw new Error("createSitemapManifest: maxUrls must be a positive integer");
+  }
+  return resolved;
+}
+function isSitemapDefinition(value) {
+  return typeof value === "object" && value !== null && !Array.isArray(value) && "entries" in value;
+}
+function normalizeSitemapDefinitions(entries, defaultMaxUrls) {
+  if (Array.isArray(entries) || typeof entries === "function") {
+    return [
+      {
+        sitemap: null,
+        entries,
+        maxUrls: defaultMaxUrls
+      }
+    ];
+  }
+  if (typeof entries !== "object" || entries === null) {
+    throw new Error("createSitemapManifest: entries must be a sitemap source or a named sitemap map");
+  }
+  const definitions = Object.entries(entries).map(([sitemap, definition]) => {
+    if (!sitemap || sitemap.trim() === "") {
+      throw new Error("createSitemapManifest: sitemap names must be non-empty strings");
+    }
+    if (Array.isArray(definition) || typeof definition === "function") {
+      return {
+        sitemap,
+        entries: definition,
+        maxUrls: defaultMaxUrls
+      };
+    }
+    if (!isSitemapDefinition(definition)) {
+      throw new Error(`createSitemapManifest: sitemap definition for "${sitemap}" must be a source or an object with entries`);
+    }
+    return {
+      sitemap,
+      entries: definition.entries,
+      maxUrls: normalizeMaxUrls(definition.maxUrls, defaultMaxUrls)
+    };
+  });
+  if (definitions.length === 0) {
+    throw new Error("createSitemapManifest: entries must include at least one sitemap");
+  }
+  return definitions;
+}
+function chunkEntries(entries, maxUrls) {
+  if (entries.length === 0)
+    return [[]];
+  const chunks = [];
+  for (let index = 0;index < entries.length; index += maxUrls) {
+    chunks.push(entries.slice(index, index + maxUrls));
+  }
+  return chunks;
+}
+function getChildSitemapPath(options) {
+  const sitemapName = options.sitemap === null ? "" : `-${options.sitemap.replace(/^\/+/, "")}`;
+  return `${options.basePath}${sitemapName}-${options.index}.xml`;
+}
+function validateSelectorIndex(index) {
+  if (typeof index !== "number" || !Number.isFinite(index) || !Number.isInteger(index) || index < 0) {
+    throw new SitemapPartNotFoundError({ index });
+  }
+}
+function createSitemapManifest(options) {
+  if (!options || typeof options !== "object") {
+    throw new Error("createSitemapManifest: options is required");
+  }
+  if (!options.domain || typeof options.domain !== "string") {
+    throw new Error("createSitemapManifest: domain must be a non-empty string");
+  }
+  const basePath = normalizeBasePath(options.basePath);
+  const maxUrls = normalizeMaxUrls(options.maxUrls, DEFAULT_MAX_URLS);
+  const definitions = normalizeSitemapDefinitions(options.entries, maxUrls);
+  const {
+    locales,
+    localeMode = "prefix",
+    prefixDefault = false
+  } = options;
+  const definitionCache = new Map;
+  function resolveDefinition(index) {
+    const cached = definitionCache.get(index);
+    if (cached)
+      return cached;
+    const definition = definitions[index];
+    if (!definition) {
+      throw new SitemapPartNotFoundError({ index });
+    }
+    const promise = (async () => {
+      const entries = await resolveSitemapEntrySource(definition.entries);
+      const chunks = chunkEntries(entries, definition.maxUrls);
+      const files = chunks.map((chunk, chunkIndex) => ({
+        sitemap: definition.sitemap,
+        index: chunkIndex,
+        path: getChildSitemapPath({
+          basePath,
+          sitemap: definition.sitemap,
+          index: chunkIndex
+        }),
+        entries: chunk
+      }));
+      return { definition, files };
+    })();
+    definitionCache.set(index, promise);
+    return promise;
+  }
+  async function getAllFiles() {
+    const plans = await Promise.all(definitions.map(async (_definition, index) => resolveDefinition(index)));
+    return plans.flatMap((plan) => plan.files);
+  }
+  async function renderFileBySelector(selector) {
+    validateSelectorIndex(selector.index);
+    let definitionIndex = 0;
+    if (definitions.length === 1) {
+      if (selector.sitemap) {
+        throw new SitemapNotFoundError(selector.sitemap);
+      }
+    } else {
+      if (!selector.sitemap) {
+        throw new Error("createSitemapManifest: sitemap is required when multiple sitemap definitions are configured");
+      }
+      definitionIndex = definitions.findIndex((definition) => definition.sitemap === selector.sitemap);
+      if (definitionIndex < 0) {
+        throw new SitemapNotFoundError(selector.sitemap);
+      }
+    }
+    const plan = await resolveDefinition(definitionIndex);
+    const file = plan.files[selector.index];
+    if (!file) {
+      throw new SitemapPartNotFoundError({
+        sitemap: plan.definition.sitemap ?? undefined,
+        index: selector.index
+      });
+    }
+    return generateSitemap(options.domain, {
+      entries: file.entries,
+      locales,
+      localeMode,
+      prefixDefault
+    });
+  }
+  return {
+    async getRootSitemap() {
+      const files = await getAllFiles();
+      if (files.length === 1) {
+        return renderFileBySelector({ index: 0 });
+      }
+      return generateSitemapIndex(options.domain, {
+        sitemaps: files.map((file) => file.path)
+      });
+    },
+    async getSitemap(selector) {
+      return renderFileBySelector(selector);
+    },
+    async getSitemapFiles() {
+      const files = await getAllFiles();
+      return files.map(({ sitemap, index, path }) => ({ sitemap, index, path }));
+    }
+  };
+}
+
+// src/robots.ts
+var DEFAULT_ROBOTS_RULES = [
+  {
+    userAgent: "*",
+    allow: "/",
+    disallow: ["/admin", "/api/"]
+  }
+];
+function serializeRobotsRules(rules) {
+  const ruleArray = Array.isArray(rules) ? rules : [rules];
+  return ruleArray.map((rule) => {
+    const agents = Array.isArray(rule.userAgent) ? rule.userAgent : [rule.userAgent];
+    const lines = agents.map((a) => `User-agent: ${a}`);
+    if (rule.allow) {
+      const allows = Array.isArray(rule.allow) ? rule.allow : [rule.allow];
+      for (const a of allows)
+        lines.push(`Allow: ${a}`);
+    }
+    if (rule.disallow) {
+      const disallows = Array.isArray(rule.disallow) ? rule.disallow : [rule.disallow];
+      for (const d of disallows)
+        lines.push(`Disallow: ${d}`);
+    }
+    return lines.join(`
+`);
+  }).join(`
+
+`);
+}
+function toSitemapPath(filename) {
+  const trimmed = filename.replace(/^\/+/, "");
+  return `/${trimmed}`;
+}
+function toSitemapUrl(domain, filename) {
+  return `${normalizeDomain(domain)}${toSitemapPath(filename)}`;
+}
+function generateRobotsTxt(domain, sitemapIndex = "sitemap.xml", rules) {
+  if (!domain || typeof domain !== "string") {
+    throw new Error("generateRobotsTxt: domain must be a non-empty string");
+  }
+  if (!sitemapIndex || typeof sitemapIndex !== "string") {
+    throw new Error("generateRobotsTxt: sitemapIndex must be a non-empty string");
+  }
+  let content = serializeRobotsRules(rules ?? DEFAULT_ROBOTS_RULES).trim();
+  if (!content.endsWith(`
+`))
+    content += `
+`;
+  content += `Sitemap: ${toSitemapUrl(domain, sitemapIndex)}
+`;
+  return content;
 }
 
 // src/validate-config.ts
@@ -245,11 +413,8 @@ function validateConfig(config) {
   if (!config.sitemaps) {
     throw new Error("vitePluginSitemap: sitemaps is required");
   }
-  if (typeof config.sitemaps === "object" && !Array.isArray(config.sitemaps)) {
-    const callbacks = Object.values(config.sitemaps).filter((value) => typeof value === "function");
-    if (callbacks.length === 0) {
-      throw new Error("vitePluginSitemap: sitemaps object must include at least one callback");
-    }
+  if (typeof config.sitemaps === "object" && !Array.isArray(config.sitemaps) && Object.keys(config.sitemaps).length === 0) {
+    throw new Error("vitePluginSitemap: sitemaps object must include at least one sitemap definition");
   }
   return config;
 }
@@ -273,51 +438,34 @@ function vitePluginSitemap(config) {
   const domain = pluginConfig.domain;
   const outDir = pluginConfig.outDir || "dist";
   const resolvedOutDir = path2.resolve(process.cwd(), outDir);
-  const locales = pluginConfig.locales;
-  const localeMode = pluginConfig.localeMode || "prefix";
-  const prefixDefault = pluginConfig.prefixDefault ?? false;
+  const manifest = createSitemapManifest({
+    domain,
+    entries: pluginConfig.sitemaps,
+    maxUrls: pluginConfig.maxUrls,
+    locales: pluginConfig.locales,
+    localeMode: pluginConfig.localeMode,
+    prefixDefault: pluginConfig.prefixDefault
+  });
   const writeRobots = (sitemapIndex = "sitemap.xml") => {
     const content = generateRobotsTxt(domain, sitemapIndex, pluginConfig.robots);
     createFile(resolvedOutDir, "robots.txt", content);
-  };
-  const writeSitemap = async (filename, entriesOptions) => {
-    const xml = await generateSitemap(domain, {
-      ...entriesOptions,
-      locales,
-      localeMode,
-      prefixDefault
-    });
-    createFile(resolvedOutDir, filename, xml);
   };
   return {
     name: "vite-plugin-sitemap",
     apply: "build",
     async closeBundle() {
-      fs.mkdirSync(resolvedOutDir, { recursive: true });
-      const { sitemaps } = pluginConfig;
-      if (typeof sitemaps === "function") {
-        await writeSitemap("sitemap.xml", { entries: sitemaps });
-        writeRobots("sitemap.xml");
-        console.log("✅ Generated single sitemap");
-        return;
-      }
-      const indexFiles = [];
-      for (const [name, cb] of Object.entries(sitemaps)) {
-        if (typeof cb !== "function")
-          continue;
-        const filename = `sitemap/${name}.xml`;
-        await writeSitemap(filename, {
-          entries: sitemaps,
-          sitemap: name
+      const rootXml = await manifest.getRootSitemap();
+      createFile(resolvedOutDir, "sitemap.xml", rootXml);
+      const files = await manifest.getSitemapFiles();
+      for (const file of files) {
+        const xml = await manifest.getSitemap({
+          sitemap: file.sitemap ?? undefined,
+          index: file.index
         });
-        indexFiles.push(filename);
+        createFile(resolvedOutDir, file.path, xml);
       }
-      const indexXml = generateIndexSitemap(domain, {
-        childSitemapNames: indexFiles
-      });
-      createFile(resolvedOutDir, "sitemap.xml", indexXml);
       writeRobots("sitemap.xml");
-      console.log(`✅ Generated ${indexFiles.length} sitemaps + index + robots.txt`);
+      console.log(`✅ Generated ${files.length} sitemap file(s) + root + robots.txt`);
     }
   };
 }
@@ -325,5 +473,5 @@ export {
   vitePluginSitemap
 };
 
-//# debugId=8AD62C9E3001817564756E2164756E21
+//# debugId=E3888E21EC4EE1A864756E2164756E21
 //# sourceMappingURL=vite.js.map

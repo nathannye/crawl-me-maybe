@@ -62,30 +62,81 @@ export type SitemapEntrySource =
 	| SitemapEntry[]
 	| (() => SitemapEntry[] | Promise<SitemapEntry[]>);
 
-/** Named sitemap entry sources for multi-sitemap mode. */
-export type NamedSitemapEntrySources = Record<string, SitemapEntrySource>;
+/** Promise-friendly helper for sitemap entry sources. */
+export type MaybePromise<T> = T | Promise<T>;
 
-/** Options for {@link generateSitemap}. */
-export type GenerateSitemapOptions =
+/** A sitemap definition used by the manifest. */
+export type SitemapDefinition =
+	| SitemapEntrySource
 	| {
 			entries: SitemapEntrySource;
-			sitemap?: never;
-			locales?: LocaleConfig[];
-			localeMode?: "prefix" | "subdomain";
-			prefixDefault?: boolean;
-	  }
-	| {
-			entries: NamedSitemapEntrySources;
-			sitemap: string;
-			locales?: LocaleConfig[];
-			localeMode?: "prefix" | "subdomain";
-			prefixDefault?: boolean;
+			maxUrls?: number;
 	  };
 
-/** Options for {@link generateIndexSitemap}. */
-export type GenerateIndexSitemapOptions = {
-	/** Sitemap filenames without a leading slash (e.g. "sitemap/pages.xml", not "/sitemap/pages.xml") */
-	childSitemapNames: string[];
+/** Low-level options for {@link generateSitemap}. */
+export type GenerateSitemapOptions =
+	{
+		entries: SitemapEntrySource;
+		locales?: LocaleConfig[];
+		localeMode?: "prefix" | "subdomain";
+		prefixDefault?: boolean;
+	};
+
+/** Low-level options for {@link generateSitemapIndex}. */
+export type GenerateSitemapIndexOptions = {
+	/** Sitemap paths without a leading slash. */
+	sitemaps: string[];
+};
+
+/** Selector for a concrete sitemap child file. */
+export type SitemapSelector = {
+	/** Named sitemap key; omit for single-sitemap manifests. */
+	sitemap?: string;
+	/** Zero-based child file index. */
+	index: number;
+};
+
+/** Metadata for a concrete sitemap child file. */
+export type SitemapFile = {
+	/** Named sitemap key, or null for a single sitemap manifest. */
+	sitemap: string | null;
+	/** Zero-based child file index. */
+	index: number;
+	/** Stable child route path. */
+	path: string;
+};
+
+/** Manifest options for runtime sitemap orchestration. */
+export type CreateSitemapManifestOptions = {
+	/** Site origin for absolute URL generation. */
+	domain: string;
+	/** Stable route base path for child files, defaulting to "/sitemap". */
+	basePath?: string;
+	/** Default maximum URLs per child file, defaulting to 50_000. */
+	maxUrls?: number;
+	/** Single sitemap source or named sitemap definitions. */
+	entries: SitemapEntrySource | Record<string, SitemapDefinition>;
+	/** Locale configurations for multi-language sitemap support. */
+	locales?: LocaleConfig[];
+	/** How to format localized URLs (default: "prefix"). */
+	localeMode?: "prefix" | "subdomain";
+	/** Whether to add a locale prefix to the default locale URL (default: false) */
+	prefixDefault?: boolean;
+};
+
+/** Runtime manifest interface. */
+export type SitemapManifest = {
+	getRootSitemap(): Promise<string>;
+	getSitemap(selector: SitemapSelector): Promise<string>;
+	getSitemapFiles(): Promise<SitemapFile[]>;
+};
+
+/** A single resolved file for the manifest internals. */
+export type ResolvedSitemapFile = {
+	sitemap: string | null;
+	index: number;
+	path: string;
+	entries: SitemapEntry[];
 };
 
 /**
@@ -97,12 +148,13 @@ export type SitemapConfig = {
 	/** Base domain for absolute URL generation. REQUIRED. */
 	domain: string;
 	/**
-	 * Either a callback returning all sitemap entries, or an object of named
-	 * content-group callbacks for multi-sitemap mode.
+	 * A single sitemap source or a named sitemap map. Named sitemaps can use
+	 * the same source shape as the runtime manifest, including per-sitemap
+	 * `maxUrls` overrides.
 	 */
-	sitemaps:
-		| { [key: string]: () => Promise<SitemapEntry[]> }
-		| (() => Promise<SitemapEntry[]>);
+	sitemaps: SitemapEntrySource | Record<string, SitemapDefinition>;
+	/** Default maximum URLs per sitemap file when a sitemap definition omits `maxUrls`. */
+	maxUrls?: number;
 	/**
 	 * Crawler rules for robots.txt generation (same shape as Next.js MetadataRoute.Robots).
 	 * Falls back to a sensible default when omitted.

@@ -21,7 +21,7 @@ Sanity Studio
 Your app / site
   ├── @crawl-me-maybe/meta                ← merge page + global metadata
   ├── @crawl-me-maybe/schema              ← derive JSON-LD from Sanity content
-  └── @crawl-me-maybe/sitemap             ← generate sitemap.xml and robots.txt
+  └── @crawl-me-maybe/sitemap             ← generate sitemap.xml, split sitemaps, and robots.txt
 ```
 
 > 🧠 Note: Use the whole stack together, or just the pieces you need. The packages are designed to work together, but can be used independently.
@@ -73,15 +73,18 @@ Minimal sitemap generator. Query your CMS, pass the result, done.
 [See docs](./packages/sitemap)
 
 - Build-time generation with a Vite plugin, or runtime output from API routes
-- Localized sitemaps with hreflang alternates and multi-sitemap indexes
+- Manifest-based routing with localized sitemaps, split child files, and multi-sitemap indexes
 - `robots.txt` generation with sitemap link — pairs with `sanity-plugin-seo` robots rules
 
 ```ts
-import { generateSitemap } from "@crawl-me-maybe/sitemap";
+import { createSitemapManifest } from "@crawl-me-maybe/sitemap";
 
-const xml = await generateSitemap("https://example.com", {
+const manifest = createSitemapManifest({
+  domain: "https://example.com",
   entries: async () => [{ path: "/" }, { path: "/about" }],
 });
+
+const xml = await manifest.getRootSitemap();
 ```
 
 ```bash
@@ -111,4 +114,3 @@ yarn add @crawl-me-maybe/schema
 ```
 
 ---
-
