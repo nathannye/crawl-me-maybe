@@ -1,5 +1,7 @@
 # Implement split sitemap support in `@crawl-me-maybe/sitemap`
 
+> **Archived design doc.** This describes a proposed `splitSitemap()` API that was not shipped. Use [`createSitemapManifest`](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap) instead — see [splitting](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/splitting.md) and [runtime routes](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/runtime-routes.md).
+
 ## Goal
 
 Add **split sitemap support** to the core runtime package so a single large sitemap can be broken into multiple numbered child sitemap files and referenced from a sitemap index.

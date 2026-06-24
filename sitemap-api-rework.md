@@ -1,5 +1,7 @@
 # Proposed runtime API shape for `@crawl-me-maybe/sitemap`
 
+> **Archived design doc.** The manifest-based API described here has been implemented. See [sitemap README](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap) and [API reference](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/api.md).
+
 The runtime `generateSitemap()` API should support the same high-level mental model as the Vite plugin:
 
 * **single sitemap** → one set of entries

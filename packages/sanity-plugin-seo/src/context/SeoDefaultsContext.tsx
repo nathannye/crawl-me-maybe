@@ -13,39 +13,32 @@ export const SeoDefaultsProvider = ({ children }) => {
 	const client = useClient({ apiVersion: "2025-01-11" });
 	const [defaults, setDefaults] = useState({
 		seoDefaults: null,
-		schemaDefaults: null,
 	});
 
 	const cleanup = useCallback(() => {
-		// return function for useEffect cleanup
 		if (cleanup.seoSub) {
 			cleanup.seoSub.unsubscribe();
 		}
-		if (cleanup.schemaSub) {
-			cleanup.schemaSub.unsubscribe();
-		}
 	}, []);
 
-	const sub = useCallback((query: string, property: string) => {
-		return client.listen(query).subscribe((update) => {
-			if (update.result) {
-				setDefaults((prev) => ({
-					...prev,
-					[property]: update.result,
-				}));
-			}
-		});
-	}, [client]);
+	const sub = useCallback(
+		(query: string, property: string) => {
+			return client.listen(query).subscribe((update) => {
+				if (update.result) {
+					setDefaults((prev) => ({
+						...prev,
+						[property]: update.result,
+					}));
+				}
+			});
+		},
+		[client],
+	);
 
 	useEffect(() => {
 		const seoSub = sub(`*[_type == "globalSeoSettings"][0]`, "seoDefaults");
-		const schemaSub = sub(
-			`*[_type == "schemaMarkupDefaults"][0]`,
-			"schemaDefaults",
-		);
 
 		cleanup.seoSub = seoSub;
-		cleanup.schemaSub = schemaSub;
 
 		client.fetch(`*[_type == "globalSeoSettings"][0]`).then((seoDefaults) =>
 			setDefaults((prev) => ({
@@ -53,15 +46,6 @@ export const SeoDefaultsProvider = ({ children }) => {
 				seoDefaults,
 			})),
 		);
-
-		client
-			.fetch(`*[_type == "schemaMarkupDefaults"][0]`)
-			.then((schemaDefaults) =>
-				setDefaults((prev) => ({
-					...prev,
-					schemaDefaults,
-				})),
-			);
 
 		return cleanup;
 	}, [client, cleanup, sub]);

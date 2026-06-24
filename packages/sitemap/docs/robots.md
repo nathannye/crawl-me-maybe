@@ -1,6 +1,6 @@
 # Robots
 
-← [Package README](../README.md)
+← [Package README](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap)
 
 Build `robots.txt` as a string. Pass the sitemap **filename only** (no domain) — e.g. `"sitemap.xml"`.
 
@@ -67,7 +67,7 @@ vitePluginSitemap({
 
 ## With @crawl-me-maybe/sanity-plugin-seo
 
-If you use [`@crawl-me-maybe/sanity-plugin-seo`](../../sanity-plugin-seo), the robots rules stored in `globalSeoSettings.advanced.robots` share the same shape as `RobotsRule`. Fetch them from Sanity and pass them directly — no mapping needed.
+If you use [`@crawl-me-maybe/sanity-plugin-seo`](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sanity-plugin-seo), the robots rules stored in `globalSeoSettings.advanced.robots` share the same shape as `RobotsRule`. Fetch them from Sanity and pass them directly — no mapping needed.
 
 ```ts
 // app/robots.txt/route.ts

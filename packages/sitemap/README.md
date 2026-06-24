@@ -32,7 +32,7 @@ yarn add @crawl-me-maybe/sitemap
 | One-off XML generation | `generateSitemap` / `generateSitemapIndex` |
 | `robots.txt` | `generateRobotsTxt` or Vite `robots` |
 
-Use a **single sitemap** when all URLs belong to one logical sitemap. Use **multiple named sitemaps** when you want separate families like pages, blog, or products. Large sitemaps are split automatically into numbered child files when they exceed `maxUrls`. See [Splitting and named sitemaps](docs/splitting.md).
+Use a **single sitemap** when all URLs belong to one logical sitemap. Use **multiple named sitemaps** when you want separate families like pages, blog, or products. Large sitemaps are split automatically into numbered child files when they exceed `maxUrls`. See [Splitting and named sitemaps](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/splitting.md).
 
 ## Quick start
 
@@ -78,7 +78,7 @@ export async function GET() {
 }
 ```
 
-For route patterns covering split and named sitemaps, see [Runtime routes](docs/runtime-routes.md).
+For route patterns covering split and named sitemaps, see [Runtime routes](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/runtime-routes.md).
 
 ### Named sitemaps
 
@@ -92,7 +92,7 @@ createSitemapManifest({
 });
 ```
 
-See [Splitting and named sitemaps](docs/splitting.md) for Vite setup, build output, and `maxUrls` overrides.
+See [Splitting and named sitemaps](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/splitting.md) for Vite setup, build output, and `maxUrls` overrides.
 
 ## Sitemap entry shape
 
@@ -129,7 +129,7 @@ type SitemapVideo = {
 - `locales` limits which configured locales a page exists in (when locale expansion is enabled)
 - `localePaths` overrides the slug for specific locales
 
-See [Locales](docs/locales.md) for locale expansion patterns.
+See [Locales](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/locales.md) for locale expansion patterns.
 
 ## Locale support
 
@@ -161,7 +161,7 @@ vitePluginSitemap({
 });
 ```
 
-More locale patterns: see [docs/locales.md](docs/locales.md).
+More locale patterns: see [locales.md](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/locales.md).
 
 ## Robots
 
@@ -182,7 +182,7 @@ export async function GET() {
 }
 ```
 
-See [docs/robots.md](docs/robots.md) for array rules, Vite plugin config, and Sanity integration.
+See [robots.md](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/robots.md) for array rules, Vite plugin config, and Sanity integration.
 
 ## Low-level primitives
 
@@ -236,15 +236,15 @@ Each video requires `title`, `description`, and `thumbnailUrl`, plus `contentUrl
 - `generateSitemap` / `generateSitemapIndex` — one-off XML generation
 - `generateRobotsTxt` — `robots.txt` string generation
 
-See [docs/api.md](docs/api.md) for full config reference and types.
+See [docs/api.md](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/api.md) for full config reference and types.
 
 ## Further reading
 
-- [Runtime routes](docs/runtime-routes.md)
-- [Locales](docs/locales.md)
-- [Splitting and named sitemaps](docs/splitting.md)
-- [Robots](docs/robots.md)
-- [API reference](docs/api.md)
+- [Runtime routes](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/runtime-routes.md)
+- [Locales](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/locales.md)
+- [Splitting and named sitemaps](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/splitting.md)
+- [Robots](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/robots.md)
+- [API reference](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/api.md)
 
 ## License
 

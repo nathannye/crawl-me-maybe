@@ -30,11 +30,9 @@
 		"build": "bun run build.ts && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src"
 	},
 	"dependencies": {
-		"@sanity/client": "^6.0.0",
 		"zhead": "^2.2.4"
 	},
 	"peerDependencies": {
-		"@sanity/client": "^6.0.0",
 		"next": ">=14"
 	},
 	"peerDependenciesMeta": {

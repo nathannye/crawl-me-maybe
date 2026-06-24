@@ -13,6 +13,7 @@ Schema markup should be generated from your content model, not rebuilt beside it
 - [`@id` and de-duplication](#id-and-de-duplication)
 - [Rendering the graph](#rendering-the-graph)
 - [Supported schemas](#supported-schemas)
+- [With Sanity](#with-sanity)
 - [Core exports](#core-exports)
 - [License](#license)
 
@@ -196,6 +197,60 @@ Builders are exported from the package root.
 | `buildItemList` | `ItemList` |
 
 See Google's [structured data gallery](https://developers.google.com/search/docs/appearance/structured-data/search-gallery) for which schema types are eligible for rich results.
+
+---
+
+## With Sanity
+
+This package has no Sanity dependency. You map your GROQ projections to builders in your app.
+
+If you use [`@crawl-me-maybe/sanity-plugin-seo`](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sanity-plugin-seo), `globalSeoSettings.logo` and `globalSeoSettings.siteUrl` are the usual sources for organization identity and absolute page URLs. Pair with [`@crawl-me-maybe/meta`](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/meta) for page titles and descriptions.
+
+**Article page example:**
+
+```groq
+*[_type == "post" && slug.current == $slug][0]{
+  title,
+  publishedAt,
+  _updatedAt,
+  "slug": slug.current,
+  "image": mainImage.asset->url,
+  "body": body
+}
+```
+
+```ts
+import {
+  buildArticle,
+  buildBreadcrumbListSchema,
+  buildSchemaMarkup,
+} from "@crawl-me-maybe/schema";
+
+const pageUrl = `${siteUrl}/blog/${post.slug}`;
+const schemas = buildSchemaMarkup({
+  identity: {
+    type: "organization",
+    name: globalSeo.siteTitle,
+    logo: globalSeo.logoUrl,
+  },
+  siteUrl,
+  siteName: globalSeo.siteTitle,
+  pageUrl,
+  pageTitle: post.title,
+  breadcrumb: buildBreadcrumbListSchema({
+    pagePath: `/blog/${post.slug}`,
+    pageTitle: post.title,
+  }),
+  mainEntity: buildArticle({
+    headline: post.title,
+    datePublished: post.publishedAt,
+    dateModified: post._updatedAt,
+    image: post.image,
+  }),
+});
+```
+
+Pick the `build*` helper that matches your document type (`buildProduct`, `buildEvent`, `buildFAQPage`, etc.) and pass it as `mainEntity`. Omit `mainEntity` for generic pages that only need site-level graph nodes.
 
 ---
 

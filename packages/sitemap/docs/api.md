@@ -1,8 +1,8 @@
 # API reference
 
-← [Package README](../README.md)
+← [Package README](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap)
 
-Full TypeScript types ship with the package in `dist/*.d.ts`. Source definitions live in [`src/types.ts`](../src/types.ts).
+Full TypeScript types ship with the package in `dist/*.d.ts`. Source definitions live in [`src/types.ts`](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/src/types.ts).
 
 ## Core types
 
@@ -16,6 +16,16 @@ type SitemapEntry = {
   videos?: SitemapVideo[]
   locales?: string[]
   localePaths?: Record<string, string>
+}
+
+type SitemapVideo = {
+  title: string
+  description: string
+  thumbnailUrl: string
+  contentUrl?: string
+  playerUrl?: string
+  duration?: number
+  publicationDate?: string
 }
 
 type SitemapLocaleConfig = {
@@ -52,6 +62,13 @@ Every entry's `path` must be site-relative (e.g. `/about`). The site origin is s
 | `robots` | `RobotsRule` or array | Crawler rules used when writing `robots.txt`. |
 | `localization` | `SitemapLocaleConfig` | Locale expansion rules for automatic hreflang generation. |
 
+## `generateSitemap` options
+
+| Option | Type | Description |
+|--------|------|-------------|
+| `entries` | `SitemapEntrySource` | Array or callback returning sitemap entries. |
+| `localization` | `SitemapLocaleConfig` | Locale expansion rules for automatic hreflang generation. |
+
 ## Low-level primitives
 
 - `GenerateSitemapOptions` — options object for `await generateSitemap(domain, options)`
@@ -73,3 +90,4 @@ Every entry's `path` must be site-relative (e.g. `/about`). The site origin is s
 | `generateSitemap` | Generate a single sitemap XML string |
 | `generateSitemapIndex` | Generate a sitemap index XML string |
 | `generateRobotsTxt` | Generate a `robots.txt` string |
+| `DEFAULT_ROBOTS_RULES` | Default allow-all rule used when `generateRobotsTxt` receives no rules |

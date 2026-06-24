@@ -1,5 +1,7 @@
 # Implement locale-aware sitemap generation
 
+> **Archived design doc.** This describes a planning phase, not the current API. See the live docs: [sitemap README](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap) and [locales](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/locales.md). Current config key is `localization` (not root `locales`); video entries use `videos: SitemapVideo[]` (not `videoUrls`).
+
 ## Goal
 
 Add **optional locale-aware sitemap generation** to the library while preserving a strong manual escape hatch.

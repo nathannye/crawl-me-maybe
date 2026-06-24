@@ -24,15 +24,11 @@ var SeoDefaultsContext = createContext(null);
 var SeoDefaultsProvider = ({ children }) => {
   const client = useClient({ apiVersion: "2025-01-11" });
   const [defaults, setDefaults] = useState({
-    seoDefaults: null,
-    schemaDefaults: null
+    seoDefaults: null
   });
   const cleanup = useCallback(() => {
     if (cleanup.seoSub) {
       cleanup.seoSub.unsubscribe();
-    }
-    if (cleanup.schemaSub) {
-      cleanup.schemaSub.unsubscribe();
     }
   }, []);
   const sub = useCallback((query, property) => {
@@ -47,16 +43,10 @@ var SeoDefaultsProvider = ({ children }) => {
   }, [client]);
   useEffect(() => {
     const seoSub = sub(`*[_type == "globalSeoSettings"][0]`, "seoDefaults");
-    const schemaSub = sub(`*[_type == "schemaMarkupDefaults"][0]`, "schemaDefaults");
     cleanup.seoSub = seoSub;
-    cleanup.schemaSub = schemaSub;
     client.fetch(`*[_type == "globalSeoSettings"][0]`).then((seoDefaults) => setDefaults((prev) => ({
       ...prev,
       seoDefaults
-    })));
-    client.fetch(`*[_type == "schemaMarkupDefaults"][0]`).then((schemaDefaults) => setDefaults((prev) => ({
-      ...prev,
-      schemaDefaults
     })));
     return cleanup;
   }, [client, cleanup, sub]);
@@ -1614,10 +1604,6 @@ function IndexingControls(props) {
     ]
   }, undefined, true, undefined, this);
 }
-// src/components/core/SchemaFieldWithDefault.tsx
-import { Box as Box11 } from "@sanity/ui";
-import { MdCheck as MdCheck2, MdWarning as MdWarning2 } from "react-icons/md";
-import { jsxDEV as jsxDEV19 } from "react/jsx-dev-runtime";
 // src/schemas/fields/search-indexing.ts
 var search_indexing_default = defineField8({
   name: "searchIndexing",
@@ -1674,4 +1660,4 @@ export {
   src_default as default
 };
 
-//# debugId=44DFE7A65758E54764756E2164756E21
+//# debugId=EF2B398288DA03C064756E2164756E21

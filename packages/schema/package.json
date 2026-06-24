@@ -24,7 +24,6 @@
 		"build": "rm -rf dist && bun build src/index.ts --outdir dist --format esm --sourcemap --external schema-dts && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src"
 	},
 	"dependencies": {
-		"@crawl-me-maybe/meta": "workspace:*",
 		"schema-dts": "^1.1.5"
 	},
 	"devDependencies": {}

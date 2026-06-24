@@ -1,10 +1,10 @@
 # Runtime routes
 
-← [Package README](../README.md)
+← [Package README](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap)
 
 Use `createSitemapManifest` when a route needs to stay stable as content grows. The manifest lazily resolves the sitemap(s) needed for the current request and gives you the root route plus child files from the same shared config.
 
-For named sitemap configuration (`entries: { pages, blog, … }`) and automatic file splitting, see [Splitting and named sitemaps](./splitting.md).
+For named sitemap configuration (`entries: { pages, blog, … }`) and automatic file splitting, see [Splitting and named sitemaps](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/splitting.md).
 
 ## Route shapes
 
@@ -90,7 +90,7 @@ export async function GET(
 
 ## Multiple named sitemaps
 
-Named sitemaps can be a raw source or a definition with a sitemap-specific `maxUrls` override. See [splitting.md](./splitting.md) for the manifest config shape.
+Named sitemaps can be a raw source or a definition with a sitemap-specific `maxUrls` override. See [splitting.md](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/splitting.md) for the manifest config shape.
 
 ```ts
 // lib/sitemaps.ts
@@ -147,4 +147,4 @@ export async function GET(
 
 ## Localized runtime sitemaps
 
-`createSitemapManifest` accepts the same `localization` config as the Vite plugin and `generateSitemap`, so alternates stay consistent across root and child routes. See [locales.md](./locales.md).
+`createSitemapManifest` accepts the same `localization` config as the Vite plugin and `generateSitemap`, so alternates stay consistent across root and child routes. See [locales.md](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/locales.md).

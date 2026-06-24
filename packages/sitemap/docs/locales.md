@@ -1,6 +1,6 @@
 # Locale configuration
 
-← [Package README](../README.md)
+← [Package README](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap)
 
 Most multilingual sites fall into a few common patterns. Pass a `localization` config to the Vite plugin, `createSitemapManifest`, or `generateSitemap` to opt in. Define each page once using its default-locale path; the package expands it into locale-specific URLs and emits hreflang alternates.
 
@@ -205,4 +205,4 @@ You cannot mix `example.com` and `example.fr` URLs in a single sitemap from one 
 | `alternates` | Emit hreflang `<xhtml:link>` tags. Default: `true`. |
 | `xDefault` | `true` uses `defaultLocale`; a locale code sets `hreflang="x-default"` explicitly. |
 
-See [API reference](./api.md) for full `SitemapLocaleConfig` types.
+See [API reference](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/api.md) for full `SitemapLocaleConfig` types.

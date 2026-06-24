@@ -1,13 +1,13 @@
 # Splitting and named sitemaps
 
-← [Package README](../README.md)
+← [Package README](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap)
 
 Two separate ideas:
 
 - **Named sitemap families** — logical separation (pages, blog, products) as distinct sitemaps under one index
 - **Automatic file splitting** — a single sitemap definition exceeds `maxUrls` and is split into numbered child files
 
-Both work in the Vite plugin and `createSitemapManifest`. For runtime route handlers, see [Runtime routes](./runtime-routes.md).
+Both work in the Vite plugin and `createSitemapManifest`. For runtime route handlers, see [Runtime routes](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/runtime-routes.md).
 
 ## Vite: multiple named sitemaps
 
@@ -100,4 +100,4 @@ export const manifest = createSitemapManifest({
 });
 ```
 
-Route handlers for this manifest are in [runtime-routes.md](./runtime-routes.md).
+Route handlers for this manifest are in [runtime-routes.md](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/runtime-routes.md).

@@ -1,5 +1,7 @@
 # Implement manifest-based runtime sitemap API
 
+> **Archived design doc.** This describes the manifest API design that is now shipped as `createSitemapManifest`. See [runtime routes](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/runtime-routes.md) and [splitting](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap/docs/splitting.md).
+
 ## Goal
 
 Refactor the runtime sitemap API around a **lazy manifest object** that supports:

@@ -4,7 +4,7 @@ SEO fields, global defaults, and social preview cards for Sanity Studio.
 
 > Built for Sanity v5 and v6
 
-Designed to pair with [`@crawl-me-maybe/meta`](../meta) on the frontend. The `globalSeoSettings` document and `pageMetadata` object use the same field names and shapes that `buildMetadata()` expects — query your content, resolve image URLs in GROQ, and pass the result straight through.
+Designed to pair with [`@crawl-me-maybe/meta`](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/meta) on the frontend. The `globalSeoSettings` document and `pageMetadata` object use the same field names and shapes that `buildMetadata()` expects — query your content, resolve image URLs in GROQ, and pass the result straight through.
 
 ## Table of contents
 
@@ -104,7 +104,7 @@ Resolve the referenced document to a URL in your frontend query and pass it to `
 
 ### Adding SEO fields to a page document
 
-Include the `pageMetadata` object type on any document schema. Global defaults are displayed automatically in Studio; use [`@crawl-me-maybe/meta`](../meta)'s `buildMetadata()` on the frontend to apply the same merge logic.
+Include the `pageMetadata` object type on any document schema. Global defaults are displayed automatically in Studio; use [`@crawl-me-maybe/meta`](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/meta)'s `buildMetadata()` on the frontend to apply the same merge logic.
 
 ```ts
 // schemas/page.ts
@@ -196,7 +196,7 @@ Preview-enabled array field for robots.txt entries. Disabled by setting `global.
 
 This plugin only stores SEO metadata inside Sanity. Your app is responsible for reading these fields and rendering meta tags, canonical URLs, schema markup, robots.txt, and sitemap.xml.
 
-[`@crawl-me-maybe/meta`](../meta) handles the metadata side — merging page and global defaults, title templates, Open Graph, Twitter cards, and canonical URLs. [`@crawl-me-maybe/sitemap`](../sitemap) and [`@crawl-me-maybe/schema`](../schema-markup) cover sitemaps, robots.txt, and JSON-LD.
+[`@crawl-me-maybe/meta`](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/meta) handles the metadata side — merging page and global defaults, title templates, Open Graph, Twitter cards, and canonical URLs. [`@crawl-me-maybe/sitemap`](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap) and [`@crawl-me-maybe/schema`](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/schema) cover sitemaps, robots.txt, and JSON-LD.
 
 ### With `@crawl-me-maybe/meta`
 
@@ -257,7 +257,7 @@ export async function generateMetadata({ params }): Promise<Metadata> {
 }
 ```
 
-See the [`@crawl-me-maybe/meta` docs](../meta) for Nuxt, raw HTML, canonical URL options, and build-time overrides.
+See the [`@crawl-me-maybe/meta` docs](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/meta) for Nuxt, raw HTML, canonical URL options, and build-time overrides.
 
 ---
 
@@ -265,7 +265,7 @@ See the [`@crawl-me-maybe/meta` docs](../meta) for Nuxt, raw HTML, canonical URL
 
 ### `globalSeoSettings` document
 
-A singleton document that provides site-wide defaults. Page-level fields display these values in Studio when empty; [`@crawl-me-maybe/meta`](../meta)'s `buildMetadata()` applies the same fallbacks on the frontend.
+A singleton document that provides site-wide defaults. Page-level fields display these values in Studio when empty; [`@crawl-me-maybe/meta`](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/meta)'s `buildMetadata()` applies the same fallbacks on the frontend.
 
 | Field | Sanity type | Required | Validation | Notes |
 |---|---|---|---|---|

@@ -4,9 +4,9 @@
 
 SEO utilities for Sanity-driven sites: merge page and global metadata, generate meta titles, and output framework-specific meta tags.
 
-Built to pair with [`@crawl-me-maybe/sanity-plugin-seo`](../sanity-plugin-seo) in Sanity Studio. The plugin's `globalSeoSettings` document and `pageMetadata` object match the `GlobalSeoSettings` and `RawPageMetadata` types that `buildMetadata()` accepts.
+Built to pair with [`@crawl-me-maybe/sanity-plugin-seo`](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sanity-plugin-seo) in Sanity Studio. The plugin's `globalSeoSettings` document and `pageMetadata` object match the `GlobalSeoSettings` and `RawPageMetadata` types that `buildMetadata()` accepts.
 
-For Schema.org JSON-LD, use [`@crawl-me-maybe/schema`](../schema-markup).
+For Schema.org JSON-LD, use [`@crawl-me-maybe/schema`](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/schema).
 
 ## Table of contents
 
@@ -77,7 +77,7 @@ const meta = buildMetadata(
 
 ## With `@crawl-me-maybe/sanity-plugin-seo`
 
-If you use [`@crawl-me-maybe/sanity-plugin-seo`](../sanity-plugin-seo), the Studio schemas map directly to `buildMetadata()` — no field renaming or custom adapters:
+If you use [`@crawl-me-maybe/sanity-plugin-seo`](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sanity-plugin-seo), the Studio schemas map directly to `buildMetadata()` — no field renaming or custom adapters:
 
 | Plugin schema | `buildMetadata` argument | Notes |
 |---|---|---|
@@ -96,7 +96,7 @@ The plugin handles global fallbacks in Studio previews; `buildMetadata()` applie
 
 ## Sanity queries
 
-These examples assume the `pageMetadata` field is named `seo` on your page document, as registered by [`@crawl-me-maybe/sanity-plugin-seo`](../sanity-plugin-seo).
+These examples assume the `pageMetadata` field is named `seo` on your page document, as registered by [`@crawl-me-maybe/sanity-plugin-seo`](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sanity-plugin-seo).
 
 `metaImage` must be a **resolved URL string** before it reaches `buildMetadata`. Resolve it in your GROQ projection — the Studio still stores image fields; your frontend query dereferences them.
 

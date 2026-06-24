@@ -32,7 +32,7 @@ Your app / site
 
 Sanity Studio plugin with SEO fields, global defaults, and social/search preview cards.
 
-[See docs](./packages/sanity-plugin-seo)
+[See docs](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sanity-plugin-seo)
 
 - Global `globalSeoSettings` defaults with per-page `pageMetadata` overrides
 - Live social previews for Facebook, Twitter/X, LinkedIn, and Google Search
@@ -51,7 +51,7 @@ yarn add @crawl-me-maybe/sanity-plugin-seo
 
 Runtime helpers to merge page and global SEO metadata and generate meta titles.
 
-[See docs](./packages/meta)
+[See docs](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/meta)
 
 - Merge page-level and global SEO defaults
 - Meta title templates (`{pageTitle} - {siteTitle}`)
@@ -70,7 +70,7 @@ yarn add @crawl-me-maybe/meta
 
 Minimal sitemap generator. Query your CMS, pass the result, done.
 
-[See docs](./packages/sitemap)
+[See docs](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sitemap)
 
 - Build-time generation with a Vite plugin, or runtime output from API routes
 - Manifest-based routing with localized sitemaps, split child files, and multi-sitemap indexes
@@ -100,7 +100,7 @@ yarn add @crawl-me-maybe/sitemap
 
 Builds Schema.org JSON-LD from Sanity content. Derive structured data from your existing content model — no extra editor fields required.
 
-[See docs](./packages/schema)
+[See docs](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/schema)
 
 - `buildSchemaMarkup` emits a JSON-LD graph for site identity, `WebSite`, and `WebPage`
 - Typed builders for Article, Product, Event, FAQPage, LocalBusiness, and more
