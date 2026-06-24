@@ -81,7 +81,7 @@ Builds Schema.org JSON-LD from Sanity content. Derive structured data from your 
 
 Includes typed builders for many Google-supported rich result schemas, including `Article`, `Product`, `Event`, `FAQPage`, `LocalBusiness`, `Organization`, `WebPage`, `WebSite`, and more.
 
-[See docs](./packages/schema-markup)
+[See docs](./packages/schema)
 
 ```bash
 npm install @crawl-me-maybe/schema
