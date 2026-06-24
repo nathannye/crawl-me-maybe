@@ -417,7 +417,7 @@ function WindowControls() {
         boxSizing: "border-box",
         boxShadow: i === 0 ? "0 0.5px 0.5px #c14545" : i === 2 ? "0 0.5px 0.5px #30993d" : "0 0.5px 0.5px #bfa350"
       }
-    }, i, false, undefined, this))
+    }, c.title, false, undefined, this))
   }, undefined, false, undefined, this);
 }
 
@@ -762,8 +762,8 @@ function InputWithGlobalDefault(props) {
 }
 
 // src/components/core/PageSeoInput/PageSeoInput.tsx
-import { buildSrc as buildSrc3 } from "@sanity-image/url-builder";
 import { Box as Box8, Flex as Flex12 } from "@sanity/ui";
+import { buildSrc as buildSrc3 } from "@sanity-image/url-builder";
 import { useEffect as useEffect3, useMemo as useMemo3, useState as useState4 } from "react";
 import { MdEdit, MdPreview } from "react-icons/md";
 import {
@@ -1544,14 +1544,14 @@ var robots_default = defineField7({
 import { defineField as defineField8 } from "sanity";
 
 // src/components/core/IndexingControls.tsx
-import { set as set2 } from "sanity";
 import { Button as Button2, Flex as Flex14, Stack as Stack7 } from "@sanity/ui";
 import { useCallback as useCallback2 } from "react";
-import { MdInfo, MdPlaylistRemove } from "react-icons/md";
 import { IoArrowRedo } from "react-icons/io5";
+import { MdInfo, MdPlaylistRemove } from "react-icons/md";
+import { set as set2 } from "sanity";
 import { jsxDEV as jsxDEV18 } from "react/jsx-dev-runtime";
 function getNested(obj, key) {
-  return obj && Object.prototype.hasOwnProperty.call(obj, key) ? obj[key] : undefined;
+  return obj && Object.hasOwn(obj, key) ? obj[key] : undefined;
 }
 function IndexingControls(props) {
   const { value = {}, onChange } = props;
@@ -1660,4 +1660,4 @@ export {
   src_default as default
 };
 
-//# debugId=EF2B398288DA03C064756E2164756E21
+//# debugId=70FF61BBE6A9E9E864756E2164756E21
