@@ -21,11 +21,15 @@ function validateLocaleConfig(config: SitemapLocaleConfig): void {
 	}
 
 	if (!Array.isArray(config.locales) || config.locales.length === 0) {
-		throw new Error("sitemap localization config must include at least one locale");
+		throw new Error(
+			"sitemap localization config must include at least one locale",
+		);
 	}
 
 	if (new Set(config.locales).size !== config.locales.length) {
-		throw new Error("sitemap localization config locales must not contain duplicates");
+		throw new Error(
+			"sitemap localization config locales must not contain duplicates",
+		);
 	}
 
 	if (!config.defaultLocale || typeof config.defaultLocale !== "string") {
@@ -40,7 +44,9 @@ function validateLocaleConfig(config: SitemapLocaleConfig): void {
 
 	const mode = config.mode ?? "prefix";
 	if (!["prefix", "subdomain", "domain"].includes(mode)) {
-		throw new Error(`sitemap localization config mode "${mode}" is not supported`);
+		throw new Error(
+			`sitemap localization config mode "${mode}" is not supported`,
+		);
 	}
 
 	if (mode !== "prefix") {
@@ -60,7 +66,10 @@ function validateLocaleConfig(config: SitemapLocaleConfig): void {
 		}
 	}
 
-	if (typeof config.xDefault === "string" && !config.locales.includes(config.xDefault)) {
+	if (
+		typeof config.xDefault === "string" &&
+		!config.locales.includes(config.xDefault)
+	) {
 		throw new Error(
 			`sitemap localization config xDefault locale "${config.xDefault}" must exist in locales`,
 		);
@@ -184,10 +193,12 @@ export function expandLocalizedEntries(
 	localization?: SitemapLocaleConfig,
 ): SitemapEntryWithAlternates[] {
 	if (!localization) {
-		return baseEntries.map(({ path, locales: _locales, localePaths: _localePaths, ...rest }) => ({
-			...rest,
-			url: resolveUrl(path, domain),
-		}));
+		return baseEntries.map(
+			({ path, locales: _locales, localePaths: _localePaths, ...rest }) => ({
+				...rest,
+				url: resolveUrl(path, domain),
+			}),
+		);
 	}
 
 	validateLocaleConfig(localization);
@@ -204,7 +215,7 @@ export function expandLocalizedEntries(
 			const resolvedPath =
 				localeCode === localization.defaultLocale
 					? path
-					: localePaths?.[localeCode] ?? path;
+					: (localePaths?.[localeCode] ?? path);
 
 			entryPathByLocale.set(localeCode, resolvedPath);
 		}

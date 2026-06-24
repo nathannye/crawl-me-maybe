@@ -1,6 +1,5 @@
-export { SitemapNotFoundError } from "./errors";
-export { SitemapPartNotFoundError } from "./errors";
-export { DEFAULT_ROBOTS_RULES, generateRobotsTxt } from "./robots";
+export { SitemapNotFoundError, SitemapPartNotFoundError } from "./errors";
 export { createSitemapManifest } from "./manifest";
+export { DEFAULT_ROBOTS_RULES, generateRobotsTxt } from "./robots";
 export { generateSitemap, generateSitemapIndex } from "./sitemap";
-export type { CreateSitemapManifestOptions, GenerateSitemapOptions, GenerateSitemapIndexOptions, MaybePromise, RobotsRule, SitemapDefinition, SitemapConfig, SitemapEntry, SitemapVideo, SitemapLocaleConfig, SitemapEntrySource, SitemapEntryWithAlternates, SitemapFile, SitemapManifest, SitemapSelector, } from "./types";
+export type { CreateSitemapManifestOptions, GenerateSitemapIndexOptions, GenerateSitemapOptions, MaybePromise, RobotsRule, SitemapConfig, SitemapDefinition, SitemapEntry, SitemapEntrySource, SitemapEntryWithAlternates, SitemapFile, SitemapLocaleConfig, SitemapManifest, SitemapSelector, SitemapVideo, } from "./types";

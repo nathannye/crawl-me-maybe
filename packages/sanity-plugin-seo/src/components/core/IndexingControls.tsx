@@ -1,16 +1,14 @@
+import { Button, Flex, Stack } from "@sanity/ui";
+import { useCallback } from "react";
+import { IoArrowRedo } from "react-icons/io5";
+import { MdInfo, MdPlaylistRemove } from "react-icons/md";
 import type { ObjectInputProps } from "sanity";
 import { set } from "sanity";
-import { Button, Flex, Text, Card, Box, Stack } from "@sanity/ui";
-import { useCallback } from "react";
 import { CardWithIcon } from "../partials";
-import { MdInfo, MdPlaylistRemove } from "react-icons/md";
-import { IoArrowRedo } from "react-icons/io5";
 
 // Helper to extract and set nested field values
-function getNested(obj: Record<string, any>, key: string) {
-	return obj && Object.prototype.hasOwnProperty.call(obj, key)
-		? obj[key]
-		: undefined;
+function getNested(obj: Record<string, unknown>, key: string) {
+	return obj && Object.hasOwn(obj, key) ? obj[key] : undefined;
 }
 
 export default function IndexingControls(props: ObjectInputProps) {

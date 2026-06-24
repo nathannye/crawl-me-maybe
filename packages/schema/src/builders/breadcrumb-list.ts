@@ -16,7 +16,9 @@ function normalizePath(path: string): string {
 	if (!path) return "/";
 	const withoutHash = path.split("#")[0];
 	const withoutQuery = withoutHash.split("?")[0];
-	const prefixed = withoutQuery.startsWith("/") ? withoutQuery : `/${withoutQuery}`;
+	const prefixed = withoutQuery.startsWith("/")
+		? withoutQuery
+		: `/${withoutQuery}`;
 	return prefixed.replace(/\/+$/, "") || "/";
 }
 
@@ -46,7 +48,9 @@ export function buildBreadcrumbListSchema({
 	pageTitle,
 	items,
 }: BuildBreadcrumbListSchemaInput): WithContext<BreadcrumbList> {
-	const parentItems = items?.length ? items : createDerivedParentItems(pagePath);
+	const parentItems = items?.length
+		? items
+		: createDerivedParentItems(pagePath);
 	const finalItems = [
 		...parentItems,
 		{

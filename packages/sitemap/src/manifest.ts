@@ -1,17 +1,17 @@
 import { SitemapNotFoundError, SitemapPartNotFoundError } from "./errors";
-import { resolveSitemapEntrySource } from "./resolve-entries";
 import { expandLocalizedEntries } from "./localize";
-import { createSitemapXml } from "./xml";
+import { resolveSitemapEntrySource } from "./resolve-entries";
 import { generateSitemapIndex } from "./sitemap";
 import type {
 	CreateSitemapManifestOptions,
 	ResolvedSitemapFile,
 	SitemapDefinition,
+	SitemapEntrySource,
 	SitemapFile,
 	SitemapManifest,
 	SitemapSelector,
-	SitemapEntrySource,
 } from "./types";
+import { createSitemapXml } from "./xml";
 
 const DEFAULT_MAX_URLS = 50_000;
 const DEFAULT_BASE_PATH = "/sitemap";
@@ -31,12 +31,16 @@ function normalizeBasePath(basePath?: string): string {
 	const resolved = basePath ?? DEFAULT_BASE_PATH;
 
 	if (typeof resolved !== "string" || resolved.trim() === "") {
-		throw new Error("createSitemapManifest: basePath must be a non-empty string");
+		throw new Error(
+			"createSitemapManifest: basePath must be a non-empty string",
+		);
 	}
 
 	const trimmed = resolved.trim().replace(/\/+$/, "");
 	if (trimmed === "") {
-		throw new Error("createSitemapManifest: basePath must be a non-empty string");
+		throw new Error(
+			"createSitemapManifest: basePath must be a non-empty string",
+		);
 	}
 
 	const withLeadingSlash = trimmed.startsWith("/") ? trimmed : `/${trimmed}`;
@@ -48,7 +52,10 @@ function normalizeBasePath(basePath?: string): string {
 	return withLeadingSlash;
 }
 
-function normalizeMaxUrls(maxUrls: number | undefined, fallback: number): number {
+function normalizeMaxUrls(
+	maxUrls: number | undefined,
+	fallback: number,
+): number {
 	const resolved = maxUrls ?? fallback;
 
 	if (
@@ -57,7 +64,9 @@ function normalizeMaxUrls(maxUrls: number | undefined, fallback: number): number
 		!Number.isInteger(resolved) ||
 		resolved <= 0
 	) {
-		throw new Error("createSitemapManifest: maxUrls must be a positive integer");
+		throw new Error(
+			"createSitemapManifest: maxUrls must be a positive integer",
+		);
 	}
 
 	return resolved;
@@ -90,13 +99,17 @@ function normalizeSitemapDefinitions(
 	}
 
 	if (typeof entries !== "object" || entries === null) {
-		throw new Error("createSitemapManifest: entries must be a sitemap source or a named sitemap map");
+		throw new Error(
+			"createSitemapManifest: entries must be a sitemap source or a named sitemap map",
+		);
 	}
 
 	const definitions = Object.entries(entries).map(
 		([sitemap, definition]): NormalizedSitemapDefinition => {
 			if (!sitemap || sitemap.trim() === "") {
-				throw new Error("createSitemapManifest: sitemap names must be non-empty strings");
+				throw new Error(
+					"createSitemapManifest: sitemap names must be non-empty strings",
+				);
 			}
 
 			if (Array.isArray(definition) || typeof definition === "function") {
@@ -122,7 +135,9 @@ function normalizeSitemapDefinitions(
 	);
 
 	if (definitions.length === 0) {
-		throw new Error("createSitemapManifest: entries must include at least one sitemap");
+		throw new Error(
+			"createSitemapManifest: entries must include at least one sitemap",
+		);
 	}
 
 	return definitions;
@@ -220,7 +235,9 @@ export function createSitemapManifest(
 		return plans.flatMap((plan) => plan.files);
 	}
 
-	async function renderFileBySelector(selector: SitemapSelector): Promise<string> {
+	async function renderFileBySelector(
+		selector: SitemapSelector,
+	): Promise<string> {
 		validateSelectorIndex(selector.index);
 
 		let definitionIndex = 0;
@@ -267,7 +284,11 @@ export function createSitemapManifest(
 		},
 		async getSitemapFiles(): Promise<SitemapFile[]> {
 			const files = await getAllFiles();
-			return files.map(({ sitemap, index, path }) => ({ sitemap, index, path }));
+			return files.map(({ sitemap, index, path }) => ({
+				sitemap,
+				index,
+				path,
+			}));
 		},
 	};
 }

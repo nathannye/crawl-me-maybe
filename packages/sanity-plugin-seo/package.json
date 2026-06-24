@@ -1,40 +1,40 @@
 {
-  "name": "@crawl-me-maybe/sanity-plugin-seo",
-  "version": "0.1.0",
-  "author": "Nathan Nye",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "license": "MIT",
-  "publishConfig": {
-    "access": "public"
-  },
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  },
-  "files": [
-    "dist"
-  ],
-  "scripts": {
-    "build": "bun run build.ts && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src --noCheck"
-  },
-  "dependencies": {
-    "@sanity-image/url-builder": "^1.1.0",
-    "react-icons": "^5.6.0"
-  },
-  "peerDependencies": {
-    "@sanity/ui": "^2.0 || ^3.0",
-    "react": "^18.3 || ^19",
-    "react-dom": "^18.3 || ^19",
-    "sanity": "^5 || ^6.0.0"
-  },
-  "devDependencies": {
-    "@sanity/ui": "^3.2.0",
-    "@types/react": "^19.2.17",
-    "react": "^19.2.7",
-    "react-dom": "^19.2.7",
-    "sanity": "^6.1.0"
-  }
+	"name": "@crawl-me-maybe/sanity-plugin-seo",
+	"version": "0.1.0",
+	"author": "Nathan Nye",
+	"main": "./dist/index.js",
+	"types": "./dist/index.d.ts",
+	"license": "MIT",
+	"publishConfig": {
+		"access": "public"
+	},
+	"exports": {
+		".": {
+			"types": "./dist/index.d.ts",
+			"import": "./dist/index.js"
+		}
+	},
+	"files": [
+		"dist"
+	],
+	"scripts": {
+		"build": "bun run build.ts && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src --noCheck"
+	},
+	"dependencies": {
+		"@sanity-image/url-builder": "^1.1.0",
+		"react-icons": "^5.6.0"
+	},
+	"peerDependencies": {
+		"@sanity/ui": "^2.0 || ^3.0",
+		"react": "^18.3 || ^19",
+		"react-dom": "^18.3 || ^19",
+		"sanity": "^5 || ^6.0.0"
+	},
+	"devDependencies": {
+		"@sanity/ui": "^3.2.0",
+		"@types/react": "^19.2.17",
+		"react": "^19.2.7",
+		"react-dom": "^19.2.7",
+		"sanity": "^6.1.0"
+	}
 }

@@ -23,7 +23,10 @@ function escapeXml(text: string): string {
 function createVideoXml(video: SitemapVideo, level: number): string {
 	const lines = [
 		xmlLine(level, "<video:video>"),
-		xmlLine(level + 1, `<video:thumbnail_loc>${video.thumbnailUrl}</video:thumbnail_loc>`),
+		xmlLine(
+			level + 1,
+			`<video:thumbnail_loc>${video.thumbnailUrl}</video:thumbnail_loc>`,
+		),
 		xmlLine(level + 1, `<video:title>${escapeXml(video.title)}</video:title>`),
 		xmlLine(
 			level + 1,
@@ -33,18 +36,26 @@ function createVideoXml(video: SitemapVideo, level: number): string {
 
 	if (video.contentUrl) {
 		lines.push(
-			xmlLine(level + 1, `<video:content_loc>${video.contentUrl}</video:content_loc>`),
+			xmlLine(
+				level + 1,
+				`<video:content_loc>${video.contentUrl}</video:content_loc>`,
+			),
 		);
 	}
 
 	if (video.playerUrl) {
 		lines.push(
-			xmlLine(level + 1, `<video:player_loc>${video.playerUrl}</video:player_loc>`),
+			xmlLine(
+				level + 1,
+				`<video:player_loc>${video.playerUrl}</video:player_loc>`,
+			),
 		);
 	}
 
 	if (video.duration !== undefined) {
-		lines.push(xmlLine(level + 1, `<video:duration>${video.duration}</video:duration>`));
+		lines.push(
+			xmlLine(level + 1, `<video:duration>${video.duration}</video:duration>`),
+		);
 	}
 
 	if (video.publicationDate) {

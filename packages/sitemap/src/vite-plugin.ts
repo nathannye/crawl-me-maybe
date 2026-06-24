@@ -1,9 +1,9 @@
 import path from "node:path";
+import { createFile } from "./file";
 import { createSitemapManifest } from "./manifest";
 import { generateRobotsTxt } from "./robots";
 import type { SitemapConfig } from "./types";
 import { validateConfig } from "./validate-config";
-import { createFile } from "./file";
 
 /**
  * Vite plugin that generates sitemap.xml and robots.txt on `closeBundle`.

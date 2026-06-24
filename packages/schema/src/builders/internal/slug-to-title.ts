@@ -1,9 +1,6 @@
 export function slugToTitle(segment: string): string {
 	const decoded = decodeURIComponent(segment || "");
-	const normalized = decoded
-		.replace(/[-_]+/g, " ")
-		.replace(/\s+/g, " ")
-		.trim();
+	const normalized = decoded.replace(/[-_]+/g, " ").replace(/\s+/g, " ").trim();
 
 	if (!normalized) return "";
 

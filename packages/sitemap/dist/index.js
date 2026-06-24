@@ -13,66 +13,6 @@ class SitemapPartNotFoundError extends Error {
     this.name = "SitemapPartNotFoundError";
   }
 }
-// src/domain.ts
-function normalizeDomain(domain) {
-  return domain.replace(/\/+$/, "");
-}
-function normalizeDomainBase(domain) {
-  return `${normalizeDomain(domain)}/`;
-}
-
-// src/robots.ts
-var DEFAULT_ROBOTS_RULES = [
-  {
-    userAgent: "*",
-    allow: "/",
-    disallow: ["/admin", "/api/"]
-  }
-];
-function serializeRobotsRules(rules) {
-  const ruleArray = Array.isArray(rules) ? rules : [rules];
-  return ruleArray.map((rule) => {
-    const agents = Array.isArray(rule.userAgent) ? rule.userAgent : [rule.userAgent];
-    const lines = agents.map((a) => `User-agent: ${a}`);
-    if (rule.allow) {
-      const allows = Array.isArray(rule.allow) ? rule.allow : [rule.allow];
-      for (const a of allows)
-        lines.push(`Allow: ${a}`);
-    }
-    if (rule.disallow) {
-      const disallows = Array.isArray(rule.disallow) ? rule.disallow : [rule.disallow];
-      for (const d of disallows)
-        lines.push(`Disallow: ${d}`);
-    }
-    return lines.join(`
-`);
-  }).join(`
-
-`);
-}
-function toSitemapPath(filename) {
-  const trimmed = filename.replace(/^\/+/, "");
-  return `/${trimmed}`;
-}
-function toSitemapUrl(domain, filename) {
-  return `${normalizeDomain(domain)}${toSitemapPath(filename)}`;
-}
-function generateRobotsTxt(domain, sitemapIndex = "sitemap.xml", rules) {
-  if (!domain || typeof domain !== "string") {
-    throw new Error("generateRobotsTxt: domain must be a non-empty string");
-  }
-  if (!sitemapIndex || typeof sitemapIndex !== "string") {
-    throw new Error("generateRobotsTxt: sitemapIndex must be a non-empty string");
-  }
-  let content = serializeRobotsRules(rules ?? DEFAULT_ROBOTS_RULES).trim();
-  if (!content.endsWith(`
-`))
-    content += `
-`;
-  content += `Sitemap: ${toSitemapUrl(domain, sitemapIndex)}
-`;
-  return content;
-}
 // src/resolve-entries.ts
 async function resolveSitemapEntrySource(source) {
   const resolved = typeof source === "function" ? await source() : source;
@@ -80,6 +20,14 @@ async function resolveSitemapEntrySource(source) {
     throw new Error("Sitemap entry source must resolve to an array of entries");
   }
   return resolved;
+}
+
+// src/domain.ts
+function normalizeDomain(domain) {
+  return domain.replace(/\/+$/, "");
+}
+function normalizeDomainBase(domain) {
+  return `${normalizeDomain(domain)}/`;
 }
 
 // src/localize.ts
@@ -533,6 +481,58 @@ function createSitemapManifest(options) {
     }
   };
 }
+// src/robots.ts
+var DEFAULT_ROBOTS_RULES = [
+  {
+    userAgent: "*",
+    allow: "/",
+    disallow: ["/admin", "/api/"]
+  }
+];
+function serializeRobotsRules(rules) {
+  const ruleArray = Array.isArray(rules) ? rules : [rules];
+  return ruleArray.map((rule) => {
+    const agents = Array.isArray(rule.userAgent) ? rule.userAgent : [rule.userAgent];
+    const lines = agents.map((a) => `User-agent: ${a}`);
+    if (rule.allow) {
+      const allows = Array.isArray(rule.allow) ? rule.allow : [rule.allow];
+      for (const a of allows)
+        lines.push(`Allow: ${a}`);
+    }
+    if (rule.disallow) {
+      const disallows = Array.isArray(rule.disallow) ? rule.disallow : [rule.disallow];
+      for (const d of disallows)
+        lines.push(`Disallow: ${d}`);
+    }
+    return lines.join(`
+`);
+  }).join(`
+
+`);
+}
+function toSitemapPath(filename) {
+  const trimmed = filename.replace(/^\/+/, "");
+  return `/${trimmed}`;
+}
+function toSitemapUrl(domain, filename) {
+  return `${normalizeDomain(domain)}${toSitemapPath(filename)}`;
+}
+function generateRobotsTxt(domain, sitemapIndex = "sitemap.xml", rules) {
+  if (!domain || typeof domain !== "string") {
+    throw new Error("generateRobotsTxt: domain must be a non-empty string");
+  }
+  if (!sitemapIndex || typeof sitemapIndex !== "string") {
+    throw new Error("generateRobotsTxt: sitemapIndex must be a non-empty string");
+  }
+  let content = serializeRobotsRules(rules ?? DEFAULT_ROBOTS_RULES).trim();
+  if (!content.endsWith(`
+`))
+    content += `
+`;
+  content += `Sitemap: ${toSitemapUrl(domain, sitemapIndex)}
+`;
+  return content;
+}
 export {
   generateSitemapIndex,
   generateSitemap,
@@ -543,5 +543,5 @@ export {
   DEFAULT_ROBOTS_RULES
 };
 
-//# debugId=E544C1147B4E5D3F64756E2164756E21
+//# debugId=BBA651A28BA7A53764756E2164756E21
 //# sourceMappingURL=index.js.map

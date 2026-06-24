@@ -92,7 +92,9 @@ const hasObjectShape = (value: unknown): value is SchemaNode => {
 	return typeof value === "object" && value !== null && !Array.isArray(value);
 };
 
-const hasType = (value: SchemaNode): value is SchemaNode & { "@type": string } => {
+const hasType = (
+	value: SchemaNode,
+): value is SchemaNode & { "@type": string } => {
 	return typeof value["@type"] === "string";
 };
 
@@ -116,7 +118,9 @@ type RankedNode = {
 	order: number;
 };
 
-const assembleNodes = (nodes: Array<Thing | SchemaNode | undefined>): string[] => {
+const assembleNodes = (
+	nodes: Array<Thing | SchemaNode | undefined>,
+): string[] => {
 	const collected: RankedNode[] = [];
 	const seenIds = new Set<string>();
 	const processingIds = new Set<string>();

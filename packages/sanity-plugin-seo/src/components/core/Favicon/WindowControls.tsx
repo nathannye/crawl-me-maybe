@@ -18,7 +18,7 @@ export default function WindowControls() {
 		>
 			{CONTROLS.map((c, i) => (
 				<span
-					key={i}
+					key={c.title}
 					title={c.title}
 					style={{
 						display: "inline-block",

@@ -5,7 +5,11 @@ export default function CardWithIcon({
 	icon,
 	text,
 	tone = "nuetral",
-}: { icon: IconType; text: string; tone?: CardTone }) {
+}: {
+	icon: IconType;
+	text: string;
+	tone?: CardTone;
+}) {
 	const Icon = icon;
 
 	return (

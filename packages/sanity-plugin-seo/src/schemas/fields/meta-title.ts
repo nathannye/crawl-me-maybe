@@ -10,7 +10,11 @@ export default defineField({
 	description: "The title of the page used in meta tags.",
 	validation: (Rule) => [
 		Rule.custom((value) => {
-			if (typeof value === "string" && value.length > 0 && value.length < MIN_CHARACTERS) {
+			if (
+				typeof value === "string" &&
+				value.length > 0 &&
+				value.length < MIN_CHARACTERS
+			) {
 				return `Short titles (under ${MIN_CHARACTERS} characters) could be more descriptive.`;
 			}
 			return true;

@@ -3,7 +3,10 @@ import { Box, Text } from "@sanity/ui";
 export function PreviewGroup({
 	title,
 	children,
-}: { title: string; children: React.ReactNode }) {
+}: {
+	title: string;
+	children: React.ReactNode;
+}) {
 	return (
 		<div>
 			<Box marginBottom={4}>

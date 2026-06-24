@@ -30,11 +30,7 @@ export function FacebookCard(props: PreviewCardProps) {
 				</Stack>
 			</Flex>
 			<Box className={styles.imageWrapper}>
-				<img
-					className={styles.image}
-					src={data.image}
-					alt="Facebook preview"
-				/>
+				<img className={styles.image} src={data.image} alt="Facebook preview" />
 			</Box>
 			<Box padding={3}>
 				<Stack space={3}>

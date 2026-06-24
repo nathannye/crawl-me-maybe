@@ -5,7 +5,11 @@ export default function ButtonWithIcon({
 	icon,
 	buttonProps = {},
 	label,
-}: { icon: IconType; buttonProps?: ButtonProps; label: string }) {
+}: {
+	icon: IconType;
+	buttonProps?: ButtonProps;
+	label: string;
+}) {
 	const Icon = icon;
 
 	return (

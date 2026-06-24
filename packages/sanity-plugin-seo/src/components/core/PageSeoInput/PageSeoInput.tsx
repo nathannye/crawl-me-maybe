@@ -1,5 +1,5 @@
-import { buildSrc } from "@sanity-image/url-builder";
 import { Box, Flex } from "@sanity/ui";
+import { buildSrc } from "@sanity-image/url-builder";
 import { useEffect, useMemo, useState } from "react";
 import { MdEdit, MdPreview } from "react-icons/md";
 import {
@@ -54,9 +54,10 @@ export default function PageSeoInput(props: ObjectInputProps) {
 	const [currentMode, setCurrentMode] = useState<SeoInputMode["name"]>(
 		MODES[0]?.name,
 	);
-	const [seoDefaults, setSeoDefaults] = useState<Record<string, unknown> | null>(
-		null,
-	);
+	const [seoDefaults, setSeoDefaults] = useState<Record<
+		string,
+		unknown
+	> | null>(null);
 
 	useEffect(() => {
 		client.fetch(`*[_type == "globalSeoSettings"][0]`).then(setSeoDefaults);

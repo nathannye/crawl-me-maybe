@@ -14,7 +14,7 @@
 			"@crawl-me-maybe/meta": ["packages/meta/src"],
 			"@crawl-me-maybe/meta/next": ["packages/meta/src/next"],
 			"@crawl-me-maybe/meta/nuxt": ["packages/meta/src/nuxt"],
-			"@crawl-me-maybe/schema": ["packages/schema/src"],
+			"@crawl-me-maybe/schema": ["packages/schema/src"]
 		}
 	}
 }

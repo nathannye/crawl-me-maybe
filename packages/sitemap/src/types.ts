@@ -107,11 +107,10 @@ export type SitemapDefinition =
 	  };
 
 /** Low-level options for {@link generateSitemap}. */
-export type GenerateSitemapOptions =
-	{
-		entries: SitemapEntrySource;
-		localization?: SitemapLocaleConfig;
-	};
+export type GenerateSitemapOptions = {
+	entries: SitemapEntrySource;
+	localization?: SitemapLocaleConfig;
+};
 
 /** Low-level options for {@link generateSitemapIndex}. */
 export type GenerateSitemapIndexOptions = {

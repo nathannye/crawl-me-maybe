@@ -1,7 +1,10 @@
 import { normalizeDomain } from "./domain";
-import { resolveSitemapEntrySource } from "./resolve-entries";
 import { expandLocalizedEntries } from "./localize";
-import type { GenerateSitemapIndexOptions, GenerateSitemapOptions } from "./types";
+import { resolveSitemapEntrySource } from "./resolve-entries";
+import type {
+	GenerateSitemapIndexOptions,
+	GenerateSitemapOptions,
+} from "./types";
 import { createSitemapXml } from "./xml";
 
 /**

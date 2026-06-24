@@ -1,5 +1,5 @@
-import type { RobotsRule } from "./types";
 import { normalizeDomain } from "./domain";
+import type { RobotsRule } from "./types";
 
 /** Default crawler rules used when `generateRobotsTxt` is called without custom rules. */
 export const DEFAULT_ROBOTS_RULES: RobotsRule[] = [

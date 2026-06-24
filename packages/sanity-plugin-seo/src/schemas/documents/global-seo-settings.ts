@@ -87,7 +87,8 @@ export default function buildGlobalSeoSettings(options?: PluginOptions) {
 				validation: (rule: StringRule) =>
 					rule.custom((val: string | undefined) => {
 						if (!val) return true;
-						if (typeof val !== "string") return "Twitter handle must be a string";
+						if (typeof val !== "string")
+							return "Twitter handle must be a string";
 						if (!val.startsWith("@")) return "Twitter handle must start with @";
 						return true;
 					}),
