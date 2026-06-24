@@ -4,6 +4,8 @@ SEO fields, global defaults, and social preview cards for Sanity Studio.
 
 > Built for Sanity v5 and v6
 
+Designed to pair with [`@crawl-me-maybe/meta`](../meta) on the frontend. The `globalSeoSettings` document and `pageMetadata` object use the same field names and shapes that `buildMetadata()` expects — query your content, resolve image URLs in GROQ, and pass the result straight through.
+
 ## Table of contents
 
 - [Install](#install)
@@ -16,6 +18,7 @@ SEO fields, global defaults, and social preview cards for Sanity Studio.
 - [Favicons](#favicons)
 - [Robots.txt](#robotstxt)
 - [Frontend integration](#frontend-integration)
+  - [With `@crawl-me-maybe/meta`](#with-crawl-me-maybemeta)
 - [Schemas](#schemas)
   - [`globalSeoSettings` document](#globalseoSettings-document)
   - [`pageMetadata` object](#pagemetadata-object)
@@ -101,7 +104,7 @@ Resolve the referenced document to a URL in your frontend query and pass it to `
 
 ### Adding SEO fields to a page document
 
-Include the `pageMetadata` object type on any document schema. Global defaults are displayed automatically in Studio, but frontend fallback merging must be wired manually.
+Include the `pageMetadata` object type on any document schema. Global defaults are displayed automatically in Studio; use [`@crawl-me-maybe/meta`](../meta)'s `buildMetadata()` on the frontend to apply the same merge logic.
 
 ```ts
 // schemas/page.ts
@@ -189,19 +192,70 @@ Preview-enabled array field for robots.txt entries. Disabled by setting `global.
 
 ---
 
-## Frontend Integration
-This plugin only stores SEO metadata inside Sanity.
+## Frontend integration
 
-You are responsible for reading these fields and generating:
-- meta tags
-- Open Graph tags
-- Twitter/X tags
-- canonical URLs
-- schema markup
-- robots.txt
-- sitemap.xml
+This plugin only stores SEO metadata inside Sanity. Your app is responsible for reading these fields and rendering meta tags, canonical URLs, schema markup, robots.txt, and sitemap.xml.
 
-`@crawl-me-maybe/meta` and `@crawl-me-maybe/sitemap` can be used to format this data for your frontend.
+[`@crawl-me-maybe/meta`](../meta) handles the metadata side — merging page and global defaults, title templates, Open Graph, Twitter cards, and canonical URLs. [`@crawl-me-maybe/sitemap`](../sitemap) and [`@crawl-me-maybe/schema-markup`](../schema-markup) cover sitemaps, robots.txt, and JSON-LD.
+
+### With `@crawl-me-maybe/meta`
+
+The plugin schemas map directly to `buildMetadata()` inputs — no adapter layer required:
+
+| Plugin schema | `buildMetadata` argument | Notes |
+|---|---|---|
+| `globalSeoSettings` | `globalSeoDefaults` (`GlobalSeoSettings`) | `siteTitle`, `pageTitleTemplate`, `siteUrl`, `metaDescription`, `twitterHandle` |
+| `globalSeoSettings.defaultMetaImage` | `defaultMetaImage` | Resolve to a URL string in GROQ (`defaultMetaImage.asset->url`) |
+| Page `title` + `slug` | `page.title`, `page.slug` | Required for title templates and self-canonical URLs |
+| `pageMetadata.description` | `page.description` | Falls back to `globalSeoSettings.metaDescription` |
+| `pageMetadata.metaImage` | `page.metaImage` | Resolve to a URL string in GROQ; falls back to `defaultMetaImage` |
+| `pageMetadata.canonicalUrl` | `page.canonicalUrl` | Path or full URL; empty values become a self-canonical from `siteUrl` + slug |
+| `pageMetadata.searchIndexing` | `page.searchIndexing` | `noIndex` / `noFollow` become a `robots` meta tag |
+
+**Page query:**
+
+```groq
+*[_type == "page" && slug.current == $slug][0]{
+  title,
+  "slug": { "current": slug.current },
+  "description": seo.description,
+  "canonicalUrl": seo.canonicalUrl,
+  "searchIndexing": seo.searchIndexing,
+  "metaImage": seo.metaImage.asset->url
+}
+```
+
+**Global defaults query:**
+
+```groq
+*[_type == "globalSeoSettings"][0]{
+  siteTitle,
+  pageTitleTemplate,
+  metaDescription,
+  siteUrl,
+  twitterHandle,
+  "defaultMetaImage": defaultMetaImage.asset->url
+}
+```
+
+**Next.js example:**
+
+```ts
+// app/[slug]/page.tsx
+import type { Metadata } from "next";
+import { buildMetadata } from "@crawl-me-maybe/meta";
+import { toNextMeta } from "@crawl-me-maybe/meta/next";
+import { client } from "@/lib/sanity";
+
+export async function generateMetadata({ params }): Promise<Metadata> {
+  const page = await client.fetch(PAGE_QUERY, { slug: params.slug });
+  const seoDefaults = await client.fetch(GLOBAL_SEO_QUERY);
+
+  return toNextMeta(buildMetadata(page, seoDefaults));
+}
+```
+
+See the [`@crawl-me-maybe/meta` docs](../meta) for Nuxt, raw HTML, canonical URL options, and build-time overrides.
 
 ---
 
@@ -209,7 +263,7 @@ You are responsible for reading these fields and generating:
 
 ### `globalSeoSettings` document
 
-A singleton document that provides site-wide defaults. Page-level fields display these values in Studio when empty; frontend fallback merging is handled by your app.
+A singleton document that provides site-wide defaults. Page-level fields display these values in Studio when empty; [`@crawl-me-maybe/meta`](../meta)'s `buildMetadata()` applies the same fallbacks on the frontend.
 
 | Field | Sanity type | Required | Validation | Notes |
 |---|---|---|---|---|

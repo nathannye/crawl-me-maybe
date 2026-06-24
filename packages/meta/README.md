@@ -4,6 +4,8 @@
 
 SEO utilities for Sanity-driven sites: merge page and global metadata, generate meta titles, and output framework-specific meta tags.
 
+Built to pair with [`@crawl-me-maybe/sanity-plugin-seo`](../sanity-plugin-seo) in Sanity Studio. The plugin's `globalSeoSettings` document and `pageMetadata` object match the `GlobalSeoSettings` and `RawPageMetadata` types that `buildMetadata()` accepts.
+
 For Schema.org JSON-LD, use [`@crawl-me-maybe/schema-markup`](../schema-markup).
 
 ## Table of contents
@@ -11,6 +13,7 @@ For Schema.org JSON-LD, use [`@crawl-me-maybe/schema-markup`](../schema-markup).
 - [Install](#install)
 - [Features](#features)
 - [Quick start](#quick-start)
+- [With `@crawl-me-maybe/sanity-plugin-seo`](#with-crawl-me-maybesanity-plugin-seo)
 - [Sanity queries](#sanity-queries)
 - [Build options](#build-options)
 - [Core exports](#core-exports)
@@ -72,7 +75,27 @@ const meta = buildMetadata(
 
 ---
 
+## With `@crawl-me-maybe/sanity-plugin-seo`
+
+If you use [`@crawl-me-maybe/sanity-plugin-seo`](../sanity-plugin-seo), the Studio schemas map directly to `buildMetadata()` — no field renaming or custom adapters:
+
+| Plugin schema | `buildMetadata` argument | Notes |
+|---|---|---|
+| `globalSeoSettings` | `globalSeoDefaults` | `siteTitle`, `pageTitleTemplate`, `siteUrl`, `metaDescription`, `twitterHandle` |
+| `globalSeoSettings.defaultMetaImage` | `defaultMetaImage` | Resolve to a URL string in GROQ |
+| Page `title` + `slug` | `page.title`, `page.slug` | Required for title templates and self-canonical URLs |
+| `pageMetadata.description` | `page.description` | Merged with `globalSeoSettings.metaDescription` |
+| `pageMetadata.metaImage` | `page.metaImage` | Resolve to a URL string in GROQ; overrides `defaultMetaImage` |
+| `pageMetadata.canonicalUrl` | `page.canonicalUrl` | Path or full URL; empty values become a self-canonical from `siteUrl` + slug |
+| `pageMetadata.searchIndexing` | `page.searchIndexing` | `noIndex` / `noFollow` become a `robots` meta tag |
+
+The plugin handles global fallbacks in Studio previews; `buildMetadata()` applies the same merge logic on the frontend.
+
+---
+
 ## Sanity queries
+
+These examples assume the `pageMetadata` field is named `seo` on your page document, as registered by [`@crawl-me-maybe/sanity-plugin-seo`](../sanity-plugin-seo).
 
 `metaImage` must be a **resolved URL string** before it reaches `buildMetadata`. Resolve it in your GROQ projection — the Studio still stores image fields; your frontend query dereferences them.
 
@@ -216,7 +239,7 @@ Requires `next` as a peer dependency.
 
 ### Nuxt (`/nuxt`)
 
-Import from the `/nuxt` subpath. Returns a `MetaFlatInput` object compatible with `useSeoMeta()`.
+Import from the `/nuxt` subpath. Returns a `NuxtMeta` object (flat SEO fields plus `title`) compatible with `useHead()`.
 
 ```vue
 <script setup lang="ts">
@@ -225,7 +248,7 @@ import { toNuxtMeta } from "@crawl-me-maybe/meta/nuxt";
 
 const merged = buildMetadata(page, globalSeoDefaults);
 
-useSeoMeta(toNuxtMeta(merged));
+useHead(toNuxtMeta(merged));
 </script>
 ```
 
