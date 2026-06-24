@@ -3,6 +3,8 @@ function toNuxtMeta(meta) {
   const ogTitle = meta.openGraph?.title ?? meta.title;
   const ogDescription = meta.openGraph?.description ?? meta.description;
   const output = {};
+  if (meta.title)
+    output.title = meta.title;
   if (meta.description)
     output.description = meta.description;
   if (meta.robots)
@@ -38,4 +40,4 @@ export {
   toNuxtMeta
 };
 
-//# debugId=BB46711CC0B6406E64756E2164756E21
+//# debugId=D7FF5DF793F9FD6164756E2164756E21

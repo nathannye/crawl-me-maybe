@@ -1,3 +1,4 @@
-import type { MetaFlatInput } from "zhead";
+import type { Head, MetaFlatInput } from "zhead";
 import type { MergedMetadata } from "./merge";
-export declare function toNuxtMeta(meta: MergedMetadata): MetaFlatInput;
+export type NuxtMeta = MetaFlatInput & Pick<Head, "title">;
+export declare function toNuxtMeta(meta: MergedMetadata): NuxtMeta;

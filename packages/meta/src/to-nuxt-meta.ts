@@ -1,12 +1,15 @@
-import type { MetaFlatInput } from "zhead";
+import type { Head, MetaFlatInput } from "zhead";
 import type { MergedMetadata } from "./merge";
 
-export function toNuxtMeta(meta: MergedMetadata): MetaFlatInput {
+export type NuxtMeta = MetaFlatInput & Pick<Head, "title">;
+
+export function toNuxtMeta(meta: MergedMetadata): NuxtMeta {
 	const ogTitle = meta.openGraph?.title ?? meta.title;
 	const ogDescription = meta.openGraph?.description ?? meta.description;
 
-	const output: MetaFlatInput = {};
+	const output: NuxtMeta = {};
 
+	if (meta.title) output.title = meta.title;
 	if (meta.description) output.description = meta.description;
 	if (meta.robots) output.robots = meta.robots;
 	if (ogTitle) output.ogTitle = ogTitle;

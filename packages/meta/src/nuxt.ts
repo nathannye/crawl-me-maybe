@@ -1,2 +1,2 @@
 export type { MergedMetadata } from "./merge";
-export { toNuxtMeta } from "./to-nuxt-meta";
+export { toNuxtMeta, type NuxtMeta } from "./to-nuxt-meta";
