@@ -60,5 +60,9 @@ export function toNextMeta(meta: MergedMetadata): Metadata {
 		};
 	}
 
+	if (meta.faviconUrl) {
+		output.icons = meta.faviconUrl;
+	}
+
 	return output;
 }

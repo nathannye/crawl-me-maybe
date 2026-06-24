@@ -1,4 +1,3 @@
-import type { SanityImageAssetDocument } from "@sanity/client";
 type OpenGraphType = "website" | "article" | "product";
 type TwitterCardStyle = "summary_large_image" | "summary" | "app" | "player";
 type TwitterMetadata = {
@@ -18,7 +17,7 @@ export type GlobalSeoSettings = {
     pageTitleTemplate: string;
     metaDescription?: string;
     siteUrl: string;
-    favicon?: SanityImageAssetDocument;
+    faviconUrl?: string;
     defaultMetaImage?: string;
     twitterHandle?: string;
 };
@@ -42,6 +41,7 @@ export type MergedMetadata = {
     description?: string;
     canonicalUrl?: string;
     metaImage?: string;
+    faviconUrl?: string;
     twitterHandle?: string;
     robots?: string;
     schemaMarkup?: string;

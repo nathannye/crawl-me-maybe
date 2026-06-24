@@ -83,6 +83,7 @@ If you use [`@crawl-me-maybe/sanity-plugin-seo`](../sanity-plugin-seo), the Stud
 |---|---|---|
 | `globalSeoSettings` | `globalSeoDefaults` | `siteTitle`, `pageTitleTemplate`, `siteUrl`, `metaDescription`, `twitterHandle` |
 | `globalSeoSettings.defaultMetaImage` | `defaultMetaImage` | Resolve to a URL string in GROQ |
+| `globalSeoSettings.favicon` | `faviconUrl` | Resolve to a URL string in GROQ (`favicon.asset->url`) |
 | Page `title` + `slug` | `page.title`, `page.slug` | Required for title templates and self-canonical URLs |
 | `pageMetadata.description` | `page.description` | Merged with `globalSeoSettings.metaDescription` |
 | `pageMetadata.metaImage` | `page.metaImage` | Resolve to a URL string in GROQ; overrides `defaultMetaImage` |
@@ -120,7 +121,8 @@ These examples assume the `pageMetadata` field is named `seo` on your page docum
   metaDescription,
   siteUrl,
   twitterHandle,
-  "defaultMetaImage": defaultMetaImage.asset->url
+  "defaultMetaImage": defaultMetaImage.asset->url,
+  "faviconUrl": favicon.asset->url
 }
 ```
 
@@ -216,11 +218,11 @@ const { title, tags, links } = toHtmlTags(merged);
 </>
 ```
 
-OG tags use `property`, standard and Twitter tags use `name`. Canonical URLs are returned in `links`.
+OG tags use `property`, standard and Twitter tags use `name`. Canonical URLs and favicons are returned in `links` (`rel: "canonical"` and `rel: "icon"`).
 
 ### Next.js (`/next`)
 
-Import from the `/next` subpath. Returns a Next.js App Router `Metadata` object.
+Import from the `/next` subpath. Returns a Next.js App Router `Metadata` object. Favicon URLs map to `icons`.
 
 ```typescript
 // app/about/page.tsx
@@ -239,7 +241,7 @@ Requires `next` as a peer dependency.
 
 ### Nuxt (`/nuxt`)
 
-Import from the `/nuxt` subpath. Returns a `NuxtMeta` object (flat SEO fields plus `title`) compatible with `useHead()`.
+Import from the `/nuxt` subpath. Returns a `NuxtMeta` object compatible with [`useHead()`](https://nuxt.com/docs/4.x/api/composables/use-head) — `title`, `meta[]`, and `link[]`. Use `useHead`, not `useSeoMeta`.
 
 ```vue
 <script setup lang="ts">
@@ -248,8 +250,25 @@ import { toNuxtMeta } from "@crawl-me-maybe/meta/nuxt";
 
 const merged = buildMetadata(page, globalSeoDefaults);
 
+// title, meta tags, canonical link, and favicon link
 useHead(toNuxtMeta(merged));
 </script>
+```
+
+Example output shape:
+
+```ts
+{
+  title: "About Us | My Website",
+  meta: [
+    { name: "description", content: "..." },
+    { property: "og:title", content: "..." },
+  ],
+  link: [
+    { rel: "canonical", href: "https://example.com/about" },
+    { rel: "icon", href: "https://cdn.sanity.io/.../favicon.svg" },
+  ],
+}
 ```
 
 ---

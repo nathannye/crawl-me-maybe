@@ -44,10 +44,13 @@ function toNextMeta(meta) {
       ...meta.metaImage ? { images: [meta.metaImage] } : {}
     };
   }
+  if (meta.faviconUrl) {
+    output.icons = meta.faviconUrl;
+  }
   return output;
 }
 export {
   toNextMeta
 };
 
-//# debugId=2AC17F8BE522B14A64756E2164756E21
+//# debugId=4CB60BCFB4EBB11464756E2164756E21

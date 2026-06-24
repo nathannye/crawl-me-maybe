@@ -111,7 +111,8 @@ var buildMetadata = (page, seoDefaults, options) => {
       description: seoDefaults?.metaDescription,
       canonicalUrl: seoDefaults?.siteUrl,
       twitterHandle: seoDefaults?.twitterHandle,
-      metaImage: seoDefaults?.defaultMetaImage
+      metaImage: seoDefaults?.defaultMetaImage,
+      faviconUrl: seoDefaults?.faviconUrl
     };
   }
   if (!seoDefaults) {
@@ -149,6 +150,7 @@ var buildMetadata = (page, seoDefaults, options) => {
     description,
     canonicalUrl,
     metaImage: pageMeta?.metaImage ?? seoDefaults.defaultMetaImage,
+    faviconUrl: seoDefaults.faviconUrl,
     twitter,
     openGraph,
     robots,
@@ -226,6 +228,9 @@ function toHtmlTags(meta) {
   if (meta.canonicalUrl) {
     links.push({ rel: "canonical", href: meta.canonicalUrl });
   }
+  if (meta.faviconUrl) {
+    links.push({ rel: "icon", href: meta.faviconUrl });
+  }
   return {
     title: meta.title ?? "",
     tags,
@@ -238,4 +243,4 @@ export {
   buildMetadata
 };
 
-//# debugId=B6DCA358EB910DDF64756E2164756E21
+//# debugId=760C4DE7847108F464756E2164756E21

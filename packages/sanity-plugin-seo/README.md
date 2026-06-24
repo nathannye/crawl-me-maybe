@@ -206,6 +206,7 @@ The plugin schemas map directly to `buildMetadata()` inputs — no adapter layer
 |---|---|---|
 | `globalSeoSettings` | `globalSeoDefaults` (`GlobalSeoSettings`) | `siteTitle`, `pageTitleTemplate`, `siteUrl`, `metaDescription`, `twitterHandle` |
 | `globalSeoSettings.defaultMetaImage` | `defaultMetaImage` | Resolve to a URL string in GROQ (`defaultMetaImage.asset->url`) |
+| `globalSeoSettings.favicon` | `faviconUrl` | Resolve to a URL string in GROQ (`favicon.asset->url`) |
 | Page `title` + `slug` | `page.title`, `page.slug` | Required for title templates and self-canonical URLs |
 | `pageMetadata.description` | `page.description` | Falls back to `globalSeoSettings.metaDescription` |
 | `pageMetadata.metaImage` | `page.metaImage` | Resolve to a URL string in GROQ; falls back to `defaultMetaImage` |
@@ -234,7 +235,8 @@ The plugin schemas map directly to `buildMetadata()` inputs — no adapter layer
   metaDescription,
   siteUrl,
   twitterHandle,
-  "defaultMetaImage": defaultMetaImage.asset->url
+  "defaultMetaImage": defaultMetaImage.asset->url,
+  "faviconUrl": favicon.asset->url
 }
 ```
 

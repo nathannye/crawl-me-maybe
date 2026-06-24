@@ -1,4 +1,3 @@
-import type { SanityImageAssetDocument } from "@sanity/client";
 import { createMetaTitle } from "./meta-title";
 import { isAbsoluteUrl, normalizeUrl, resolveCanonicalUrl } from "./url";
 
@@ -24,7 +23,7 @@ export type GlobalSeoSettings = {
 	pageTitleTemplate: string;
 	metaDescription?: string;
 	siteUrl: string;
-	favicon?: SanityImageAssetDocument;
+	faviconUrl?: string;
 	defaultMetaImage?: string;
 	twitterHandle?: string;
 };
@@ -50,6 +49,7 @@ export type MergedMetadata = {
 	description?: string;
 	canonicalUrl?: string;
 	metaImage?: string;
+	faviconUrl?: string;
 	twitterHandle?: string;
 	robots?: string;
 	schemaMarkup?: string;
@@ -174,6 +174,7 @@ export const buildMetadata = (
 			canonicalUrl: seoDefaults?.siteUrl,
 			twitterHandle: seoDefaults?.twitterHandle,
 			metaImage: seoDefaults?.defaultMetaImage,
+			faviconUrl: seoDefaults?.faviconUrl,
 		};
 	}
 
@@ -226,6 +227,7 @@ export const buildMetadata = (
 		description: description,
 		canonicalUrl: canonicalUrl,
 		metaImage: pageMeta?.metaImage ?? seoDefaults.defaultMetaImage,
+		faviconUrl: seoDefaults.faviconUrl,
 		twitter: twitter,
 		openGraph: openGraph,
 		robots: robots,

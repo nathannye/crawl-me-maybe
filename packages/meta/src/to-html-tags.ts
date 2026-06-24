@@ -98,6 +98,10 @@ export function toHtmlTags(meta: MergedMetadata): HtmlTagsOutput {
 		links.push({ rel: "canonical", href: meta.canonicalUrl });
 	}
 
+	if (meta.faviconUrl) {
+		links.push({ rel: "icon", href: meta.faviconUrl });
+	}
+
 	return {
 		title: meta.title ?? "",
 		tags,
