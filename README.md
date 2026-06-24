@@ -41,7 +41,7 @@ yarn add @crawl-me-maybe/sanity-plugin-seo
 
 ---
 
-### Frontend Metadata Transformer
+### Metadata
 
 Runtime helpers to merge page and global SEO metadata and generate meta titles.
 
