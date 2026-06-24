@@ -14,7 +14,7 @@
     "react": "19.2.4",
     "react-dom": "19.2.4",
     "@crawl-me-maybe/meta": "workspace:*",
-    "@crawl-me-maybe/schema-markup": "workspace:*",
+    "@crawl-me-maybe/schema": "workspace:*",
     "@crawl-me-maybe/sitemap": "workspace:*"
   },
   "devDependencies": {

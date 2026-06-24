@@ -6,7 +6,7 @@ SEO utilities for Sanity-driven sites: merge page and global metadata, generate 
 
 Built to pair with [`@crawl-me-maybe/sanity-plugin-seo`](../sanity-plugin-seo) in Sanity Studio. The plugin's `globalSeoSettings` document and `pageMetadata` object match the `GlobalSeoSettings` and `RawPageMetadata` types that `buildMetadata()` accepts.
 
-For Schema.org JSON-LD, use [`@crawl-me-maybe/schema-markup`](../schema-markup).
+For Schema.org JSON-LD, use [`@crawl-me-maybe/schema`](../schema-markup).
 
 ## Table of contents
 

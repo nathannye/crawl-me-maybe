@@ -196,7 +196,7 @@ Preview-enabled array field for robots.txt entries. Disabled by setting `global.
 
 This plugin only stores SEO metadata inside Sanity. Your app is responsible for reading these fields and rendering meta tags, canonical URLs, schema markup, robots.txt, and sitemap.xml.
 
-[`@crawl-me-maybe/meta`](../meta) handles the metadata side — merging page and global defaults, title templates, Open Graph, Twitter cards, and canonical URLs. [`@crawl-me-maybe/sitemap`](../sitemap) and [`@crawl-me-maybe/schema-markup`](../schema-markup) cover sitemaps, robots.txt, and JSON-LD.
+[`@crawl-me-maybe/meta`](../meta) handles the metadata side — merging page and global defaults, title templates, Open Graph, Twitter cards, and canonical URLs. [`@crawl-me-maybe/sitemap`](../sitemap) and [`@crawl-me-maybe/schema`](../schema-markup) cover sitemaps, robots.txt, and JSON-LD.
 
 ### With `@crawl-me-maybe/meta`
 

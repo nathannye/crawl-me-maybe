@@ -18,7 +18,7 @@ Sanity Studio
 
 Your app / site
   ├── @crawl-me-maybe/meta                ← merge page + global metadata
-  ├── @crawl-me-maybe/schema-markup       ← derive JSON-LD from Sanity content
+  ├── @crawl-me-maybe/schema       ← derive JSON-LD from Sanity content
   └── @crawl-me-maybe/sitemap             ← generate sitemap.xml and robots.txt
 ```
 
@@ -84,10 +84,10 @@ Includes typed builders for many Google-supported rich result schemas, including
 [See docs](./packages/schema-markup)
 
 ```bash
-npm install @crawl-me-maybe/schema-markup
-pnpm add @crawl-me-maybe/schema-markup
-bun add @crawl-me-maybe/schema-markup
-yarn add @crawl-me-maybe/schema-markup
+npm install @crawl-me-maybe/schema
+pnpm add @crawl-me-maybe/schema
+bun add @crawl-me-maybe/schema
+yarn add @crawl-me-maybe/schema
 ```
 
 ---

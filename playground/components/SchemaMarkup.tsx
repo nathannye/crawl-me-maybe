@@ -1,4 +1,4 @@
-import { buildSchemaMarkup } from "@crawl-me-maybe/schema-markup";
+import { buildSchemaMarkup } from "@crawl-me-maybe/schema";
 
 export default function SchemaMarkup() {
 	const schema = buildSchemaMarkup({

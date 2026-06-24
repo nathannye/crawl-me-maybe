@@ -1,4 +1,4 @@
-# @crawl-me-maybe/schema-markup
+# @crawl-me-maybe/schema
 
 Schema markup should be generated from your content model, not rebuilt beside it. If editors update the content, the schema should update with it.
 
@@ -19,10 +19,10 @@ Schema markup should be generated from your content model, not rebuilt beside it
 ## Install
 
 ```bash
-npm install @crawl-me-maybe/schema-markup
-pnpm add @crawl-me-maybe/schema-markup
-bun add @crawl-me-maybe/schema-markup
-yarn add @crawl-me-maybe/schema-markup
+npm install @crawl-me-maybe/schema
+pnpm add @crawl-me-maybe/schema
+bun add @crawl-me-maybe/schema
+yarn add @crawl-me-maybe/schema
 ```
 
 ---
@@ -76,7 +76,7 @@ import {
   buildArticle,
   buildBreadcrumbListSchema,
   buildSchemaMarkup,
-} from "@crawl-me-maybe/schema-markup";
+} from "@crawl-me-maybe/schema";
 
 const schemas = buildSchemaMarkup({
   identity: {
