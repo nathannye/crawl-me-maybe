@@ -1,3 +1,6 @@
+<img width="1060" height="272" alt="crawl-me-maybe-thumb" src="https://github.com/user-attachments/assets/daf50064-4d4b-44c5-a9f5-4a9106f6e219" />
+<br/>
+
 # Crawl me maybe
 
 Framework-agnostic tools for CMS-driven SEO.
