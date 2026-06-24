@@ -19,7 +19,7 @@ export function vitePluginSitemap(config: SitemapConfig) {
 		domain,
 		entries: pluginConfig.sitemaps,
 		maxUrls: pluginConfig.maxUrls,
-		locales: pluginConfig.locales,
+		localization: pluginConfig.localization,
 	});
 
 	const writeRobots = (sitemapIndex = "sitemap.xml") => {

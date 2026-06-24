@@ -133,14 +133,14 @@ See [Locales](docs/locales.md) for locale expansion patterns.
 
 ## Locale support
 
-Pass a `locales` config to opt into automatic expansion and hreflang alternates. Omit it to control paths yourself.
+Pass a `localization` config to opt into automatic expansion and hreflang alternates. Omit it to control paths yourself.
 
 **Automatic prefix mode:**
 
 ```ts
 vitePluginSitemap({
   domain: "https://example.com",
-  locales: {
+  localization: {
     locales: ["en", "fr"],
     defaultLocale: "en",
     mode: "prefix",
@@ -149,7 +149,7 @@ vitePluginSitemap({
 });
 ```
 
-**Manual mode** — omit `locales` and emit prefixed paths yourself:
+**Manual mode** — omit `localization` and emit prefixed paths yourself:
 
 ```ts
 vitePluginSitemap({

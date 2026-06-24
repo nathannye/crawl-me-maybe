@@ -174,7 +174,7 @@ export function createSitemapManifest(
 	const basePath = normalizeBasePath(options.basePath);
 	const maxUrls = normalizeMaxUrls(options.maxUrls, DEFAULT_MAX_URLS);
 	const definitions = normalizeSitemapDefinitions(options.entries, maxUrls);
-	const { locales } = options;
+	const { localization } = options;
 
 	const definitionCache = new Map<number, Promise<ResolvedSitemapPlan>>();
 
@@ -192,7 +192,7 @@ export function createSitemapManifest(
 			const concreteEntries = expandLocalizedEntries(
 				entries,
 				options.domain,
-				locales,
+				localization,
 			);
 			const chunks = chunkEntries(concreteEntries, definition.maxUrls);
 			const files: ResolvedSitemapFile[] = chunks.map((chunk, chunkIndex) => ({

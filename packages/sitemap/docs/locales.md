@@ -2,11 +2,11 @@
 
 ← [Package README](../README.md)
 
-Most multilingual sites fall into a few common patterns. Pass a `locales` config to the Vite plugin, `createSitemapManifest`, or `generateSitemap` to opt in. Define each page once using its default-locale path; the package expands it into locale-specific URLs and emits hreflang alternates.
+Most multilingual sites fall into a few common patterns. Pass a `localization` config to the Vite plugin, `createSitemapManifest`, or `generateSitemap` to opt in. Define each page once using its default-locale path; the package expands it into locale-specific URLs and emits hreflang alternates.
 
-When `locales` is omitted, entries are resolved against `domain` with no locale expansion and no hreflang alternates. Paths are still site-relative — manual mode controls how you structure those paths, not whether you can embed other origins.
+When `localization` is omitted, entries are resolved against `domain` with no locale expansion and no hreflang alternates. Paths are still site-relative — manual mode controls how you structure those paths, not whether you can embed other origins.
 
-`createSitemapManifest` and `generateSitemap` accept the same `locales` config as the Vite plugin, so alternates stay consistent across build-time and runtime output.
+`createSitemapManifest` and `generateSitemap` accept the same `localization` config as the Vite plugin, so alternates stay consistent across build-time and runtime output.
 
 ## Every page exists in every locale
 
@@ -15,7 +15,7 @@ Your site serves the same pages in every language. URLs use a locale prefix (`/f
 ```ts
 vitePluginSitemap({
   domain: "https://example.com",
-  locales: {
+  localization: {
     locales: ["en", "fr", "de"],
     defaultLocale: "en",
     mode: "prefix", // default
@@ -43,7 +43,7 @@ Not every page is translated. Limit an entry with `locales` — omit it to inclu
 ```ts
 vitePluginSitemap({
   domain: "https://example.com",
-  locales: {
+  localization: {
     locales: ["en", "fr", "de"],
     defaultLocale: "en",
     mode: "prefix",
@@ -65,7 +65,7 @@ The French version of a page has its own slug. `path` is always the default-loca
 ```ts
 vitePluginSitemap({
   domain: "https://example.com",
-  locales: {
+  localization: {
     locales: ["en", "fr"],
     defaultLocale: "en",
     mode: "prefix",
@@ -99,7 +99,7 @@ URLs are not prefixed — each locale has its own origin. Set `mode` to `"subdom
 // fr.example.com/a-propos
 vitePluginSitemap({
   domain: "https://example.com",
-  locales: {
+  localization: {
     locales: ["en", "fr"],
     defaultLocale: "en",
     mode: "subdomain",
@@ -121,7 +121,7 @@ vitePluginSitemap({
 // example.fr/a-propos
 vitePluginSitemap({
   domain: "https://example.com",
-  locales: {
+  localization: {
     locales: ["en", "fr"],
     defaultLocale: "en",
     mode: "domain",
@@ -141,7 +141,7 @@ vitePluginSitemap({
 
 ## Skip the locale system entirely
 
-Omit `locales` when you want to control URL structure yourself, or when locale handling does not fit a single expansion model. Paths remain site-relative; each manifest or plugin instance covers one `domain`.
+Omit `localization` when you want to control URL structure yourself, or when locale handling does not fit a single expansion model. Paths remain site-relative; each manifest or plugin instance covers one `domain`.
 
 **Prefix locales in `path` on a single domain:**
 
@@ -156,7 +156,7 @@ vitePluginSitemap({
 });
 ```
 
-Each path is resolved as `domain + path`. `locales` and `localePaths` on entries are ignored. You are responsible for emitting the correct path per locale — the package does not expand or link alternates.
+Each path is resolved as `domain + path`. Entry-level `locales` and `localePaths` are ignored. You are responsible for emitting the correct path per locale — the package does not expand or link alternates.
 
 **Separate domains require separate instances** — one manifest or plugin per origin:
 

@@ -15,7 +15,7 @@ export async function generateSitemap(
 	const processedUrls = expandLocalizedEntries(
 		entries,
 		domain,
-		options.locales,
+		options.localization,
 	);
 
 	return createSitemapXml(processedUrls);

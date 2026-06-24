@@ -93,7 +93,7 @@ export type SitemapDefinition = SitemapEntrySource | {
 /** Low-level options for {@link generateSitemap}. */
 export type GenerateSitemapOptions = {
     entries: SitemapEntrySource;
-    locales?: SitemapLocaleConfig;
+    localization?: SitemapLocaleConfig;
 };
 /** Low-level options for {@link generateSitemapIndex}. */
 export type GenerateSitemapIndexOptions = {
@@ -126,8 +126,8 @@ export type CreateSitemapManifestOptions = {
     maxUrls?: number;
     /** Single sitemap source or named sitemap definitions. */
     entries: SitemapEntrySource | Record<string, SitemapDefinition>;
-    /** Locale configurations for automatic locale-aware sitemap generation. */
-    locales?: SitemapLocaleConfig;
+    /** Localization settings for automatic locale-aware sitemap generation. */
+    localization?: SitemapLocaleConfig;
 };
 /** Runtime manifest interface. */
 export type SitemapManifest = {
@@ -164,6 +164,6 @@ export type SitemapConfig = {
      * The correct `Sitemap:` lines are always appended automatically.
      */
     robots?: RobotsRule | RobotsRule[];
-    /** Locale configurations for automatic locale-aware sitemap generation. */
-    locales?: SitemapLocaleConfig;
+    /** Localization settings for automatic locale-aware sitemap generation. */
+    localization?: SitemapLocaleConfig;
 };

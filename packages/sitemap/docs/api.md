@@ -39,7 +39,7 @@ Every entry's `path` must be site-relative (e.g. `/about`). The site origin is s
 | `basePath` | `string` | Stable child route base path, defaulting to `/sitemap`. |
 | `maxUrls` | `number` | Default maximum URLs per child sitemap file, defaulting to `50_000`. |
 | `entries` | `SitemapEntrySource` or `Record<string, SitemapDefinition>` | Single sitemap source or a named sitemap map. |
-| `locales` | `SitemapLocaleConfig` | Locale expansion rules for automatic hreflang generation. |
+| `localization` | `SitemapLocaleConfig` | Locale expansion rules for automatic hreflang generation. |
 
 ## Vite plugin options (`vitePluginSitemap`)
 
@@ -50,7 +50,7 @@ Every entry's `path` must be site-relative (e.g. `/about`). The site origin is s
 | `sitemaps` | source or object | A single sitemap source, or named sitemap definitions with optional per-sitemap `maxUrls`. |
 | `maxUrls` | `number` | Default split threshold used when a named sitemap definition omits `maxUrls`. |
 | `robots` | `RobotsRule` or array | Crawler rules used when writing `robots.txt`. |
-| `locales` | `SitemapLocaleConfig` | Locale expansion rules for automatic hreflang generation. |
+| `localization` | `SitemapLocaleConfig` | Locale expansion rules for automatic hreflang generation. |
 
 ## Low-level primitives
 

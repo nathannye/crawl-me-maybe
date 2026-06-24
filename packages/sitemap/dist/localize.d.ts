@@ -7,6 +7,6 @@ import type { SitemapEntry, SitemapEntryWithAlternates, SitemapLocaleConfig } fr
 export declare function resolveUrl(path: string, domain: string): string;
 /**
  * Expands a set of sitemap entries into concrete URLs with optional hreflang alternates.
- * When no locale config is provided, entries are emitted exactly once without alternates.
+ * When no localization config is provided, entries are emitted exactly once without alternates.
  */
-export declare function expandLocalizedEntries(baseEntries: SitemapEntry[], domain: string, locales?: SitemapLocaleConfig): SitemapEntryWithAlternates[];
+export declare function expandLocalizedEntries(baseEntries: SitemapEntry[], domain: string, localization?: SitemapLocaleConfig): SitemapEntryWithAlternates[];

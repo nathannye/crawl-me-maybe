@@ -147,4 +147,4 @@ export async function GET(
 
 ## Localized runtime sitemaps
 
-`createSitemapManifest` accepts the same `locales` config as the Vite plugin and `generateSitemap`, so alternates stay consistent across root and child routes. See [locales.md](./locales.md).
+`createSitemapManifest` accepts the same `localization` config as the Vite plugin and `generateSitemap`, so alternates stay consistent across root and child routes. See [locales.md](./locales.md).

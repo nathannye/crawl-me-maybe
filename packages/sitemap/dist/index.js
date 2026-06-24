@@ -89,37 +89,37 @@ function resolveUrl(path, domain) {
 }
 function validateLocaleConfig(config) {
   if (!config || typeof config !== "object") {
-    throw new Error("sitemap locales config must be an object");
+    throw new Error("sitemap localization config must be an object");
   }
   if (!Array.isArray(config.locales) || config.locales.length === 0) {
-    throw new Error("sitemap locales config must include at least one locale");
+    throw new Error("sitemap localization config must include at least one locale");
   }
   if (new Set(config.locales).size !== config.locales.length) {
-    throw new Error("sitemap locales config locales must not contain duplicates");
+    throw new Error("sitemap localization config locales must not contain duplicates");
   }
   if (!config.defaultLocale || typeof config.defaultLocale !== "string") {
-    throw new Error("sitemap locales config must include a defaultLocale");
+    throw new Error("sitemap localization config must include a defaultLocale");
   }
   if (!config.locales.includes(config.defaultLocale)) {
-    throw new Error(`sitemap locales config defaultLocale "${config.defaultLocale}" must exist in locales`);
+    throw new Error(`sitemap localization config defaultLocale "${config.defaultLocale}" must exist in locales`);
   }
   const mode = config.mode ?? "prefix";
   if (!["prefix", "subdomain", "domain"].includes(mode)) {
-    throw new Error(`sitemap locales config mode "${mode}" is not supported`);
+    throw new Error(`sitemap localization config mode "${mode}" is not supported`);
   }
   if (mode !== "prefix") {
     if (!config.domainByLocale || typeof config.domainByLocale !== "object") {
-      throw new Error(`sitemap locales config domainByLocale is required for ${mode} mode`);
+      throw new Error(`sitemap localization config domainByLocale is required for ${mode} mode`);
     }
     for (const locale of config.locales) {
       const base = config.domainByLocale[locale];
       if (!base || typeof base !== "string") {
-        throw new Error(`sitemap locales config domainByLocale must include a valid base domain for locale "${locale}"`);
+        throw new Error(`sitemap localization config domainByLocale must include a valid base domain for locale "${locale}"`);
       }
     }
   }
   if (typeof config.xDefault === "string" && !config.locales.includes(config.xDefault)) {
-    throw new Error(`sitemap locales config xDefault locale "${config.xDefault}" must exist in locales`);
+    throw new Error(`sitemap localization config xDefault locale "${config.xDefault}" must exist in locales`);
   }
 }
 function getLocaleBaseDomain(domain, config, localeCode) {
@@ -128,7 +128,7 @@ function getLocaleBaseDomain(domain, config, localeCode) {
     return domain;
   const mappedDomain = config.domainByLocale?.[localeCode];
   if (!mappedDomain) {
-    throw new Error(`sitemap locales config domainByLocale is missing a base domain for locale "${localeCode}"`);
+    throw new Error(`sitemap localization config domainByLocale is missing a base domain for locale "${localeCode}"`);
   }
   return mappedDomain;
 }
@@ -155,13 +155,13 @@ function getEntryLocaleCodes(entry, config) {
   }
   for (const locale of entryLocales) {
     if (!configuredLocales.has(locale)) {
-      throw new Error(`sitemap entry locale "${locale}" is not present in the sitemap locales config`);
+      throw new Error(`sitemap entry locale "${locale}" is not present in the sitemap localization config`);
     }
   }
   if (entry.localePaths) {
     for (const locale of Object.keys(entry.localePaths)) {
       if (!configuredLocales.has(locale)) {
-        throw new Error(`sitemap entry localePaths locale "${locale}" is not present in the sitemap locales config`);
+        throw new Error(`sitemap entry localePaths locale "${locale}" is not present in the sitemap localization config`);
       }
     }
   }
@@ -184,31 +184,31 @@ function buildAlternates(entryPathByLocale, config, domain) {
   }
   return alternates;
 }
-function expandLocalizedEntries(baseEntries, domain, locales) {
-  if (!locales) {
+function expandLocalizedEntries(baseEntries, domain, localization) {
+  if (!localization) {
     return baseEntries.map(({ path, locales: _locales, localePaths: _localePaths, ...rest }) => ({
       ...rest,
       url: resolveUrl(path, domain)
     }));
   }
-  validateLocaleConfig(locales);
+  validateLocaleConfig(localization);
   const localizedEntries = [];
   for (const entry of baseEntries) {
     const { path, locales: entryLocales, localePaths, ...rest } = entry;
-    const localeCodes = getEntryLocaleCodes(entry, locales);
+    const localeCodes = getEntryLocaleCodes(entry, localization);
     if (localeCodes.length === 0)
       continue;
     const entryPathByLocale = new Map;
     for (const localeCode of localeCodes) {
-      const resolvedPath = localeCode === locales.defaultLocale ? path : localePaths?.[localeCode] ?? path;
+      const resolvedPath = localeCode === localization.defaultLocale ? path : localePaths?.[localeCode] ?? path;
       entryPathByLocale.set(localeCode, resolvedPath);
     }
-    const alternates = locales.alternates === false ? undefined : buildAlternates(entryPathByLocale, locales, domain);
+    const alternates = localization.alternates === false ? undefined : buildAlternates(entryPathByLocale, localization, domain);
     for (const localeCode of localeCodes) {
       const resolvedPath = entryPathByLocale.get(localeCode) ?? path;
       localizedEntries.push({
         ...rest,
-        url: localizeUrl(resolvedPath, localeCode, locales, domain),
+        url: localizeUrl(resolvedPath, localeCode, localization, domain),
         alternates
       });
     }
@@ -322,7 +322,7 @@ function createSitemapXml(urls) {
 // src/sitemap.ts
 async function generateSitemap(domain, options) {
   const entries = await resolveSitemapEntrySource(options.entries);
-  const processedUrls = expandLocalizedEntries(entries, domain, options.locales);
+  const processedUrls = expandLocalizedEntries(entries, domain, options.localization);
   return createSitemapXml(processedUrls);
 }
 function generateSitemapIndex(domain, options) {
@@ -431,7 +431,7 @@ function createSitemapManifest(options) {
   const basePath = normalizeBasePath(options.basePath);
   const maxUrls = normalizeMaxUrls(options.maxUrls, DEFAULT_MAX_URLS);
   const definitions = normalizeSitemapDefinitions(options.entries, maxUrls);
-  const { locales } = options;
+  const { localization } = options;
   const definitionCache = new Map;
   function resolveDefinition(index) {
     const cached = definitionCache.get(index);
@@ -443,7 +443,7 @@ function createSitemapManifest(options) {
     }
     const promise = (async () => {
       const entries = await resolveSitemapEntrySource(definition.entries);
-      const concreteEntries = expandLocalizedEntries(entries, options.domain, locales);
+      const concreteEntries = expandLocalizedEntries(entries, options.domain, localization);
       const chunks = chunkEntries(concreteEntries, definition.maxUrls);
       const files = chunks.map((chunk, chunkIndex) => ({
         sitemap: definition.sitemap,
@@ -514,5 +514,5 @@ export {
   DEFAULT_ROBOTS_RULES
 };
 
-//# debugId=A8A0F416C79420EA64756E2164756E21
+//# debugId=BAE96AAF56349B3764756E2164756E21
 //# sourceMappingURL=index.js.map
