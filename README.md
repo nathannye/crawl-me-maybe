@@ -30,10 +30,13 @@ Your app / site
 
 ### Sanity Plugin
 
-
 Sanity Studio plugin with SEO fields, global defaults, and social/search preview cards.
 
 [See docs](./packages/sanity-plugin-seo)
+
+- Global `globalSeoSettings` defaults with per-page `pageMetadata` overrides
+- Live social previews for Facebook, Twitter/X, LinkedIn, and Google Search
+- Favicon preview and robots.txt rule builder in Studio
 
 ```bash
 npm install @crawl-me-maybe/sanity-plugin-seo
@@ -65,9 +68,13 @@ yarn add @crawl-me-maybe/meta
 
 ### Sitemap
 
-Minimal sitemap generator. Query your CMS, pass the result, done. Ships with Vite-Plugin and API-route friendly helpers that support localization and multiple sitemaps.
+Minimal sitemap generator. Query your CMS, pass the result, done.
 
 [See docs](./packages/sitemap)
+
+- Build-time generation with a Vite plugin, or runtime output from API routes
+- Localized sitemaps with hreflang alternates and multi-sitemap indexes
+- `robots.txt` generation with sitemap link — pairs with `sanity-plugin-seo` robots rules
 
 ```bash
 npm install @crawl-me-maybe/sitemap
@@ -82,9 +89,11 @@ yarn add @crawl-me-maybe/sitemap
 
 Builds Schema.org JSON-LD from Sanity content. Derive structured data from your existing content model — no extra editor fields required.
 
-Includes typed builders for many Google-supported rich result schemas, including `Article`, `Product`, `Event`, `FAQPage`, `LocalBusiness`, `Organization`, `WebPage`, `WebSite`, and more.
-
 [See docs](./packages/schema)
+
+- `buildSchemaMarkup` emits a JSON-LD graph for site identity, `WebSite`, and `WebPage`
+- Typed builders for Article, Product, Event, FAQPage, LocalBusiness, and more
+- Entity de-duping by `@id` when nested nodes reference the same thing
 
 ```bash
 npm install @crawl-me-maybe/schema
