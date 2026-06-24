@@ -24,7 +24,7 @@ Your app / site
   └── @crawl-me-maybe/sitemap             ← generate sitemap.xml, split sitemaps, and robots.txt
 ```
 
-> 🧠 Note: Use the whole stack together, or just the pieces you need. The packages are designed to work together, but can be used independently.
+> 🧠 Use the whole stack together, or just the pieces you need. The packages are designed to work together, but can be used independently.
 
 ## Packages
 
@@ -96,7 +96,7 @@ yarn add @crawl-me-maybe/sitemap
 
 ---
 
-## Schema.org Markup (JSON-LD)
+## Schema Markup
 
 Builds Schema.org JSON-LD from Sanity content. Derive structured data from your existing content model — no extra editor fields required.
 
