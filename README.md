@@ -12,6 +12,9 @@ Crawl me maybe takes the opposite approach. Editors fill in the few things that 
 ---
 
 
+> **ESM Only**: These packages does not ship a CommonJS build.
+
+
 ## How the packages fit together
 
 ```
