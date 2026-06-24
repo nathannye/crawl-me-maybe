@@ -216,7 +216,58 @@ function expandLocalizedEntries(baseEntries, domain, locales) {
   return localizedEntries;
 }
 
+// src/validate-video.ts
+function formatEntryContext(entryPath) {
+  return entryPath ? ` for sitemap entry "${entryPath}"` : "";
+}
+function validateSitemapVideos(videos, entryPath) {
+  const context = formatEntryContext(entryPath);
+  for (const [index, video] of videos.entries()) {
+    const label = `sitemap video[${index}]${context}`;
+    if (!video.title?.trim()) {
+      throw new Error(`${label} must include a non-empty title`);
+    }
+    if (!video.description?.trim()) {
+      throw new Error(`${label} must include a non-empty description`);
+    }
+    if (!video.thumbnailUrl?.trim()) {
+      throw new Error(`${label} must include a non-empty thumbnailUrl`);
+    }
+    if (!video.contentUrl?.trim() && !video.playerUrl?.trim()) {
+      throw new Error(`${label} must include contentUrl or playerUrl (at least one)`);
+    }
+    if (video.duration !== undefined) {
+      if (!Number.isInteger(video.duration) || video.duration <= 0) {
+        throw new Error(`${label} duration must be a positive integer (seconds)`);
+      }
+    }
+  }
+}
+
 // src/xml.ts
+function escapeXml(text) {
+  return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&apos;");
+}
+function createVideoXml(video) {
+  let xml = "<video:video>";
+  xml += `<video:thumbnail_loc>${video.thumbnailUrl}</video:thumbnail_loc>`;
+  xml += `<video:title>${escapeXml(video.title)}</video:title>`;
+  xml += `<video:description>${escapeXml(video.description)}</video:description>`;
+  if (video.contentUrl) {
+    xml += `<video:content_loc>${video.contentUrl}</video:content_loc>`;
+  }
+  if (video.playerUrl) {
+    xml += `<video:player_loc>${video.playerUrl}</video:player_loc>`;
+  }
+  if (video.duration !== undefined) {
+    xml += `<video:duration>${video.duration}</video:duration>`;
+  }
+  if (video.publicationDate) {
+    xml += `<video:publication_date>${video.publicationDate}</video:publication_date>`;
+  }
+  xml += "</video:video>";
+  return xml;
+}
 function createSitemapXml(urls) {
   try {
     const now = new Date().toISOString();
@@ -224,6 +275,9 @@ function createSitemapXml(urls) {
     let videoNS = false;
     let xhtmlNS = false;
     const items = urls.map((u) => {
+      if (u.videos?.length) {
+        validateSitemapVideos(u.videos);
+      }
       let xml = `<url><loc>${u.url}</loc><lastmod>${u.lastmod ?? now}</lastmod>`;
       if (u.changefreq) {
         xml += `<changefreq>${u.changefreq}</changefreq>`;
@@ -243,10 +297,10 @@ function createSitemapXml(urls) {
           xml += `<image:image><image:loc>${img}</image:loc></image:image>`;
         }
       }
-      if (u.videoUrls?.length) {
+      if (u.videos?.length) {
         videoNS = true;
-        for (const vid of u.videoUrls) {
-          xml += `<video:video><video:content_loc>${vid}</video:content_loc></video:video>`;
+        for (const video of u.videos) {
+          xml += createVideoXml(video);
         }
       }
       xml += "</url>";
@@ -460,5 +514,5 @@ export {
   DEFAULT_ROBOTS_RULES
 };
 
-//# debugId=366E02F54252DC6C64756E2164756E21
+//# debugId=A8A0F416C79420EA64756E2164756E21
 //# sourceMappingURL=index.js.map

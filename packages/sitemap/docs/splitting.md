@@ -35,7 +35,14 @@ export const sitemaps = {
         lastmod: "2025-05-15",
         changefreq: "weekly",
         priority: 0.9,
-        videoUrls: ["https://example.com/videos/widget.mp4"],
+        videos: [
+          {
+            title: "Widget demo",
+            description: "Product overview video",
+            thumbnailUrl: "https://example.com/images/widget-thumb.jpg",
+            contentUrl: "https://example.com/videos/widget.mp4",
+          },
+        ],
       },
     ],
     maxUrls: 10_000,

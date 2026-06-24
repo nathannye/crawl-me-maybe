@@ -6,11 +6,12 @@ This package takes a simpler approach. You provide routes, it generates sitemap.
 
 ## Features
 
-- Framework agnostic sitemap generation
+- Framework agnostic
 - Build-time generation with Vite
 - Runtime generation for ISR and SSR applications
 - Localized sitemaps with hreflang alternates
 - Split large sitemaps into numbered child files
+- Google image and video sitemap extensions
 - robots.txt generation with sitemap link
 
 ## Install
@@ -106,13 +107,25 @@ type SitemapEntry = {
   changefreq?: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never"
   priority?: number
   imageUrls?: string[]
-  videoUrls?: string[]
+  videos?: SitemapVideo[]
   locales?: string[]
   localePaths?: Record<string, string>
+}
+
+type SitemapVideo = {
+  title: string
+  description: string
+  thumbnailUrl: string
+  contentUrl?: string
+  playerUrl?: string
+  duration?: number
+  publicationDate?: string
 }
 ```
 
 - `path` must be site-relative, e.g. `/about` — not an absolute URL
+- `imageUrls` must be absolute image URLs — see [Image and video](#image-and-video)
+- `videos` uses absolute media URLs; `contentUrl` or `playerUrl` is required per video
 - `locales` limits which configured locales a page exists in (when locale expansion is enabled)
 - `localePaths` overrides the slug for specific locales
 
@@ -189,6 +202,32 @@ const indexXml = generateSitemapIndex("https://example.com", {
   sitemaps: ["/sitemap-0.xml", "/sitemap-1.xml"],
 });
 ```
+
+## Image and video
+
+**Images** — pass absolute URLs on `imageUrls`. The package emits `<image:loc>` inside the normal urlset.
+
+**Videos** — pass a `videos` array with Google-required metadata. URLs are absolute (CDN, Mux, YouTube embed, etc.) and are not joined with `domain`.
+
+```ts
+{
+  path: "/blog/hello-world",
+  lastmod: "2025-06-01",
+  imageUrls: ["https://cdn.example.com/images/hello-world.jpg"],
+  videos: [
+    {
+      title: "Hello World",
+      description: "A short intro video",
+      thumbnailUrl: "https://cdn.example.com/thumb.jpg",
+      contentUrl: "https://cdn.example.com/video.mp4",
+      duration: 183,
+      publicationDate: "2025-06-01T12:00:00+00:00",
+    },
+  ],
+}
+```
+
+Each video requires `title`, `description`, and `thumbnailUrl`, plus `contentUrl` or `playerUrl`. `duration` and `publicationDate` are optional. Locale expansion copies `videos` onto each expanded URL unchanged.
 
 ## API overview
 

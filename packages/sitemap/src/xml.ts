@@ -1,4 +1,40 @@
-import type { SitemapEntryWithAlternates } from "./types";
+import type { SitemapEntryWithAlternates, SitemapVideo } from "./types";
+import { validateSitemapVideos } from "./validate-video";
+
+function escapeXml(text: string): string {
+	return text
+		.replace(/&/g, "&amp;")
+		.replace(/</g, "&lt;")
+		.replace(/>/g, "&gt;")
+		.replace(/"/g, "&quot;")
+		.replace(/'/g, "&apos;");
+}
+
+function createVideoXml(video: SitemapVideo): string {
+	let xml = "<video:video>";
+	xml += `<video:thumbnail_loc>${video.thumbnailUrl}</video:thumbnail_loc>`;
+	xml += `<video:title>${escapeXml(video.title)}</video:title>`;
+	xml += `<video:description>${escapeXml(video.description)}</video:description>`;
+
+	if (video.contentUrl) {
+		xml += `<video:content_loc>${video.contentUrl}</video:content_loc>`;
+	}
+
+	if (video.playerUrl) {
+		xml += `<video:player_loc>${video.playerUrl}</video:player_loc>`;
+	}
+
+	if (video.duration !== undefined) {
+		xml += `<video:duration>${video.duration}</video:duration>`;
+	}
+
+	if (video.publicationDate) {
+		xml += `<video:publication_date>${video.publicationDate}</video:publication_date>`;
+	}
+
+	xml += "</video:video>";
+	return xml;
+}
 
 /**
  * Builds a urlset sitemap XML string from resolved entries.
@@ -14,6 +50,10 @@ export function createSitemapXml(urls: SitemapEntryWithAlternates[]): string {
 
 		const items: string = urls
 			.map((u) => {
+				if (u.videos?.length) {
+					validateSitemapVideos(u.videos);
+				}
+
 				let xml = `<url><loc>${u.url}</loc><lastmod>${u.lastmod ?? now}</lastmod>`;
 				if (u.changefreq) {
 					xml += `<changefreq>${u.changefreq}</changefreq>`;
@@ -33,10 +73,10 @@ export function createSitemapXml(urls: SitemapEntryWithAlternates[]): string {
 						xml += `<image:image><image:loc>${img}</image:loc></image:image>`;
 					}
 				}
-				if (u.videoUrls?.length) {
+				if (u.videos?.length) {
 					videoNS = true;
-					for (const vid of u.videoUrls) {
-						xml += `<video:video><video:content_loc>${vid}</video:content_loc></video:video>`;
+					for (const video of u.videos) {
+						xml += createVideoXml(video);
 					}
 				}
 				xml += "</url>";

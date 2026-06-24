@@ -13,7 +13,7 @@ type SitemapEntry = {
   changefreq?: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never"
   priority?: number
   imageUrls?: string[]
-  videoUrls?: string[]
+  videos?: SitemapVideo[]
   locales?: string[]
   localePaths?: Record<string, string>
 }

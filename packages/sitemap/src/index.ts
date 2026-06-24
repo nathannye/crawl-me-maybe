@@ -12,6 +12,7 @@ export type {
 	SitemapDefinition,
 	SitemapConfig,
 	SitemapEntry,
+	SitemapVideo,
 	SitemapLocaleConfig,
 	SitemapEntrySource,
 	SitemapEntryWithAlternates,

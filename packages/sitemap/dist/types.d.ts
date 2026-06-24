@@ -30,6 +30,26 @@ export type SitemapLocaleConfig = {
     xDefault?: boolean | string;
 };
 /**
+ * Video metadata for Google video sitemap extensions.
+ * See: https://developers.google.com/search/docs/crawling-indexing/sitemaps/video-sitemaps
+ */
+export type SitemapVideo = {
+    /** Video title (maps to video:title) */
+    title: string;
+    /** Video description (maps to video:description) */
+    description: string;
+    /** Thumbnail image URL (maps to video:thumbnail_loc) */
+    thumbnailUrl: string;
+    /** Direct video file URL (maps to video:content_loc) */
+    contentUrl?: string;
+    /** Embed player URL (maps to video:player_loc) */
+    playerUrl?: string;
+    /** Duration in seconds (maps to video:duration) */
+    duration?: number;
+    /** Publication date ISO 8601 string (maps to video:publication_date) */
+    publicationDate?: string;
+};
+/**
  * An entry describing a page for the sitemap.
  * See: https://www.sitemaps.org/protocol.html
  */
@@ -42,8 +62,8 @@ export type SitemapEntry = {
     changefreq?: "always" | "hourly" | "daily" | "weekly" | "monthly" | "yearly" | "never";
     /** Optional image URLs to associate with this entry (Google Images support) */
     imageUrls?: string[];
-    /** Optional video URLs to associate with this entry (Google Video support) */
-    videoUrls?: string[];
+    /** Optional video metadata for this entry (Google Video support) */
+    videos?: SitemapVideo[];
     /** 0.0–1.0 relative priority hint for crawlers */
     priority?: number;
     /** Locales this page exists in. Defaults to all configured locales. */
