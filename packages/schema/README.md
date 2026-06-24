@@ -172,9 +172,10 @@ Builders are exported from the package root.
 
 ### Site / structural entities
 
+Site identity (`Organization`, `Person`, or `LocalBusiness`) is emitted by `buildSchemaMarkup` via the `identity` option — not a separate builder.
+
 | Builder | Schema.org type |
 |---|---|
-| `buildOrganization` | `Organization` |
 | `buildLocalBusiness` | `LocalBusiness` |
 | `buildWebSite` | `WebSite` |
 | `buildWebPage` | `WebPage` |

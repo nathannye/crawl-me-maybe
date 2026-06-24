@@ -13,35 +13,6 @@ function createSchemaId({
   }
   return `${baseUrl}#${kind}-${normalizeId(name)}`;
 }
-function asIdReference(id) {
-  return { "@id": id };
-}
-function buildWebsiteReference(canonicalUrl) {
-  if (!canonicalUrl)
-    return;
-  return {
-    "@type": "WebSite",
-    "@id": `${canonicalUrl}#website`
-  };
-}
-function mapContactPoints(contactPoints) {
-  if (!contactPoints?.length)
-    return;
-  return contactPoints.map((cp) => ({
-    "@type": "ContactPoint",
-    contactType: cp.contactType,
-    telephone: cp.telephone,
-    email: cp.email,
-    url: cp.url,
-    areaServed: cp.areaServed,
-    availableLanguage: cp.availableLanguage
-  }));
-}
-function mapEntityReferences(entities, mapToReference, baseUrl) {
-  if (!entities?.length)
-    return;
-  return entities.map((entity) => mapToReference(entity, baseUrl)).filter(Boolean);
-}
 
 // src/utils/image.ts
 function buildImageObject(input) {
@@ -355,104 +326,10 @@ var buildJobPosting = defineBuilder("JobPosting");
 var buildLocalBusiness = defineBuilder("LocalBusiness");
 // src/builders/movie.ts
 var buildMovie = defineBuilder("Movie");
-// src/builders/utils.ts
-function buildOrganizationCore(org, baseUrl) {
-  const base = baseUrl || org.url || "";
-  const id = createSchemaId({
-    kind: "organization",
-    name: org.name,
-    baseUrl: base,
-    explicitId: org["@id"]
-  });
-  const departments = org.department ? org.department.map((dept) => buildOrgSchema(dept, true, baseUrl)).filter(Boolean) : undefined;
-  const contactPoint = mapContactPoints(org.contactPoint);
-  return {
-    "@type": "Organization",
-    "@id": id,
-    name: org.name,
-    url: org.url,
-    logo: buildImageObject(org.logo),
-    sameAs: org.sameAs,
-    department: departments,
-    contactPoint
-  };
-}
-function buildPersonSchema(person, asReference = false, baseUrl) {
-  if (!person)
-    return;
-  const base = baseUrl || "";
-  const id = createSchemaId({
-    kind: "person",
-    name: person.name,
-    baseUrl: base,
-    explicitId: person["@id"]
-  });
-  if (asReference) {
-    return asIdReference(id);
-  }
-  return {
-    "@type": "Person",
-    "@id": id,
-    name: person.name,
-    url: person.url,
-    sameAs: person.sameAs,
-    jobTitle: person.jobTitle,
-    image: buildImageObject(person.image)
-  };
-}
-function buildOrgSchema(org, asReference = false, baseUrl) {
-  if (!org)
-    return;
-  const base = baseUrl || org.url || "";
-  const id = createSchemaId({
-    kind: "organization",
-    name: org.name,
-    baseUrl: base,
-    explicitId: org["@id"]
-  });
-  if (asReference) {
-    return asIdReference(id);
-  }
-  return buildOrganizationCore(org, baseUrl);
-}
-function buildPersonOrOrg(entity, asReference = false, baseUrl) {
-  if (!entity)
-    return;
-  if ("jobTitle" in entity || !("logo" in entity)) {
-    return buildPersonSchema(entity, asReference, baseUrl);
-  }
-  return buildOrgSchema(entity, asReference, baseUrl);
-}
-function formatSchemaDate(date) {
-  if (!date)
-    return;
-  if (typeof date === "string") {
-    return date;
-  }
-  return date.toISOString();
-}
-
-// src/builders/organization.ts
-function buildOrganization(organization, baseUrl, asReference = false) {
-  const base = baseUrl || organization.url || "";
-  const id = createSchemaId({
-    kind: "organization",
-    name: organization.name,
-    baseUrl: base,
-    explicitId: organization["@id"]
-  });
-  if (asReference) {
-    return asIdReference(id);
-  }
-  return {
-    "@context": "https://schema.org",
-    ...buildOrganizationCore(organization, baseUrl)
-  };
-}
-// src/builders/profile-page.ts
-var buildProfilePage = defineBuilder("ProfilePage");
 // src/builders/product.ts
 var buildProduct = defineBuilder("Product");
+// src/builders/profile-page.ts
+var buildProfilePage = defineBuilder("ProfilePage");
 // src/builders/qa-page.ts
 var buildQAPage = defineBuilder("QAPage");
 // src/builders/question.ts
@@ -472,12 +349,6 @@ var buildWebPage = defineBuilder("WebPage");
 // src/builders/website.ts
 var buildWebSite = defineBuilder("WebSite");
 export {
-  normalizeId,
-  mapEntityReferences,
-  mapContactPoints,
-  formatSchemaDate,
-  createSchemaId,
-  buildWebsiteReference,
   buildWebSite,
   buildWebPage,
   buildVideoObject,
@@ -490,11 +361,6 @@ export {
   buildQAPage,
   buildProfilePage,
   buildProduct,
-  buildPersonSchema,
-  buildPersonOrOrg,
-  buildOrganizationCore,
-  buildOrganization,
-  buildOrgSchema,
   buildMovie,
   buildLocalBusiness,
   buildJobPosting,
@@ -510,9 +376,8 @@ export {
   buildArticle,
   buildAnswer,
   buildAggregateRating,
-  buildAboutPage,
-  asIdReference
+  buildAboutPage
 };
 
-//# debugId=353BAB7279BFA2D564756E2164756E21
+//# debugId=5F889F4F897E1F2564756E2164756E21
 //# sourceMappingURL=index.js.map
