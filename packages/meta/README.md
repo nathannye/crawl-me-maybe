@@ -1,3 +1,6 @@
+<img width="1590" height="408" alt="meta-thumb" src="https://github.com/user-attachments/assets/defbfb17-6b76-4c9d-91cd-84d5ea28b47c" />
+<br/>
+
 # @crawl-me-maybe/meta
 
 SEO utilities for Sanity-driven sites: merge page and global metadata, generate meta titles, and output framework-specific meta tags.
