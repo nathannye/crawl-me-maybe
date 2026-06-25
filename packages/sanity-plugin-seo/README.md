@@ -1,3 +1,6 @@
+<img width="1590" height="408" alt="sanity-plugin-thumb" src="https://github.com/user-attachments/assets/1069b4d7-7a3c-4ceb-b538-b0f3bcbe4c71" />
+<br/>
+
 # @crawl-me-maybe/sanity-plugin-seo
 
 SEO fields, global defaults, and social preview cards for Sanity Studio.
