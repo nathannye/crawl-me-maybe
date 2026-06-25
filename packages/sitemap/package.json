@@ -1,6 +1,6 @@
 {
 	"name": "@crawl-me-maybe/sitemap",
-	"version": "0.1.0",
+	"version": "0.1.1",
 	"type": "module",
 	"sideEffects": false,
 	"author": "Nathan Nye <nathan@nye.dev> (https://nye.dev)",

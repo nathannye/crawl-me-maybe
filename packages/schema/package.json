@@ -1,6 +1,7 @@
 {
 	"name": "@crawl-me-maybe/schema",
-	"version": "0.1.0",
+	"version": "0.1.1",
+	"sideEffects": false,
 	"type": "module",
 	"author": "Nathan Nye <nathan@nye.dev> (https://nye.dev)",
 	"license": "MIT",
