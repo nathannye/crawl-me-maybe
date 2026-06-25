@@ -1,3 +1,6 @@
+<img width="1590" height="408" alt="schema-thumb" src="https://github.com/user-attachments/assets/3afe5640-0396-48cd-abb9-8bfcae3ca7fc" />
+<br/>
+
 # @crawl-me-maybe/schema
 
 Schema markup should be generated from your content model, not rebuilt beside it. If editors update the content, the schema should update with it.
