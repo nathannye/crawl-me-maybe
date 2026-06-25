@@ -1,3 +1,6 @@
+<img width="1590" height="408" alt="sitemap-thumb" src="https://github.com/user-attachments/assets/3706d469-61fa-48f6-a0ec-f9d0c6795881" />
+<br/>
+
 # @crawl-me-maybe/sitemap
 
 Most sitemap generators either crawl your built site, scan your filesystem, or expect you to be using a specific framework.
