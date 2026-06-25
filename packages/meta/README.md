@@ -1,7 +1,5 @@
 # @crawl-me-maybe/meta
 
-> This library is under active development. APIs and data shapes may change.
-
 SEO utilities for Sanity-driven sites: merge page and global metadata, generate meta titles, and output framework-specific meta tags.
 
 Built to pair with [`@crawl-me-maybe/sanity-plugin-seo`](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/sanity-plugin-seo) in Sanity Studio. The plugin's `globalSeoSettings` document and `pageMetadata` object match the `GlobalSeoSettings` and `RawPageMetadata` types that `buildMetadata()` accepts.
