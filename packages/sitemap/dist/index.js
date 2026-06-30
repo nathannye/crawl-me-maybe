@@ -13,15 +13,6 @@ class SitemapPartNotFoundError extends Error {
     this.name = "SitemapPartNotFoundError";
   }
 }
-// src/resolve-entries.ts
-async function resolveSitemapEntrySource(source) {
-  const resolved = typeof source === "function" ? await source() : source;
-  if (!Array.isArray(resolved)) {
-    throw new Error("Sitemap entry source must resolve to an array of entries");
-  }
-  return resolved;
-}
-
 // src/domain.ts
 function normalizeDomain(domain) {
   return domain.replace(/\/+$/, "");
@@ -162,6 +153,15 @@ function expandLocalizedEntries(baseEntries, domain, localization) {
     }
   }
   return localizedEntries;
+}
+
+// src/resolve-entries.ts
+async function resolveSitemapEntrySource(source) {
+  const resolved = typeof source === "function" ? await source() : source;
+  if (!Array.isArray(resolved)) {
+    throw new Error("Sitemap entry source must resolve to an array of entries");
+  }
+  return resolved;
 }
 
 // src/validate-video.ts
@@ -477,7 +477,11 @@ function createSitemapManifest(options) {
     },
     async getSitemapFiles() {
       const files = await getAllFiles();
-      return files.map(({ sitemap, index, path }) => ({ sitemap, index, path }));
+      return files.map(({ sitemap, index, path }) => ({
+        sitemap,
+        index,
+        path
+      }));
     }
   };
 }
@@ -543,5 +547,5 @@ export {
   DEFAULT_ROBOTS_RULES
 };
 
-//# debugId=BBA651A28BA7A53764756E2164756E21
+//# debugId=09279C6698B1D2EA64756E2164756E21
 //# sourceMappingURL=index.js.map

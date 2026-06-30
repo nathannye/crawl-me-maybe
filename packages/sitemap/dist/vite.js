@@ -1,6 +1,19 @@
 // src/vite-plugin.ts
 import path2 from "node:path";
 
+// src/file.ts
+import { mkdirSync, writeFileSync } from "node:fs";
+import path from "node:path";
+var createFile = (outputPath, filename, content) => {
+  try {
+    const targetPath = path.join(outputPath, filename);
+    mkdirSync(path.dirname(targetPath), { recursive: true });
+    writeFileSync(targetPath, content);
+  } catch (err) {
+    throw new Error(`Failed to write file ${filename} to ${outputPath}: ${err instanceof Error ? err.message : String(err)}`);
+  }
+};
+
 // src/errors.ts
 class SitemapNotFoundError extends Error {
   constructor(sitemap) {
@@ -17,15 +30,6 @@ class SitemapPartNotFoundError extends Error {
   }
 }
 
-// src/resolve-entries.ts
-async function resolveSitemapEntrySource(source) {
-  const resolved = typeof source === "function" ? await source() : source;
-  if (!Array.isArray(resolved)) {
-    throw new Error("Sitemap entry source must resolve to an array of entries");
-  }
-  return resolved;
-}
-
 // src/domain.ts
 function normalizeDomain(domain) {
   return domain.replace(/\/+$/, "");
@@ -35,8 +39,8 @@ function normalizeDomainBase(domain) {
 }
 
 // src/localize.ts
-function resolveUrl(path, domain) {
-  const slug = path.startsWith("/") ? path.slice(1) : path;
+function resolveUrl(path2, domain) {
+  const slug = path2.startsWith("/") ? path2.slice(1) : path2;
   return new URL(slug, normalizeDomainBase(domain)).href;
 }
 function validateLocaleConfig(config) {
@@ -84,17 +88,17 @@ function getLocaleBaseDomain(domain, config, localeCode) {
   }
   return mappedDomain;
 }
-function localizeUrl(path, localeCode, config, domain) {
+function localizeUrl(path2, localeCode, config, domain) {
   const mode = config.mode ?? "prefix";
   const baseDomain = getLocaleBaseDomain(domain, config, localeCode);
   if (mode === "prefix") {
     if (localeCode === config.defaultLocale && !config.prefixDefault) {
-      return resolveUrl(path, domain);
+      return resolveUrl(path2, domain);
     }
     const prefixedBase = `${normalizeDomain(baseDomain)}/${localeCode}/`;
-    return resolveUrl(path, prefixedBase);
+    return resolveUrl(path2, prefixedBase);
   }
-  return resolveUrl(path, baseDomain);
+  return resolveUrl(path2, baseDomain);
 }
 function getEntryLocaleCodes(entry, config) {
   const configuredLocales = new Set(config.locales);
@@ -120,17 +124,17 @@ function getEntryLocaleCodes(entry, config) {
   return entryLocales;
 }
 function buildAlternates(entryPathByLocale, config, domain) {
-  const alternates = Array.from(entryPathByLocale.entries()).map(([localeCode, path]) => ({
+  const alternates = Array.from(entryPathByLocale.entries()).map(([localeCode, path2]) => ({
     hreflang: localeCode,
-    href: localizeUrl(path, localeCode, config, domain)
+    href: localizeUrl(path2, localeCode, config, domain)
   }));
   const xDefaultTarget = config.xDefault === true ? config.defaultLocale : typeof config.xDefault === "string" ? config.xDefault : undefined;
   if (xDefaultTarget && entryPathByLocale.has(xDefaultTarget)) {
-    const path = entryPathByLocale.get(xDefaultTarget);
-    if (path) {
+    const path2 = entryPathByLocale.get(xDefaultTarget);
+    if (path2) {
       alternates.push({
         hreflang: "x-default",
-        href: localizeUrl(path, xDefaultTarget, config, domain)
+        href: localizeUrl(path2, xDefaultTarget, config, domain)
       });
     }
   }
@@ -138,26 +142,26 @@ function buildAlternates(entryPathByLocale, config, domain) {
 }
 function expandLocalizedEntries(baseEntries, domain, localization) {
   if (!localization) {
-    return baseEntries.map(({ path, locales: _locales, localePaths: _localePaths, ...rest }) => ({
+    return baseEntries.map(({ path: path2, locales: _locales, localePaths: _localePaths, ...rest }) => ({
       ...rest,
-      url: resolveUrl(path, domain)
+      url: resolveUrl(path2, domain)
     }));
   }
   validateLocaleConfig(localization);
   const localizedEntries = [];
   for (const entry of baseEntries) {
-    const { path, locales: entryLocales, localePaths, ...rest } = entry;
+    const { path: path2, locales: entryLocales, localePaths, ...rest } = entry;
     const localeCodes = getEntryLocaleCodes(entry, localization);
     if (localeCodes.length === 0)
       continue;
     const entryPathByLocale = new Map;
     for (const localeCode of localeCodes) {
-      const resolvedPath = localeCode === localization.defaultLocale ? path : localePaths?.[localeCode] ?? path;
+      const resolvedPath = localeCode === localization.defaultLocale ? path2 : localePaths?.[localeCode] ?? path2;
       entryPathByLocale.set(localeCode, resolvedPath);
     }
     const alternates = localization.alternates === false ? undefined : buildAlternates(entryPathByLocale, localization, domain);
     for (const localeCode of localeCodes) {
-      const resolvedPath = entryPathByLocale.get(localeCode) ?? path;
+      const resolvedPath = entryPathByLocale.get(localeCode) ?? path2;
       localizedEntries.push({
         ...rest,
         url: localizeUrl(resolvedPath, localeCode, localization, domain),
@@ -166,6 +170,15 @@ function expandLocalizedEntries(baseEntries, domain, localization) {
     }
   }
   return localizedEntries;
+}
+
+// src/resolve-entries.ts
+async function resolveSitemapEntrySource(source) {
+  const resolved = typeof source === "function" ? await source() : source;
+  if (!Array.isArray(resolved)) {
+    throw new Error("Sitemap entry source must resolve to an array of entries");
+  }
+  return resolved;
 }
 
 // src/validate-video.ts
@@ -476,7 +489,11 @@ function createSitemapManifest(options) {
     },
     async getSitemapFiles() {
       const files = await getAllFiles();
-      return files.map(({ sitemap, index, path }) => ({ sitemap, index, path }));
+      return files.map(({ sitemap, index, path: path2 }) => ({
+        sitemap,
+        index,
+        path: path2
+      }));
     }
   };
 }
@@ -556,19 +573,6 @@ function validateConfig(config) {
   return config;
 }
 
-// src/file.ts
-import { mkdirSync, writeFileSync } from "node:fs";
-import path from "node:path";
-var createFile = (outputPath, filename, content) => {
-  try {
-    const targetPath = path.join(outputPath, filename);
-    mkdirSync(path.dirname(targetPath), { recursive: true });
-    writeFileSync(targetPath, content);
-  } catch (err) {
-    throw new Error(`Failed to write file ${filename} to ${outputPath}: ${err instanceof Error ? err.message : String(err)}`);
-  }
-};
-
 // src/vite-plugin.ts
 function vitePluginSitemap(config) {
   const pluginConfig = validateConfig(config);
@@ -614,5 +618,5 @@ export {
   vitePluginSitemap
 };
 
-//# debugId=D99D015353E7651664756E2164756E21
+//# debugId=01912838F5EA257D64756E2164756E21
 //# sourceMappingURL=vite.js.map
