@@ -11,7 +11,7 @@
 		"build:packages": "bun run --filter '*' build",
 		"prepare": "husky",
 		"precommit": "lint-staged",
-		"postversion": "bun run build:packages && git add . && git commit --amend --no-edit",
+		"postversion": "bun run build:packages",
 		"version:patch": "npm version patch",
 		"version:minor": "npm version minor",
 		"version:major": "npm version major"

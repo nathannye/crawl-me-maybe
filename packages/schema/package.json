@@ -22,7 +22,8 @@
 	"scripts": {
 		"lint": "biome check .",
 		"fix": "biome check --write .",
-		"build": "rm -rf dist && bun build src/index.ts --outdir dist --format esm --sourcemap --external schema-dts && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src"
+		"build": "rm -rf dist && bun build src/index.ts --outdir dist --format esm --sourcemap --external schema-dts && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src",
+		"prepublishOnly": "bun run build"
 	},
 	"dependencies": {
 		"schema-dts": "^1.1.5"

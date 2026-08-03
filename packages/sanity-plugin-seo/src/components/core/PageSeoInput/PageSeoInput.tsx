@@ -1,14 +1,14 @@
 import { Box, Flex } from "@sanity/ui";
 import { buildSrc } from "@sanity-image/url-builder";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { MdEdit, MdPreview } from "react-icons/md";
 import {
 	type ObjectInputProps,
-	useClient,
 	useDataset,
 	useFormValue,
 	useProjectId,
 } from "sanity";
+import { useSeoDefaults } from "../../../context/SeoDefaultsContext";
 import { concatenatePageTitle } from "../../../utils/string";
 import ButtonWithIcon from "../../partials/ButtonWithIcon";
 import FacebookCard from "../../socials/facebook/FacebookCard";
@@ -40,10 +40,14 @@ const PREVIEW_GROUPS = [
 	},
 ];
 
+function asString(value: unknown): string | undefined {
+	return typeof value === "string" ? value : undefined;
+}
+
 export default function PageSeoInput(props: ObjectInputProps) {
-	const client = useClient({ apiVersion: "2025-01-11" });
 	const dataset = useDataset();
 	const projectId = useProjectId();
+	const { seoDefaults, resolveValue } = useSeoDefaults();
 	const MODES = [
 		{ name: "fields", title: "Fields", icon: MdEdit },
 		{ name: "preview", title: "Preview", icon: MdPreview },
@@ -54,23 +58,19 @@ export default function PageSeoInput(props: ObjectInputProps) {
 	const [currentMode, setCurrentMode] = useState<SeoInputMode["name"]>(
 		MODES[0]?.name,
 	);
-	const [seoDefaults, setSeoDefaults] = useState<Record<
-		string,
-		unknown
-	> | null>(null);
 
-	useEffect(() => {
-		client.fetch(`*[_type == "globalSeoSettings"][0]`).then(setSeoDefaults);
-	}, [client]);
-
-	const document = useFormValue([]) || {};
+	const document = (useFormValue([]) || {}) as Record<string, unknown>;
 	const pageValue = (props.value || {}) as {
+		description?: unknown;
 		metaImage?: { asset?: { _ref?: string } };
 	};
 	const defaults = (seoDefaults || {}) as {
+		metaDescription?: unknown;
 		defaultMetaImage?: { asset?: { _ref?: string } };
-		siteTitle?: string;
-		pageTitleTemplate?: string;
+		siteTitle?: unknown;
+		pageTitleTemplate?: unknown;
+		twitterHandle?: unknown;
+		siteUrl?: unknown;
 	};
 
 	const previewImageUrl = useMemo(() => {
@@ -84,16 +84,22 @@ export default function PageSeoInput(props: ObjectInputProps) {
 		})?.src;
 	}, [dataset, defaults.defaultMetaImage, pageValue.metaImage, projectId]);
 
+	const resolvedDescription =
+		asString(resolveValue(pageValue.description)) ??
+		asString(resolveValue(defaults.metaDescription)) ??
+		"";
+
 	const seoData = {
-		...defaults,
-		...pageValue,
-		image: previewImageUrl,
-		title: concatenatePageTitle(
-			document?.title,
-			defaults.siteTitle,
-			defaults.pageTitleTemplate,
-		),
-		// merge description or other fields as needed
+		siteUrl: asString(resolveValue(defaults.siteUrl)) ?? "",
+		twitterHandle: asString(resolveValue(defaults.twitterHandle)),
+		image: previewImageUrl ?? "",
+		title:
+			concatenatePageTitle(
+				asString(resolveValue(document?.title)),
+				asString(resolveValue(defaults.siteTitle)),
+				asString(resolveValue(defaults.pageTitleTemplate)),
+			) ?? "",
+		description: resolvedDescription,
 	};
 
 	return (

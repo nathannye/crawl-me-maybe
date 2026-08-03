@@ -1,34 +1,47 @@
 import {
 	createContext,
+	type ReactNode,
 	useCallback,
 	useContext,
 	useEffect,
+	useMemo,
 	useState,
 } from "react";
 import { useClient } from "sanity";
+import type { ResolveValue } from "../types";
 
-const SeoDefaultsContext = createContext(null);
+type SeoDefaultsContextValue = {
+	seoDefaults: Record<string, unknown> | null;
+	resolveValue: ResolveValue;
+};
 
-export const SeoDefaultsProvider = ({ children }) => {
+const identityResolveValue: ResolveValue = (value) => value;
+
+const SeoDefaultsContext = createContext<SeoDefaultsContextValue>({
+	seoDefaults: null,
+	resolveValue: identityResolveValue,
+});
+
+type SeoDefaultsProviderProps = {
+	children: ReactNode;
+	resolveValue?: ResolveValue;
+};
+
+export const SeoDefaultsProvider = ({
+	children,
+	resolveValue = identityResolveValue,
+}: SeoDefaultsProviderProps) => {
 	const client = useClient({ apiVersion: "2025-01-11" });
-	const [defaults, setDefaults] = useState({
-		seoDefaults: null,
-	});
-
-	const cleanup = useCallback(() => {
-		if (cleanup.seoSub) {
-			cleanup.seoSub.unsubscribe();
-		}
-	}, []);
+	const [seoDefaults, setSeoDefaults] = useState<Record<
+		string,
+		unknown
+	> | null>(null);
 
 	const sub = useCallback(
-		(query: string, property: string) => {
+		(query: string) => {
 			return client.listen(query).subscribe((update) => {
 				if (update.result) {
-					setDefaults((prev) => ({
-						...prev,
-						[property]: update.result,
-					}));
+					setSeoDefaults(update.result as Record<string, unknown>);
 				}
 			});
 		},
@@ -36,22 +49,29 @@ export const SeoDefaultsProvider = ({ children }) => {
 	);
 
 	useEffect(() => {
-		const seoSub = sub(`*[_type == "globalSeoSettings"][0]`, "seoDefaults");
+		const seoSub = sub(`*[_type == "globalSeoSettings"][0]`);
 
-		cleanup.seoSub = seoSub;
+		client
+			.fetch(`*[_type == "globalSeoSettings"][0]`)
+			.then((result) =>
+				setSeoDefaults((result as Record<string, unknown> | null) ?? null),
+			);
 
-		client.fetch(`*[_type == "globalSeoSettings"][0]`).then((seoDefaults) =>
-			setDefaults((prev) => ({
-				...prev,
-				seoDefaults,
-			})),
-		);
+		return () => {
+			seoSub.unsubscribe();
+		};
+	}, [client, sub]);
 
-		return cleanup;
-	}, [client, cleanup, sub]);
+	const value = useMemo(
+		() => ({
+			seoDefaults,
+			resolveValue,
+		}),
+		[resolveValue, seoDefaults],
+	);
 
 	return (
-		<SeoDefaultsContext.Provider value={defaults}>
+		<SeoDefaultsContext.Provider value={value}>
 			{children}
 		</SeoDefaultsContext.Provider>
 	);

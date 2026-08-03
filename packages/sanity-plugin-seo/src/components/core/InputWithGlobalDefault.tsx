@@ -13,7 +13,7 @@ function hasContent(value: unknown): boolean {
 }
 
 export default function InputWithGlobalDefault(props: InputProps) {
-	const { seoDefaults } = useSeoDefaults();
+	const { seoDefaults, resolveValue } = useSeoDefaults();
 	const dataset = useDataset();
 	const projectId = useProjectId();
 
@@ -26,23 +26,27 @@ export default function InputWithGlobalDefault(props: InputProps) {
 		);
 	}
 
-	const value = props?.value;
-	const defaultValue = defaultFieldName
+	const isImageField = props?.schemaType?.name === "metaImage";
+	const rawValue = props?.value;
+	const rawDefault = defaultFieldName
 		? seoDefaults?.[defaultFieldName]
 		: null;
+
+	// Image fields keep raw asset objects; stringy fields go through resolveValue.
+	const value = isImageField ? rawValue : resolveValue(rawValue);
+	const defaultValue = isImageField ? rawDefault : resolveValue(rawDefault);
 	const hasDefault = hasContent(defaultValue);
 	const hasValue = hasContent(value);
-	const isImageField = props?.schemaType?.name === "metaImage";
 	const defaultText =
 		typeof defaultValue === "string" ? defaultValue.trim() : null;
 
 	const imageFallbackUrl = useMemo(() => {
-		if (!isImageField || !defaultValue || typeof defaultValue !== "object") {
+		if (!isImageField || !rawDefault || typeof rawDefault !== "object") {
 			return null;
 		}
 
 		const assetRef =
-			(defaultValue as { asset?: { _ref?: string } })?.asset?._ref ?? null;
+			(rawDefault as { asset?: { _ref?: string } })?.asset?._ref ?? null;
 		if (!assetRef) return null;
 
 		const src = buildSrc({
@@ -61,7 +65,7 @@ export default function InputWithGlobalDefault(props: InputProps) {
 		} catch {
 			return src;
 		}
-	}, [dataset, defaultValue, isImageField, projectId]);
+	}, [dataset, isImageField, projectId, rawDefault]);
 
 	const propsWithPlaceholder =
 		!hasValue && defaultText

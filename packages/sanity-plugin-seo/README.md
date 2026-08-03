@@ -18,6 +18,7 @@ Designed to pair with [`@crawl-me-maybe/meta`](https://github.com/nathannye/craw
   - [Custom canonical URLs](#custom-canonical-urls)
   - [Adding SEO fields to a page document](#adding-seo-fields-to-a-page-document)
   - [Studio structure — surfacing Global SEO Settings](#studio-structure--surfacing-global-seo-settings)
+  - [Field-level i18n (i18n-fields)](#field-level-i18n-i18n-fields)
 - [Favicons](#favicons)
 - [Robots.txt](#robotstxt)
 - [Frontend integration](#frontend-integration)
@@ -78,6 +79,9 @@ export default defineConfig({
 | `global.robots` | `boolean` | `true` | Includes the robots rules builder in Global SEO Settings |
 | `page.searchIndexing` | `boolean` | `true` | Includes noIndex / noFollow controls on the `pageMetadata` field |
 | `page.canonicalUrl` | `boolean` | `true` | Includes the canonical URL field on `pageMetadata`. Disable if you manage canonical via a custom reference field on the document |
+| `fieldTypes.metaDescription` | `string` | `"text"` | Base Sanity type for the shared `metaDescription` field |
+| `fieldTypes.metaTitle` | `string` | `"string"` | Base Sanity type for the shared `metaTitle` field |
+| `resolveValue` | `(value: unknown) => unknown` | identity | Studio helper that turns stored field values into scalars for placeholders, `hasContent`, and social previews |
 
 ### Custom canonical URLs
 
@@ -174,6 +178,69 @@ export default defineConfig({
     crawlMeMaybeSeo(),
   ],
 });
+```
+
+### Field-level i18n (i18n-fields)
+
+When using [sanity-plugin-i18n-fields](https://www.sanity.io/plugins/i18n-fields), swap the base types for `metaDescription` / `metaTitle` and provide a `resolveValue` so Studio can read a locale string out of the stored locale object.
+
+`i18n.text` / `i18n.string` store values like `{ _type: "i18n.text", en: "...", fr: "..." }` instead of plain strings. Without `resolveValue`, global-default placeholders and social preview cards cannot display those values.
+
+```ts
+// sanity.config.ts
+import { defineConfig } from "sanity";
+import crawlMeMaybeSeo from "@crawl-me-maybe/sanity-plugin-seo";
+import { I18nFields } from "sanity-plugin-i18n-fields";
+
+export default defineConfig({
+  plugins: [
+    I18nFields({
+      locales: [
+        { code: "en", title: "English", default: true },
+        { code: "fr", title: "French" },
+      ],
+    }),
+    crawlMeMaybeSeo({
+      fieldTypes: {
+        metaDescription: "i18n.text",
+        metaTitle: "i18n.string",
+      },
+      resolveValue: (value) => {
+        if (typeof value === "string") return value;
+        if (value && typeof value === "object" && !Array.isArray(value)) {
+          // Locale used for Studio placeholders + social previews
+          return (value as { en?: string }).en ?? null;
+        }
+        return null;
+      },
+    }),
+  ],
+});
+```
+
+`resolveValue` only affects Studio UI (placeholders, empty-state messaging, and preview cards). On the frontend, resolve the active locale before passing data to [`@crawl-me-maybe/meta`](https://github.com/nathannye/crawl-me-maybe/tree/main/packages/meta), which expects strings:
+
+```groq
+*[_type == "page" && slug.current == $slug][0]{
+  title,
+  "slug": { "current": slug.current },
+  "description": coalesce(seo.description[$locale], seo.description.en),
+  "canonicalUrl": seo.canonicalUrl,
+  "searchIndexing": seo.searchIndexing,
+  "metaImage": seo.metaImage.asset->url
+}
+```
+
+```groq
+*[_type == "globalSeoSettings"][0]{
+  siteTitle,
+  pageTitleTemplate,
+  "metaDescription": coalesce(metaDescription[$locale], metaDescription.en),
+  siteUrl,
+  twitterHandle,
+  "defaultMetaImage": defaultMetaImage.asset->url,
+  "faviconUrl": favicon.asset->url
+}
 ```
 
 ---
@@ -303,8 +370,8 @@ These named types are registered by the plugin and can be reused in your own sch
 
 | Type name | Base type | Description |
 |---|---|---|
-| `metaDescription` | `text` | 3-row textarea with 120–160 char warnings |
-| `metaTitle` | `string` | Single-line title field with 50–60 char warnings |
+| `metaDescription` | `text` (configurable via `fieldTypes.metaDescription`) | 3-row textarea with 120–160 char warnings when base type is `text` |
+| `metaTitle` | `string` (configurable via `fieldTypes.metaTitle`) | Single-line title field with 50–60 char warnings when base type is `string` |
 | `metaImage` | `image` | Standard image field for OG/social use |
 | `favicon` | `image` | Image with browser-tab preview component |
 | `searchIndexing` | `object` | noIndex + noFollow boolean controls |

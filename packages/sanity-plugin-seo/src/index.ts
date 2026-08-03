@@ -1,10 +1,10 @@
 import { definePlugin } from "sanity";
-import SeoLayoutWrapper from "./components/core/SeoLayoutWrapper";
+import createSeoLayoutWrapper from "./components/core/SeoLayoutWrapper";
 import buildDocuments from "./schemas/documents";
 import buildFieldTypes from "./schemas/fields";
 import type { PluginOptions } from "./types";
 
-export type { PluginOptions };
+export type { PluginOptions, ResolveValue } from "./types";
 
 export default definePlugin<PluginOptions | undefined>((options) => ({
 	name: "crawl-me-maybe",
@@ -17,7 +17,7 @@ export default definePlugin<PluginOptions | undefined>((options) => ({
 	},
 	studio: {
 		components: {
-			layout: SeoLayoutWrapper,
+			layout: createSeoLayoutWrapper(options?.resolveValue),
 		},
 	},
 }));

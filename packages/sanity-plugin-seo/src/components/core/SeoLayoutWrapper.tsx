@@ -1,8 +1,13 @@
 import type { LayoutProps } from "sanity";
 import { SeoDefaultsProvider } from "../../context/SeoDefaultsContext";
+import type { ResolveValue } from "../../types";
 
-export default function SeoLayoutWrapper(props: LayoutProps) {
-	return (
-		<SeoDefaultsProvider>{props.renderDefault(props)}</SeoDefaultsProvider>
-	);
+export default function createSeoLayoutWrapper(resolveValue?: ResolveValue) {
+	return function SeoLayoutWrapper(props: LayoutProps) {
+		return (
+			<SeoDefaultsProvider resolveValue={resolveValue}>
+				{props.renderDefault(props)}
+			</SeoDefaultsProvider>
+		);
+	};
 }

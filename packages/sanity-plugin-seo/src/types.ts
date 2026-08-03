@@ -7,6 +7,8 @@ export type PreviewCardProps = {
 	favicon?: string;
 };
 
+export type ResolveValue = (value: unknown) => unknown;
+
 export type PluginOptions = {
 	global?: {
 		/** Include the favicon field in Global SEO Settings (default: true) */
@@ -20,4 +22,16 @@ export type PluginOptions = {
 		/** Include canonicalUrl on page metadata (default: true). Disable if you use a custom reference field for canonical URLs. */
 		canonicalUrl?: boolean;
 	};
+	fieldTypes?: {
+		/** Base Sanity type for metaDescription (default: "text") */
+		metaDescription?: string;
+		/** Base Sanity type for metaTitle (default: "string") */
+		metaTitle?: string;
+	};
+	/**
+	 * Studio helper: turn a stored field value into a scalar for
+	 * hasContent / placeholders / social previews.
+	 * Also useful as a reference for how to resolve values on the frontend.
+	 */
+	resolveValue?: ResolveValue;
 };

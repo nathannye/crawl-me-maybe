@@ -28,7 +28,8 @@
 	"scripts": {
 		"lint": "biome check .",
 		"fix": "biome check --write .",
-		"build": "bun run build.ts && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src"
+		"build": "bun run build.ts && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src",
+		"prepublishOnly": "bun run build"
 	},
 	"dependencies": {
 		"zhead": "^2.2.4"

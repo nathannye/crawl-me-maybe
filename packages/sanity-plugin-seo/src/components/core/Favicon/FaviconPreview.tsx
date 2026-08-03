@@ -10,10 +10,11 @@ import styles from "./favicon-preview.module.css";
 import WindowControls from "./WindowControls";
 
 export default function FaviconPreview(props: ImageInputProps) {
-	const defaults = useSeoDefaults() as {
-		siteUrl?: string;
-		siteTitle?: string;
-	} | null;
+	const { seoDefaults } = useSeoDefaults();
+	const siteTitle =
+		typeof seoDefaults?.siteTitle === "string"
+			? seoDefaults.siteTitle
+			: undefined;
 	const theme = useRootTheme();
 	const dataset = useDataset();
 	const projectId = useProjectId();
@@ -55,7 +56,7 @@ export default function FaviconPreview(props: ImageInputProps) {
 				<Flex paddingX={4} paddingY={2} justify="flex-start" align="center">
 					<WindowControls />
 					<BrowserTab
-						title={defaults?.siteTitle}
+						title={siteTitle}
 						favicon={faviconUrl}
 						scheme={previewScheme}
 					/>

@@ -18,7 +18,8 @@
 		"dist"
 	],
 	"scripts": {
-		"build": "bun run build.ts && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src --noCheck"
+		"build": "bun run build.ts && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src --noCheck",
+		"prepublishOnly": "bun run build"
 	},
 	"dependencies": {
 		"@sanity-image/url-builder": "^1.1.0",
