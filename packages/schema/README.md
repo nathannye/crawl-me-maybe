@@ -343,12 +343,30 @@ Relative values are joined to `siteUrl`, keeping any base path. Empty input retu
 
 ### `buildImageObject(input)`
 
-Turns a URL string or `{ url, width, height }` into an `ImageObject`. Returns `undefined` for empty input.
+Turns a URL string or an object into an `ImageObject`, typed so it can be passed straight to any `image` or `logo` field. Returns `undefined` for empty input.
 
 ```ts
 buildImageObject("https://example.com/logo.png");
 buildImageObject({ url: image.url, width: 1200, height: 630 });
 ```
+
+The output always includes `contentUrl` alongside `url`, with the same value. Google's [image metadata](https://developers.google.com/search/docs/appearance/structured-data/image-license-metadata) feature requires `contentUrl`, and other uses such as logos read `url`.
+
+To show license and credit details in Google Images, add any of the image metadata fields:
+
+```ts
+buildImageObject({
+  url: image.url,
+  caption: image.alt,
+  creditText: "Acme Photography",
+  copyrightNotice: "© 2026 Acme",
+  license: "https://example.com/image-license",
+  acquireLicensePage: "https://example.com/licensing",
+  creator: identityRef,
+});
+```
+
+`creator` accepts `identityRef`, `buildPerson(...)`, `buildOrganization(...)`, or an `{ "@id" }` reference.
 
 ### Portable Text
 
@@ -437,10 +455,46 @@ Building blocks for properties like `offers`, `hasCourseInstance`, `location`, o
 | `buildOrganization` | `Organization` | `hiringOrganization`, `organizer`, `productionCompany` |
 | `buildHowToStep` | `HowToStep` | `recipeInstructions` on Recipe |
 | `buildNutritionInformation` | `NutritionInformation` | `nutrition` on Recipe |
+| `buildOfferShippingDetails` | `OfferShippingDetails` | `shippingDetails` on Offer |
+| `buildMerchantReturnPolicy` | `MerchantReturnPolicy` | `hasMerchantReturnPolicy` on Offer or Organization |
 
 `buildPerson` and `buildOrganization` are for other people and organizations on the page. For the site owner, use `identity` on `buildSchemaMarkup` and link to it with [`identityRef`](#identityref).
 
+**Product merchant listing example:**
+
+```ts
+buildProduct({
+  name: product.title,
+  image: buildImageObject(product.imageUrl),
+  offers: [
+    buildOffer({
+      price: product.price,
+      priceCurrency: "USD",
+      availability: "InStock",
+      shippingDetails: buildOfferShippingDetails({
+        shippingRate: buildMonetaryAmount({ value: 0, currency: "USD" }),
+        shippingDestination: { "@type": "DefinedRegion", addressCountry: "US" },
+        deliveryTime: {
+          "@type": "ShippingDeliveryTime",
+          handlingTime: { "@type": "QuantitativeValue", minValue: 0, maxValue: 1, unitCode: "DAY" },
+          transitTime: { "@type": "QuantitativeValue", minValue: 1, maxValue: 5, unitCode: "DAY" },
+        },
+      }),
+      hasMerchantReturnPolicy: buildMerchantReturnPolicy({
+        applicableCountry: "US",
+        returnPolicyCategory: "MerchantReturnFiniteReturnWindow",
+        merchantReturnDays: 30,
+        returnMethod: "ReturnByMail",
+        returnFees: "FreeReturn",
+      }),
+    }),
+  ],
+});
+```
+
 See Google's [structured data gallery](https://developers.google.com/search/docs/appearance/structured-data/search-gallery) for which schema types are eligible for rich results.
+
+> Google no longer lists FAQ or Course info rich results. `buildFAQPage`, and `offers` / `hasCourseInstance` on a Course, still produce valid Schema.org markup but won't earn a rich result. Google's Course list only needs `name`, `description`, and `provider` on each `Course`, plus an `ItemList` for the carousel.
 
 ---
 

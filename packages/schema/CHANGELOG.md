@@ -16,6 +16,13 @@ These change the JSON-LD that `buildSchemaMarkup` emits. No exports were removed
   GROQ projections no longer need `coalesce()` just to keep `null` out of the markup.
 - **Nested nodes no longer carry `@context`.** Only top-level nodes include it, so nesting
   builders (e.g. `buildAggregateRating` inside `buildProduct`) produces clean output.
+- **`buildImageObject` emits `contentUrl`** alongside `url`, with the same value. This also
+  applies to identity logos and images. Its return type is now `ImageObjectLeaf`, so the
+  output can be passed straight to builder `image` and `logo` fields.
+- **`schema-dts` upgraded to 2.0.** Builder types now follow Schema.org v30. `Quantity`
+  types such as `Duration`, `Distance`, `Energy`, and `Mass` are now plain strings, so object
+  forms like `{ "@type": "Duration", ... }` no longer type-check. Use ISO 8601 strings, e.g.
+  from `toIsoDuration`.
 
 ### Added
 
@@ -26,13 +33,16 @@ These change the JSON-LD that `buildSchemaMarkup` emits. No exports were removed
 - Nested builders: `buildOffer`, `buildAggregateOffer`, `buildMonetaryAmount`,
   `buildQuantitativeValue`, `buildBrand`, `buildCourseInstance`, `buildSchedule`,
   `buildPlace`, `buildPostalAddress`, `buildGeoCoordinates`, `buildPerson`,
-  `buildOrganization`, `buildHowToStep`, `buildNutritionInformation`.
+  `buildOrganization`, `buildHowToStep`, `buildNutritionInformation`,
+  `buildOfferShippingDetails`, `buildMerchantReturnPolicy`.
 - `toIsoDuration(parts)`: ISO 8601 durations from named parts, e.g.
   `toIsoDuration({ hours: 1, minutes: 30 })` returns `"PT1H30M"`.
 - `toIsoDate(value)`: accepts a `Date` or an ISO 8601 string. Keeps timezone offsets and
   rewrites `+hhmm` to `+hh:mm`.
 - `toAbsoluteUrl(value, siteUrl)`: resolves slugs and relative paths against `siteUrl`.
-- `buildImageObject` and the `ImageInput` type are now exported.
+- `buildImageObject` and the `ImageInput` type are now exported. The object input also accepts
+  Google's image metadata fields: `caption`, `creditText`, `copyrightNotice`, `license`,
+  `acquireLicensePage`, and `creator`.
 
 ### Upgrading
 
@@ -41,3 +51,5 @@ These change the JSON-LD that `buildSchemaMarkup` emits. No exports were removed
 - Replace inline site organizations in `mainEntity`, like
   `{ "@type": "Organization", name: siteName, url: siteUrl }`, with `identityRef`. The inline
   version creates a second organization that isn't linked to your site identity.
+- If you pass `Duration`, `Distance`, `Energy`, or `Mass` as objects, switch to strings,
+  e.g. `cookTime: toIsoDuration({ minutes: 45 })` or `calories: "240 calories"`.
