@@ -6,6 +6,7 @@ import type {
 	WithContext,
 } from "schema-dts";
 import { createSchemaId } from "./builders/fragments";
+import { IDENTITY_REF_ID } from "./identity-ref";
 import { buildImageObject, type ImageInput } from "./utils/image";
 
 type SchemaNode = Record<string, unknown>;
@@ -102,6 +103,18 @@ const hasId = (value: SchemaNode): value is SchemaNode & { "@id": string } => {
 	return typeof value["@id"] === "string" && value["@id"].length > 0;
 };
 
+const isEmptyValue = (value: unknown): boolean => {
+	if (value === null || value === undefined) return true;
+	if (typeof value === "string") return value.trim().length === 0;
+	if (Array.isArray(value)) return value.length === 0;
+	if (hasObjectShape(value)) {
+		return Object.keys(value).every(
+			(key) => key === "@type" || key === "@context",
+		);
+	}
+	return false;
+};
+
 const ensureContext = (node: SchemaNode): SchemaNode => {
 	if (hasType(node) && node["@context"] === undefined) {
 		return {
@@ -120,6 +133,7 @@ type RankedNode = {
 
 const assembleNodes = (
 	nodes: Array<Thing | SchemaNode | undefined>,
+	identityId: string,
 ): string[] => {
 	const collected: RankedNode[] = [];
 	const seenIds = new Set<string>();
@@ -141,10 +155,16 @@ const assembleNodes = (
 
 	const processValue = (value: unknown, isRoot = false): unknown => {
 		if (Array.isArray(value)) {
-			return value.map((item) => processValue(item, false));
+			return value
+				.map((item) => processValue(item, false))
+				.filter((item) => !isEmptyValue(item));
 		}
 
 		if (!hasObjectShape(value)) return value;
+
+		if (value["@id"] === IDENTITY_REF_ID) {
+			return { "@id": identityId };
+		}
 
 		if (!isRoot && hasType(value) && hasId(value)) {
 			registerEntity(value);
@@ -153,7 +173,10 @@ const assembleNodes = (
 
 		const output: SchemaNode = {};
 		for (const [key, child] of Object.entries(value)) {
-			output[key] = processValue(child, false);
+			if (!isRoot && key === "@context") continue;
+			const processed = processValue(child, false);
+			if (isEmptyValue(processed)) continue;
+			output[key] = processed;
 		}
 		return output;
 	};
@@ -193,13 +216,14 @@ const assembleNodes = (
 const buildIdentityNodes = (
 	identity: Identity,
 	siteUrl: string,
+	idBase: string,
 ): { node: SchemaNode; ref: { "@id": string } } => {
 	switch (identity.type) {
 		case "person": {
 			const id = createSchemaId({
 				kind: "person",
 				name: identity.name,
-				baseUrl: siteUrl,
+				baseUrl: idBase,
 			});
 			return {
 				node: {
@@ -218,7 +242,7 @@ const buildIdentityNodes = (
 			const id = createSchemaId({
 				kind: "organization",
 				name: identity.name,
-				baseUrl: siteUrl,
+				baseUrl: idBase,
 			});
 			return {
 				node: {
@@ -237,7 +261,7 @@ const buildIdentityNodes = (
 			const id = createSchemaId({
 				kind: "local-business",
 				name: identity.name,
-				baseUrl: siteUrl,
+				baseUrl: idBase,
 			});
 			return {
 				node: {
@@ -260,11 +284,13 @@ const buildIdentityNodes = (
 };
 
 export const buildSchemaMarkup = (input: BuildSchemaMarkupInput): string[] => {
-	const { node: identityNode, ref: identityRef } = buildIdentityNodes(
+	const idBase = input.siteUrl.replace(/\/+$/, "");
+	const { node: identityNode, ref: identityNodeRef } = buildIdentityNodes(
 		input.identity,
 		input.siteUrl,
+		idBase,
 	);
-	const websiteId = `${input.siteUrl}#website`;
+	const websiteId = `${idBase}#website`;
 
 	const websiteNode: SchemaNode = {
 		"@type": "WebSite",
@@ -272,7 +298,7 @@ export const buildSchemaMarkup = (input: BuildSchemaMarkupInput): string[] => {
 		name: input.siteName,
 		url: input.siteUrl,
 		description: input.siteDescription,
-		publisher: identityRef,
+		publisher: identityNodeRef,
 	};
 
 	const webpageNode: SchemaNode = {
@@ -286,5 +312,8 @@ export const buildSchemaMarkup = (input: BuildSchemaMarkupInput): string[] => {
 		mainEntity: input.mainEntity,
 	};
 
-	return assembleNodes([identityNode, websiteNode, webpageNode]);
+	return assembleNodes(
+		[identityNode, websiteNode, webpageNode],
+		identityNodeRef["@id"],
+	);
 };

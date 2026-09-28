@@ -15,6 +15,10 @@ Schema markup should be generated from your content model, not rebuilt beside it
 - [`mainEntity`](#mainentity)
 - [`@id` and de-duplication](#id-and-de-duplication)
 - [Rendering the graph](#rendering-the-graph)
+- [Nesting entities](#nesting-entities)
+- [Dates and durations](#dates-and-durations)
+- [Helpers](#helpers)
+- [Empty values](#empty-values)
 - [Supported schemas](#supported-schemas)
 - [With Sanity](#with-sanity)
 - [Core exports](#core-exports)
@@ -36,8 +40,11 @@ yarn add @crawl-me-maybe/schema
 - `buildSchemaMarkup` emits a JSON-LD graph for identity, `WebSite`, and `WebPage`
 - Typed builders for common Schema.org nodes, backed by `schema-dts`
 - Entity de-duping by `@id` when nested nodes reference the same entity
-- Identity roots for `Person`, `Organization`, and `LocalBusiness`
+- Identity roots for `Person`, `Organization`, and `LocalBusiness`, linkable from any page via `identityRef`
 - Utility builders for breadcrumbs, FAQ pages, products, articles, events, and more
+- Nested builders for offers, course instances, schedules, places, people, and more
+- Cleans the graph for you: nested `@context` and empty values (`null`, `""`, `[]`) are dropped
+- Small helpers for ISO 8601 durations and dates, and absolute URLs
 
 ## Why this exists
 
@@ -136,6 +143,10 @@ If multiple nodes reference the same entity, give them the same `@id`. The libra
 
 In most cases, `buildSchemaMarkup` handles page-level identity, `WebSite`, and `WebPage` IDs for you. You'll mainly care about `@id` when composing custom or nested entities manually.
 
+A nested node with both `@type` and `@id` is hoisted to its own top-level node in the graph, and replaced where it was nested with an `{ "@id": ... }` reference. To link to the site identity, use [`identityRef`](#identityref).
+
+Generated IDs ignore trailing slashes on `siteUrl`, so `https://example.com` and `https://example.com/` produce the same IDs.
+
 ---
 
 ## Rendering the graph
@@ -149,6 +160,189 @@ In most cases, `buildSchemaMarkup` handles page-level identity, `WebSite`, and `
   />
 ))}
 ```
+
+---
+
+## Nesting entities
+
+Nested values like a course's offers or instances need their own `@type`. Use a nested builder where one exists, or a plain object with `"@type"` for anything else:
+
+```ts
+import {
+  buildCourse,
+  buildCourseInstance,
+  buildOffer,
+  buildSchedule,
+  identityRef,
+  toIsoDate,
+  toIsoDuration,
+} from "@crawl-me-maybe/schema";
+
+const mainEntity = buildCourse({
+  name: course.title,
+  description: course.summary,
+  provider: identityRef,
+  offers: [
+    buildOffer({
+      category: "Paid",
+      price: course.price,
+      priceCurrency: "USD",
+    }),
+  ],
+  hasCourseInstance: [
+    buildCourseInstance({
+      courseMode: "Online",
+      courseWorkload: toIsoDuration({ hours: course.totalHours }),
+      courseSchedule: buildSchedule({
+        duration: toIsoDuration({ minutes: course.sessionMinutes }),
+        repeatFrequency: "P1W",
+        startDate: toIsoDate(course.startsAt),
+      }),
+    }),
+  ],
+  // No builder for this type — a plain object with "@type" works too.
+  audience: { "@type": "EducationalAudience", educationalRole: "student" },
+});
+```
+
+- Builders add their own `@context`. When nested, `buildSchemaMarkup` strips it, so only top-level nodes carry `@context`.
+- There is no automatic `@type` inference. Many properties accept more than one type (`author` can be a `Person` or `Organization`), and `@type` is what gives you accurate autocomplete from `schema-dts`.
+- The graph cleanup (nested `@context`, [empty values](#empty-values), and `identityRef`) only happens inside `buildSchemaMarkup`. If you serialize a builder's output yourself, it's emitted as-is.
+
+---
+
+## Dates and durations
+
+Schema.org expects ISO 8601 for dates and durations, but `schema-dts` types them as plain `string`, so nothing catches `"3 hours"` at compile time.
+
+| Format | Common fields |
+|---|---|
+| Duration (`PT1H30M`) | `Recipe.prepTime` / `cookTime` / `totalTime`, `VideoObject.duration`, `Movie.duration`, `Schedule.duration` / `repeatFrequency`, `CourseInstance.courseWorkload` |
+| Date / date-time (`2026-09-28`, `2026-09-28T13:00:00-06:00`) | `Article.datePublished` / `dateModified`, `Event.startDate` / `endDate`, `JobPosting.datePosted` / `validThrough`, `VideoObject.uploadDate`, `Offer.validFrom` / `validThrough` / `priceValidUntil`, `Schedule.startDate` / `endDate` |
+
+### `toIsoDuration(parts)`
+
+Takes an object of named parts, so the unit is always explicit:
+
+```ts
+toIsoDuration({ hours: 1, minutes: 30 });       // "PT1H30M"
+toIsoDuration({ seconds: video.duration });     // "PT183S"
+toIsoDuration({ minutes: recipe.cookMinutes }); // "PT45M"
+toIsoDuration({ weeks: 1 });                    // "P1W"
+toIsoDuration({ months: 1 });                   // "P1M"
+```
+
+- Accepts `years`, `months`, `weeks`, `days`, `hours`, `minutes`, and `seconds`.
+- Parts are emitted as given, without carrying over — `{ minutes: 90 }` is `"PT90M"`, which is valid ISO 8601.
+- Zero parts are omitted; all zeros gives `"PT0S"`.
+- Throws on negative or non-finite values, fractional values other than `seconds`, and `weeks` combined with other parts.
+
+### `toIsoDate(value)`
+
+Accepts a `Date` or an ISO 8601 string:
+
+```ts
+toIsoDate(new Date());                     // "2026-09-28T19:17:00.000Z"
+toIsoDate("2026-09-28T19:17:00.000Z");     // unchanged (Sanity datetime)
+toIsoDate("2026-09-28T13:00:00-06:00");    // unchanged, offset kept
+toIsoDate("2026-09-28T13:00+0600");        // "2026-09-28T13:00+06:00"
+toIsoDate("2026-09-28");                   // unchanged
+```
+
+- `Date` objects are converted to UTC with `toISOString()`.
+- Valid ISO strings are returned as written, so an editor's local time and offset survive. `+hhmm` offsets are rewritten to `+hh:mm`.
+- Date-times without an offset are passed through unchanged — the helper can't safely guess a timezone.
+- Anything else throws.
+
+---
+
+## Helpers
+
+### `identityRef`
+
+Page- and component-level code usually doesn't have the global identity config handy. Use `identityRef` anywhere an entity is expected, and `buildSchemaMarkup` resolves it to the `@id` of the identity node it emits:
+
+```ts
+// Page or component level
+const mainEntity = buildCourse({
+  name: course.title,
+  provider: identityRef,
+  publisher: identityRef,
+});
+
+// App level
+buildSchemaMarkup({
+  identity: { type: "organization", name: siteName },
+  siteUrl,
+  siteName,
+  pageUrl,
+  pageTitle,
+  mainEntity,
+});
+```
+
+Prefer this over inlining `{ "@type": "Organization", name: siteName, url: siteUrl }`. Without an `@id`, the inline version is a second organization that search engines can't link to your site identity.
+
+`identityRef` is a plain object (`{ "@id": "@identity" }`), so it survives being serialized across a server/client or loader boundary. It only resolves inside `buildSchemaMarkup`.
+
+### Reusing other entities
+
+For entities that appear in several places, like an instructor across courses, give them a stable `@id`. They're hoisted to top-level nodes and de-duplicated:
+
+```ts
+const instructor = buildPerson({
+  "@id": `${siteUrl}#instructor-jane`,
+  name: "Jane Doe",
+});
+
+buildCourse({
+  name: "Intro",
+  hasCourseInstance: [
+    buildCourseInstance({ courseMode: "Online", instructor: [instructor] }),
+  ],
+});
+```
+
+### `toAbsoluteUrl(value, siteUrl)`
+
+Search engines expect absolute URLs for `url`, `image`, and breadcrumb `item` values. CMS content usually gives you slugs or relative paths:
+
+```ts
+toAbsoluteUrl("/blog/post", "https://example.com");        // "https://example.com/blog/post"
+toAbsoluteUrl("blog/post", "https://example.com/");        // "https://example.com/blog/post"
+toAbsoluteUrl("/a", "https://example.com/docs");           // "https://example.com/docs/a"
+toAbsoluteUrl("https://cdn.sanity.io/x.jpg", siteUrl);     // unchanged
+toAbsoluteUrl("//cdn.example.com/x.jpg", "https://example.com"); // "https://cdn.example.com/x.jpg"
+toAbsoluteUrl(null, siteUrl);                              // undefined
+```
+
+Relative values are joined to `siteUrl`, keeping any base path. Empty input returns `undefined`, so the field is dropped from the graph.
+
+### `buildImageObject(input)`
+
+Turns a URL string or `{ url, width, height }` into an `ImageObject`. Returns `undefined` for empty input.
+
+```ts
+buildImageObject("https://example.com/logo.png");
+buildImageObject({ url: image.url, width: 1200, height: 630 });
+```
+
+### Portable Text
+
+For descriptions stored as Portable Text, convert to a plain string first — for example with `toPlainText` from [`@portabletext/toolkit`](https://github.com/portabletext/toolkit). This package has no Sanity dependency.
+
+---
+
+## Empty values
+
+`buildSchemaMarkup` drops values that carry no information before serializing:
+
+- `null` and `undefined`
+- empty or whitespace-only strings
+- empty arrays (after removing empty items)
+- objects with nothing besides `@type`
+
+`0` and `false` are kept. GROQ returns `null` for unset fields, so projections don't need `coalesce()` just to keep `null` out of the markup.
 
 ---
 
@@ -199,6 +393,29 @@ Site identity (`Organization`, `Person`, or `LocalBusiness`) is emitted by `buil
 | `buildQAPage` | `QAPage` |
 | `buildDiscussionForumPosting` | `DiscussionForumPosting` |
 | `buildItemList` | `ItemList` |
+
+### Nested values
+
+Building blocks for properties like `offers`, `hasCourseInstance`, `location`, or `author`. See [Nesting entities](#nesting-entities).
+
+| Builder | Schema.org type | Typical parent properties |
+|---|---|---|
+| `buildOffer` | `Offer` | `offers` on Product, Course, Event, SoftwareApplication |
+| `buildAggregateOffer` | `AggregateOffer` | `offers` with a price range (`lowPrice`, `highPrice`, `offerCount`) |
+| `buildMonetaryAmount` | `MonetaryAmount` | `baseSalary` on JobPosting |
+| `buildQuantitativeValue` | `QuantitativeValue` | `value` in MonetaryAmount, product dimensions |
+| `buildBrand` | `Brand` | `brand` on Product |
+| `buildCourseInstance` | `CourseInstance` | `hasCourseInstance` on Course |
+| `buildSchedule` | `Schedule` | `courseSchedule`, `eventSchedule` |
+| `buildPlace` | `Place` | `location` on Event, `jobLocation` on JobPosting |
+| `buildPostalAddress` | `PostalAddress` | `address` on Place, Organization, LocalBusiness |
+| `buildGeoCoordinates` | `GeoCoordinates` | `geo` on Place, LocalBusiness |
+| `buildPerson` | `Person` | `author`, `actor`, `director`, `instructor` on CourseInstance |
+| `buildOrganization` | `Organization` | `hiringOrganization`, `organizer`, `productionCompany` |
+| `buildHowToStep` | `HowToStep` | `recipeInstructions` on Recipe |
+| `buildNutritionInformation` | `NutritionInformation` | `nutrition` on Recipe |
+
+`buildPerson` and `buildOrganization` are for other people and organizations on the page. For the site owner, use `identity` on `buildSchemaMarkup` and link to it with [`identityRef`](#identityref).
 
 See Google's [structured data gallery](https://developers.google.com/search/docs/appearance/structured-data/search-gallery) for which schema types are eligible for rich results.
 
@@ -262,6 +479,10 @@ Pick the `build*` helper that matches your document type (`buildProduct`, `build
 
 - `buildSchemaMarkup` — builds the page-level JSON-LD graph
 - `build*` schema builders — typed builders for individual Schema.org nodes
+- `identityRef` — reference to the site identity, resolved by `buildSchemaMarkup`
+- `toIsoDuration`, `toIsoDate`, `DurationParts` — ISO 8601 duration and date helpers
+- `toAbsoluteUrl` — resolves slugs and relative paths against `siteUrl`
+- `buildImageObject`, `ImageInput` — `ImageObject` helper
 - `BuilderInput` — input helper type for builder functions
 - `BuildSchemaMarkupInput` — input type for `buildSchemaMarkup`
 - `Identity`, `PersonIdentity`, `OrganizationIdentity`, `LocalBusinessIdentity` — supported site identity roots
