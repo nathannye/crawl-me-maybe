@@ -19,6 +19,8 @@ export type BuildSchemaMarkupInput = {
 	pageUrl: string;
 	pageTitle: string;
 	pageDescription?: string;
+	/** BCP 47 language tag for the page content, e.g. `"fr"` or `"fr-CA"`. */
+	inLanguage?: string;
 	breadcrumb?: WithContext<BreadcrumbList>;
 	mainEntity?: Thing | SchemaNode;
 };
@@ -307,6 +309,7 @@ export const buildSchemaMarkup = (input: BuildSchemaMarkupInput): string[] => {
 		url: input.pageUrl,
 		name: input.pageTitle,
 		description: input.pageDescription,
+		inLanguage: input.inLanguage,
 		isPartOf: { "@id": websiteId },
 		breadcrumb: input.breadcrumb,
 		mainEntity: input.mainEntity,

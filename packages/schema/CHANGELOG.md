@@ -19,6 +19,8 @@ These change the JSON-LD that `buildSchemaMarkup` emits. No exports were removed
 
 ### Added
 
+- `inLanguage` on `buildSchemaMarkup`: a BCP 47 tag for the page content, emitted on the
+  `WebPage` node, e.g. `inLanguage: "fr"`.
 - `identityRef`: link to the site identity from page- or component-level code, e.g.
   `provider: identityRef`. `buildSchemaMarkup` resolves it to the identity node's `@id`.
 - Nested builders: `buildOffer`, `buildAggregateOffer`, `buildMonetaryAmount`,

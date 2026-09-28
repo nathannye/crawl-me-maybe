@@ -15,6 +15,7 @@ Schema markup should be generated from your content model, not rebuilt beside it
 - [`mainEntity`](#mainentity)
 - [`@id` and de-duplication](#id-and-de-duplication)
 - [Rendering the graph](#rendering-the-graph)
+- [Localized pages](#localized-pages)
 - [Nesting entities](#nesting-entities)
 - [Dates and durations](#dates-and-durations)
 - [Helpers](#helpers)
@@ -160,6 +161,28 @@ Generated IDs ignore trailing slashes on `siteUrl`, so `https://example.com` and
   />
 ))}
 ```
+
+---
+
+## Localized pages
+
+Pass `inLanguage` to set the language of the current page. It is emitted on the `WebPage` node only.
+
+```ts
+buildSchemaMarkup({
+  // ...
+  siteUrl: "https://example.com",
+  pageUrl: "https://example.com/fr/a-propos",
+  pageTitle: "À propos",
+  inLanguage: "fr",
+});
+```
+
+- Pass the language of the content that is actually rendered. If a `/fr/...` route falls back to English content, pass `"en"`.
+- Use a BCP 47 tag with hyphens (`fr-CA`, not `fr_CA`). Never pass `x-default`; it is an hreflang value, not a language.
+- Keep `siteUrl` as the root origin for every locale (`https://example.com`, not `https://example.com/fr`) so all locales share one `WebSite` `@id`.
+- Nested entities don't inherit it and don't need it. Set `inLanguage` on an entity only when its language differs from the page.
+- `inLanguage` does not replace hreflang. Localized alternates still come from your sitemap or `<link rel="alternate" hreflang>` tags.
 
 ---
 
