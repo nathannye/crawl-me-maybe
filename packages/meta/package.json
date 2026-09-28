@@ -1,7 +1,11 @@
 {
 	"name": "@crawl-me-maybe/meta",
 	"version": "0.1.2",
-	"sideEffects": false,
+	"sideEffects": [
+		"./src/index.ts",
+		"./src/next.ts",
+		"./src/nuxt.ts"
+	],
 	"type": "module",
 	"main": "./dist/index.js",
 	"types": "./dist/index.d.ts",
@@ -28,7 +32,7 @@
 	"scripts": {
 		"lint": "biome check .",
 		"fix": "biome check --write .",
-		"build": "bun run build.ts && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src",
+		"build": "bun run build.ts && node ../../scripts/check-exports.mjs dist/index.js dist/next.js dist/nuxt.js && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src",
 		"prepublishOnly": "bun run build"
 	},
 	"dependencies": {

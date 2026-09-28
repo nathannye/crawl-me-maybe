@@ -2,7 +2,10 @@
 	"name": "@crawl-me-maybe/sitemap",
 	"version": "0.1.2",
 	"type": "module",
-	"sideEffects": false,
+	"sideEffects": [
+		"./src/index.ts",
+		"./src/vite.ts"
+	],
 	"author": "Nathan Nye <nathan@nye.dev> (https://nye.dev)",
 	"license": "MIT",
 	"main": "./dist/index.js",
@@ -22,7 +25,7 @@
 		"docs"
 	],
 	"scripts": {
-		"build": "rm -rf dist && bun build src/index.ts --outdir dist --format esm --sourcemap && bun build src/vite.ts --outdir dist --format esm --sourcemap --target=node --external node:fs --external node:path && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src",
+		"build": "rm -rf dist && bun build src/index.ts --outdir dist --format esm --sourcemap && bun build src/vite.ts --outdir dist --format esm --sourcemap --target=node --external node:fs --external node:path && node ../../scripts/check-exports.mjs dist/index.js dist/vite.js && tsc -p tsconfig.json --declaration --emitDeclarationOnly --declarationDir dist --rootDir src",
 		"prepublishOnly": "bun run build"
 	},
 	"publishConfig": {

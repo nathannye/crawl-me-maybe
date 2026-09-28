@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.2.1
+
+### Fixed
+
+- **0.2.0 shipped a broken bundle.** `dist/index.js` exported `buildSchemaMarkup`,
+  `identityRef`, `buildImageObject`, `toIsoDuration`, `toIsoDate`, and `toAbsoluteUrl` without
+  defining them, so importing the package failed with
+  `Export 'buildSchemaMarkup' is not defined in module`. The cause was a Bun 1.3+ bundler
+  regression: with `"sideEffects": false`, Bun drops modules that the entry file re-exports
+  by name. `sideEffects` now lists the entry file, which keeps those modules in the bundle and
+  is still treated as side-effect-free by consumers' bundlers, since `src/` isn't published.
+- The build now fails if any exported name is missing from the bundle.
+
+If you installed 0.2.0, upgrade to 0.2.1. There are no API changes.
+
 ## 0.2.0
 
 ### Changed
